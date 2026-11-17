@@ -12,6 +12,8 @@ Cada batalha consiste em uma única rodada de rolagem. Após aplicar os resultad
 
 **Proposta:** ao adaptar uma carta para defesa reativa, preservar seu efeito e aplicá-lo à região atacada, sem exigir que o marcador esteja lá. A elegibilidade das demais cartas permanece pendente. Os estados específicos de Guarda Imperial, Praga Resistente e cartas piratas pertencem aos respectivos documentos de facção.
 
+**Definido; implementado no protótipo de quatro facções:** após a declaração de qualquer combate e antes da rolagem, o jogador dos Elfos pode usar Canção de paz para cancelá-lo, mesmo quando os Elfos não participam. Como em uma reação, gasta um marcador de ação disponível e descarta a carta. Resolva o combate como 0 a 0, sem dano aos lados: tropas movidas permanecem no destino, recursos gastos não voltam e cartas já declaradas e marcadores gastos não são recuperados, inclusive os de uma reação defensiva declarada anteriormente. A intervenção não torna os Elfos combatentes. A carta está em [Elfos](../faccoes/elfos.md).
+
 ## Rolagem e dano
 
 **Definido para teste; implementado.** Use as faces de [Dados](dados.md). Role um dado de ataque por tropa atacante no início da rodada e um dado de defesa para cada defensor que exceda o número de atacantes. Some espadas e cruzes; as baixas de ambos os lados são simultâneas. Cada dano aplicado elimina uma tropa.

@@ -4,13 +4,25 @@ Este módulo reúne regras comuns fora de combate, dados, mapa e pontuação. Pa
 
 ## Rodada e ações
 
-**Direção para teste; implementada como hipótese no protótipo.** Cada facção aloca até dois marcadores em regiões. A alocação é coletiva e, no protótipo, cada facção confirma quando termina, mesmo que use menos de dois. As ações são resolvidas sequencialmente; ao chegar sua vez, a facção escolhe uma carta compatível com um marcador disponível e o estado atual do tabuleiro.
+**Definido; implementado nos dois protótipos.** Cada facção coloca exatamente dois marcadores em regiões, um por vez. A primeira colocação cabe ao próximo jogador após o líder no sentido anti-horário; os demais seguem nesse sentido, com o líder por último. Repete-se a mesma volta para o segundo marcador. A resolução começa após todos colocarem seus dois marcadores.
 
-O protótipo usa marcadores públicos, ordem escolhida manualmente e alternância entre facções com marcadores disponíveis. A configuração padrão da mão é cinco cartas, ajustável de 1 a 10; no início de cada rodada, o jogo completa a mão e reembaralha o descarte se necessário. Passar consome o marcador escolhido. Consultar uma carta durante a alocação não a joga.
+**Direção para teste; implementada como hipótese no protótipo.** As ações são resolvidas sequencialmente; ao chegar sua vez, a facção escolhe uma carta compatível com um marcador disponível e o estado atual do tabuleiro.
+
+O protótipo usa marcadores públicos e alternância entre facções com marcadores disponíveis, começando pelo líder da rodada e seguindo sempre o sentido anti-horário da mesa. A pessoa escolhe apenas o primeiro jogador da partida; a sequência fixa de assentos é Império → Necromante → Piratas → Elfos → Império no protótipo de quatro facções e Império → Necromante → Piratas → Império no de três. A configuração padrão da mão é cinco cartas, ajustável de 1 a 10; no início de cada rodada, o jogo completa a mão e reembaralha o descarte se necessário. Passar uma ação consome o marcador escolhido. Consultar uma carta durante a alocação não a joga.
 
 **Definido; implementado:** a compra normal de cartas ocorre antes da fase de alocação de marcadores. Como exceção, as cartas que mandam descartar toda a mão também compram imediatamente até ter cinco cartas, mesmo durante a resolução. Durante a resolução, o jogador pode descartar uma carta da mão usando um marcador disponível, inclusive quando não puder jogar nenhuma carta. O descarte de uma carta com marcador não gera compra imediata.
 
-**Pendente:** procedimento de liderança, passagem de liderança, ordem definitiva de alocação e resolução, visibilidade dos marcadores, quantidade e política de reposição, passe e tratamento de ações cujo alvo se torna inválido. O uso de cartas que envolvem múltiplas regiões ou qualquer lugar também precisa de revisão.
+## Liderança por leilão
+
+**Definido; implementado nos dois protótipos:** no início de cada rodada há uma disputa de liderança por cartas, depois da compra e antes da alocação. Cada carta tem valor de liderança entre 0 e 3; cartas mais versáteis tendem a valer mais e as de valor 3 devem ser raras. Os valores individuais definidos pelo usuário para teste estão nos documentos de cada facção; o balanceamento não é final.
+
+As facções revelam cartas para disputar a liderança; um novo lance precisa superar o anterior. Cartas oferecidas permanecem abertas até o fim do leilão e não podem ser substituídas: o jogador pode acrescentar cartas ao próprio lance. O vencedor joga primeiro e descarta suas cartas comprometidas; os demais recuperam as suas. O leilão não implica compra imediata após o descarte. Após o líder, segue-se a ordem anti-horária da mesa. Se ninguém fizer um lance positivo, mantém-se o líder anterior; na primeira rodada, ele é escolhido manualmente.
+
+O líder anterior tem a primeira oportunidade de lance; na primeira rodada, usa-se o jogador inicial escolhido manualmente. A vez de ofertar segue a ordem anti-horária da mesa, pulando quem já passou e quem detém o maior lance. Passar retira o jogador do leilão. A disputa termina quando ninguém pode ou precisa cobrir o maior lance, ou quando todos passam sem lance positivo.
+
+## Demais questões da rodada
+
+**Pendente:** visibilidade dos marcadores, política de reposição, passe em ações e tratamento de ações cujo alvo se torna inválido. O uso de cartas que envolvem múltiplas regiões ou qualquer lugar também precisa de revisão.
 
 ## Domínio e coexistência
 

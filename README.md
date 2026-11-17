@@ -16,15 +16,17 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Facção e baralho dos Piratas | [Piratas](faccoes/piratas.md) |
 | Facção, baralho e magias do Necromante | [Necromante](faccoes/necromante.md) |
 | Facção, tecnologias, baralhos e impostos do Império | [Império — proposta](faccoes/imperio.md) |
-| Ideias para facções futuras | [Elfos](faccoes/elfos.md) · [Dragões](faccoes/dragoes.md) |
+| Facção e baralho dos Elfos | [Elfos](faccoes/elfos.md) |
+| Ideias para facções futuras | [Dragões](faccoes/dragoes.md) |
 | Ideias gerais em exploração | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) |
 | Estado, hipóteses, divergências e testes do jogo | [Estado do protótipo](prototipo/estado-e-testes.md) |
+| Planejamento do protótipo para quatro facções | [Plano de quatro facções](prototipo/plano-quatro-faccoes.md) |
 
-[Abrir o protótipo](mapa-conflito.html). A pessoa que testa controla manualmente as três facções, sem IA. O HTML contém o jogo e pode ser aberto localmente sem servidor.
+[Abrir o protótipo de quatro facções](mapa-quatro-faccoes.html) · [Abrir o protótipo anterior de três facções](mapa-conflito.html). As facções são controladas manualmente, sem IA. Cada jogo está em um único HTML que pode ser aberto localmente sem servidor; a nova versão não depende dos arquivos de instalação da anterior.
 
 ## Site e instalação no celular
 
-O fluxo em `.github/workflows/pages.yml` publica o jogo no GitHub Pages quando há alteração na branch `main`. Em **Settings → Pages**, selecione **GitHub Actions** como origem. O endereço esperado é `https://marcosvba.github.io/ConflictIslandBG/`.
+O fluxo em `.github/workflows/pages.yml` publica a versão anterior de três facções no GitHub Pages quando há alteração na branch `main`; o novo protótipo de quatro facções ainda não faz parte da publicação. Em **Settings → Pages**, selecione **GitHub Actions** como origem. O endereço esperado é `https://marcosvba.github.io/ConflictIslandBG/`.
 
 O site pode ser instalado pelo menu do navegador no Android ou, no iPhone, pelo Safari em **Compartilhar → Adicionar à Tela de Início**. Após a primeira visita online, o jogo pode abrir offline. A partida não é salva ao fechar ou recarregar. Trata-se de um aplicativo web instalável, sem APK ou distribuição por loja.
 
@@ -44,4 +46,4 @@ Os documentos anteriores foram preservados em [histórico](historico/README.md).
 
 ## Verificação local
 
-Com Node.js instalado, execute `node testes/validar-documentacao.cjs`. O teste compara dados dos módulos com o HTML e verifica cenários centrais; não substitui uma partida real nem inspeção visual.
+Com Node.js instalado, execute `node testes/validar-documentacao.cjs`, `node testes/validar-quatro-faccoes.cjs`, `node testes/validar-lideranca.cjs` e `node testes/validar-alocacao.cjs`. Os testes verificam dados e cenários centrais das duas versões; não substituem uma partida real nem inspeção visual.

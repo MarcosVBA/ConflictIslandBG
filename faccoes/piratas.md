@@ -35,3 +35,20 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 | Novas Comandante a Bordo | 2 | Qualquer lugar | Descarte toda a mão e compre até ter 5 cartas. |
 | Taverna Pirata | 3 | Região sobre seu controle | Adicione um bar pirata na região |
 | **Total** | **23** | | |
+
+## Liderança por carta
+
+**Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.
+
+| Carta | Liderança |
+| --- | ---: |
+| Invasão Costeira | 2 |
+| Ataque a Linha de Suprimentos | 1 |
+| Trabalhe enquanto eles dormem | 1 |
+| Carta de Corsário | 0 |
+| Serviço de Transporte Pirata | 0 |
+| Pirata Aprendiz | 1 |
+| Mercenários Piratas | 2 |
+| Atrás do Tesouro | 0 |
+| Novas Comandante a Bordo | 0 |
+| Taverna Pirata | 1 |

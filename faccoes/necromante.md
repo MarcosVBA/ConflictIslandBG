@@ -37,6 +37,23 @@ Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inic
 | Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento, pontue 2 por região com monumento, descarte toda a mão e compre até ter 5 cartas. |
 | **Total** | **22** | | |
 
+## Liderança por carta
+
+**Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.
+
+| Carta | Liderança |
+| --- | ---: |
+| Ataque Zumbi | 1 |
+| Infestação | 1 |
+| Horda interminável | 3 |
+| Praga Resistente | 0 |
+| Magia das Trevas | 1 |
+| Trabalhadores Zumbificado | 0 |
+| Projeto de Poder Maligno | 1 |
+| Despertar para a Morte | 2 |
+| Remanejando Mortos | 0 |
+| Monumento a Morte | 1 |
+
 ## Magias das Trevas
 
 | Magia | Custo | Alvo e efeito |

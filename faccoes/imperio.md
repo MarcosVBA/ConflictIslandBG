@@ -27,6 +27,13 @@ Efeitos de coleta aplicam-se uma vez por ação e não criam recurso sem coleta 
 Durante a construção: Mercado Local e Quartel exigem Serraria; Salão Imperial exige Mercado Local; Fortaleza exige Quartel, em outra região controlada.
 Pontue 1 ponto sempre que construir
 
+## Alistamento Obrigatório
+
+Todo turno, durante a alocação de marcadores, adicione uma tropa em qualquer região controlada.
+
+Se não houver regiões controladas, adicione duas tropas em uma região com menos tropas inimigas, no caso de empate, o jogador decide.
+
+**Implementação para teste:** o novo protótipo de quatro facções aplica essa habilidade uma vez por rodada, no início da alocação; o HTML anterior de três facções ainda não a inclui.
 
 ## Baralho principal proposto
 
@@ -35,14 +42,30 @@ Pontue 1 ponto sempre que construir
 | Marcha Imperial | 3 | Região adjacente a uma que você domina | Mova até 3 soldados de uma região adjacente para a região selecionada; Inicie uma batalha na região. |
 | Guarda Imperial | 2 | Ao ser atacado | Ignore até 1 danos às suas unidades nessa batalha. |
 | Tambores de Guerra | 2 | Região qualquer | Mova até 2 soldados adjacentes; Inicie batalha na região; ignore 1 dano às suas unidades na batalha. |
-| Alistamento | 3 | Região controlada | Pague 1 Ouro e adicione 2 soldados. |
+| Alistamento | 2 | Região controlada | Pague 1 Ouro e adicione 2 soldados. |
 | O Progresso | 3 | Região controlada sem construção imperial | Pague o custo de uma tecnologia disponível e construa-a. |
 | Assegurar Recursos para o Rei | 5 | Região com recurso disponível | Colete 1 recurso; descarte cópias adicionais da mão para coletar mais 1 do mesmo tipo por cópia. |
 | Reorganizar Contingente | 2 | Região com soldados imperiais | Mova até 3 soldados para uma região adjacente. |
 | Aliança com o Império | 1 | Região com outro jogador | Façam uma troca imediata de recursos sem limite, desde que ambos concordem |
 | Pagamento de Impostos | 3 | Região controlada | Pague o imposto ativo e pontue seu valor se puder arcar com o custo. |
-| **Total** | **24** | | |
+| **Total** | **23** | | |
 
+
+## Liderança por carta
+
+**Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.
+
+| Carta | Liderança |
+| --- | ---: |
+| Marcha Imperial | 1 |
+| Guarda Imperial | 1 |
+| Tambores de Guerra | 2 |
+| Alistamento | 0 |
+| O Progresso | 1 |
+| Assegurar Recursos para o Rei | 1 |
+| Reorganizar Contingente | 1 |
+| Aliança com o Império | 0 |
+| Pagamento de Impostos | 1 |
 
 ## Baralho de impostos proposto
 
@@ -53,7 +76,6 @@ Pontue 1 ponto sempre que construir
 | 2 Ouros e 1 Madeira | 3 | 2 |
 | 1 Madeira e 1 soldado | 3 | 2 |
 | 1 Madeira, 1 Ouro e 1 soldado | 4 | 1 |
-
 
 
 **Adaptações de teste:** os efeitos das construções dependem de controle; Guarda Imperial usa um marcador defensivo disponível, conforme Combate. Ataques continuam exigindo tropas defensoras, conforme a limitação comum. O baralho de impostos descartados não é reposto durante a partida de teste.
