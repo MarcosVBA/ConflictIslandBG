@@ -4,8 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const base = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8').split('// Links dos módulos atuais')[0];
-for (const file of ['mapa-conflito.html', 'mapa-quatro-faccoes.html', 'mapa-fluxo-dinamico.html']) {
- const harness = base.replace("const html = read('mapa-conflito.html');", `const html = read('${file}');`);
+for (const file of ['mapa-fluxo-dinamico.html']) {
+ const harness = base.replace("const html = read('mapa-fluxo-dinamico.html');", `const html = read('${file}');`);
  const scenario = String.raw`
 // A compra precede a regeneração da Torre e o alistamento.
 run("state.R4.units.necromante=0;state.R4.extractor=false;state.R3.units.necromante=4");

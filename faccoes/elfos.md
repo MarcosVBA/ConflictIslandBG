@@ -1,8 +1,8 @@
 # Elfos da Floresta
 
-**Conteúdo registrado pelo usuário; implementado no protótipo de quatro facções para teste.** O baralho tem 25 cartas. O protótipo anterior de três facções não inclui os Elfos.
+**Conteúdo registrado pelo usuário; implementado no protótipo de quatro facções para teste.** O baralho tem 25 cartas.
 
-**Início definido; implementado no novo protótipo:** os Elfos dominam duas regiões de floresta, com duas unidades em uma e uma unidade na outra, sem recursos iniciais. As regiões do cenário de teste estão em [Mapa](../regras/mapa.md).
+**Início definido; implementado no protótipo principal:** os Elfos dominam duas regiões de floresta, com duas unidades em uma e uma unidade na outra, sem recursos iniciais. As regiões do cenário de teste estão em [Mapa](../regras/mapa.md).
 
 ## Guardiões da Floresta
 
@@ -29,7 +29,7 @@ Sempre que trocar ao menos um recurso com um jogador, receba 1 ponto. Esse bonus
 | Milagre da Floresta | 2 | Qualquer região | Converta 3 recursos de um mesmo tipo em 2 de outro mesmo tipo; tropas élficas contam como recurso. |
 | **Total** | **25** | | |
 
-Na variante de fluxo dinâmico, Canção de paz consome um marcador da reserva, sem colocação prévia no mapa; as demais consequências são as mesmas.
+Canção de paz consome um marcador da reserva, sem colocação prévia no mapa.
 
 ## Liderança por carta
 

@@ -22,6 +22,11 @@ jobs:
         with:
           node-version: '20'
       - run: node testes/validar-documentacao.cjs
+      - run: node testes/validar-lideranca.cjs
+      - run: node testes/validar-fluxo-dinamico.cjs
+      - run: node testes/validar-elfos.cjs
+      - run: node testes/validar-necromante.cjs
+      - run: node testes/validar-novas-habilidades.cjs
       - run: node testes/validar-publicacao.cjs
       - run: node scripts/preparar-site.cjs
       - uses: actions/configure-pages@v5

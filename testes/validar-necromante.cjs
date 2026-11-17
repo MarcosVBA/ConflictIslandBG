@@ -5,8 +5,8 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8');
 const harness = source.split('// Links dos módulos atuais')[0];
-for (const file of ['mapa-conflito.html', 'mapa-quatro-faccoes.html', 'mapa-fluxo-dinamico.html']) {
-  const base = harness.replace("const html = read('mapa-conflito.html');", `const html = read('${file}');`);
+for (const file of ['mapa-fluxo-dinamico.html']) {
+  const base = harness.replace("const html = read('mapa-fluxo-dinamico.html');", `const html = read('${file}');`);
   const scenario = `
 const text = read('faccoes/necromante.md');
 const section = text.split('## Baralho registrado')[1]?.split('\\n## ')[0];

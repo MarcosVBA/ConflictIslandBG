@@ -33,7 +33,7 @@ Todo turno até o jogador ter 7 tropas no mapa, após a compra de carta no inici
 
 Se não houver regiões controladas, adicione duas tropas em uma região com menos tropas inimigas, no caso de empate, o jogador decide.
 
-**Definido para teste; implementado nos três protótipos:** ocorre uma vez por rodada, após a compra e antes do leilão. O máximo de sete vale para essa habilidade: se restar apenas uma vaga, a recuperação sem região dominada adiciona apenas uma tropa; com sete ou mais, não há alistamento. As cartas podem aumentar o total além de sete. As condições de O Progresso e Assegurar Recursos para o Rei também estão implementadas nos três protótipos.
+**Definido para teste; implementado no protótipo principal:** ocorre uma vez por rodada, após a compra e antes do leilão. O máximo de sete vale para essa habilidade: se restar apenas uma vaga, a recuperação sem região dominada adiciona apenas uma tropa; com sete ou mais, não há alistamento. As cartas podem aumentar o total além de sete. As condições de O Progresso e Assegurar Recursos para o Rei também estão implementadas no protótipo principal.
 
 ## Baralho principal proposto
 

@@ -4,7 +4,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8');
-const harness = source.split('// Links dos módulos atuais')[0].replace("const html = read('mapa-conflito.html');", "const html = read('mapa-fluxo-dinamico.html');");
+const harness = source.split('// Links dos módulos atuais')[0];
 const scenario = String.raw`
 check("byId('R7').name==='Pico Desolado'&&!byId('R7').coast&&byId('R7').resource==='Sem recurso'&&byId('R9').name==='Baixio dos Garimpeiros'&&byId('R9').terrain==='planicie'&&byId('R11').name==='Costa do Ouro Perdido'&&['R9','R11'].every(id=>byId(id).coast&&byId(id).resource==='Ouro')");
 assert(element('diagnostics').innerHTML.includes('Verificações aprovadas'),'Diagnóstico deve refletir a nova distribuição de recursos.');
@@ -72,11 +72,7 @@ for(let round=1;round<=6;round++){
 }
 check("flow.phase==='fim'&&flow.round===6&&game.imperialRecruitRound===6");
 click('reset');check("flow.round===1&&flow.phase==='preparação'&&flow.markers.length===0&&state.R1.units.imperio===2");
-const previous=read('mapa-quatro-faccoes.html');
-for(const pattern of [/const edges=\[[^\n]+/,/const leadershipValues=Object\.freeze\([^\n]+/,/const cardDefs=\{[\s\S]*?\n\};/]){
-  assert(html.match(pattern)?.[0]===previous.match(pattern)?.[0],'Mapa ou valores de liderança divergentes do protótipo de referência.');
-}
 assert(!/<(?:script|link|img)\b[^>]*(?:src|href)\s*=/i.test(html),'O protótipo deve funcionar em um único HTML.');
-console.log('Seis rodadas, reinício, mapa e baralhos de referência OK');
+console.log('Seis rodadas e reinício OK');
 `;
 vm.runInNewContext(harness + scenario, { require, console, process, __dirname });

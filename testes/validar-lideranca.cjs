@@ -6,10 +6,9 @@ const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8');
 const harness = source.split('// Links dos módulos atuais')[0];
 for (const [file, order] of [
-  ['mapa-conflito.html', 'imperio,necromante,piratas'],
-  ['mapa-quatro-faccoes.html', 'imperio,necromante,piratas,elfos'],
+  ['mapa-fluxo-dinamico.html', 'imperio,necromante,piratas,elfos'],
 ]) {
-  const base = harness.replace("const html = read('mapa-conflito.html');", `const html = read('${file}');`);
+  const base = harness.replace("const html = read('mapa-fluxo-dinamico.html');", `const html = read('${file}');`);
   const scenario = `
 const seatOrder = ${JSON.stringify(order)};
 function clearBid(){for(let i=0;i<10;i++) element('bid-'+i).checked=false}
@@ -40,17 +39,17 @@ click('passBid');
 if(seatOrder.includes('elfos'))click('passBid');
 check("flow.order[flow.auction.turn]==='imperio'");clearBid();element('bid-1').checked=true;click('submitBid');
 check("flow.auction.leader==='imperio'&&flow.auction.high===3&&flow.auction.offers.imperio.length===2");
-click('passBid');check("flow.phase==='alocação'&&flow.order[0]==='imperio'&&flow.decks.imperio.hand.length===0&&flow.decks.imperio.discard.length===2&&flow.decks.necromante.hand.length===2");
+click('passBid');check("flow.phase==='resolução'&&flow.order[0]==='imperio'&&flow.decks.imperio.hand.length===0&&flow.decks.imperio.discard.length===2&&flow.decks.necromante.hand.length===2");
 click('reset');set('orderChoice','imperio');set('handSize',5);click('startRound');if(run("flow.phase==='alistamento'")){set('imperialRecruit','R1');click('confirmImperialRecruit')}
 run("flow.decks.imperio.hand=[{name:'Marcha Imperial',leadership:leadershipValues['Marcha Imperial']}];flow.decks.necromante.hand=[{name:'Horda interminável',leadership:leadershipValues['Horda interminável']}];renderFlow()");
 clearBid();element('bid-0').checked=true;click('submitBid');clearBid();element('bid-0').checked=true;click('submitBid');click('passBid');if(seatOrder.includes('elfos'))click('passBid');click('passBid');
-check("flow.phase==='alocação'&&flow.order[0]==='necromante'&&flow.allocationFaction==='piratas'&&flow.decks.necromante.discard.length===1&&flow.decks.imperio.hand.length===1");
+check("flow.phase==='resolução'&&flow.order[0]==='necromante'&&activeFaction()==='necromante'&&flow.decks.necromante.discard.length===1&&flow.decks.imperio.hand.length===1");
 assert(run("flow.order.join(',')")===seatOrder.split(',').slice(1).concat('imperio').join(','),'Ordem da mesa alterada após a vitória.');
 run("flow.round=2;flow.phase='preparação';renderFlow()");
 set('handSize',5);click('startRound');if(run("flow.phase==='alistamento'")){set('imperialRecruit','R1');click('confirmImperialRecruit')}
 check("flow.phase==='leilão'&&flow.order[flow.auction.turn]==='necromante'");
 for(let i=0;i<seatOrder.split(',').length;i++)click('passBid');
-check("flow.phase==='alocação'&&flow.order[0]==='necromante'");
+check("flow.phase==='resolução'&&flow.order[0]==='necromante'");
 console.log('Leilão, valores e lances verificados: ${file}');
 `;
   vm.runInNewContext(base + scenario, { require, console, process, __dirname });

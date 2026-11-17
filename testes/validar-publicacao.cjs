@@ -17,7 +17,16 @@ for (const icon of manifest.icons) {
   assert.equal(buffer.readUInt32BE(20), size);
 }
 assert(manifest.icons.some(icon => icon.purpose === 'maskable'));
-const html = read('mapa-conflito.html').toString();
+require('../scripts/preparar-site.cjs');
+const source = read('mapa-fluxo-dinamico.html').toString();
+const html = read('dist/index.html').toString();
+assert(source.includes('protótipo principal'));
+assert(!source.includes('href="./manifest.webmanifest"'));
+assert(html.includes('4 facções · controle manual'));
+assert(html.includes("{id:'R11',name:'Costa do Ouro Perdido'"));
+for (const script of source.matchAll(/<script>([\s\S]*?)<\/script>/g)) assert(html.includes(script[0]), 'A cópia publicada deve preservar o código do jogo principal.');
+assert.deepEqual(read('dist/service-worker.js'), read('service-worker.js'));
+assert.deepEqual(read('dist/manifest.webmanifest'), read('manifest.webmanifest'));
 assert(html.includes('href="./manifest.webmanifest"'));
 assert(html.includes("register('./service-worker.js')"));
 const handlers = {};

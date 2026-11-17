@@ -8,7 +8,7 @@ Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inic
 
 ## Magia da Torre
 
-**Definida; implementada nos três protótipos.** Se a Torre for a única região dominada pelo Necromante, após a compra normal de cartas adicione um zumbi ali, até cinco zumbis na região.
+**Definida; implementada no protótipo principal.** Se a Torre for a única região dominada pelo Necromante, após a compra normal de cartas adicione um zumbi ali, até cinco zumbis na região.
 
 Ao perder o domínio da Torre, inclusive por empate, remova imediatamente todas as tropas e construções da sua região e todas as tropas e construções do Necromante no mapa; a própria Torre permanece e recebe dois zumbis. Se a perda ocorrer na movimentação anterior a um combate e eliminar um dos combatentes, a ação é consumida sem rolagem. Uma preparação de combate que já acionou a magia não pode ser cancelada.
 
@@ -42,7 +42,7 @@ Ao perder o domínio da Torre, inclusive por empate, remova imediatamente todas 
 | Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento por 1 madeira, pontue 2 por região com monumento, descarte toda a mão e compre até ter 5 cartas. |
 | **Total** | **20** | | |
 
-**Implementado nos três protótipos:** Monumento a Morte exige e consome 1 Madeira. Sem o recurso, a ação não é realizada e a carta e o marcador permanecem disponíveis.
+**Implementado no protótipo principal:** Monumento a Morte exige e consome 1 Madeira. Sem o recurso, a ação não é realizada e a carta e o marcador permanecem disponíveis.
 
 ## Liderança por carta
 

@@ -8,13 +8,11 @@ Cada batalha consiste em uma única rodada de rolagem. Após aplicar os resultad
 
 ## Reação defensiva
 
-**Definido; implementado no fluxo de teste.** Antes dos dados, o defensor decide se usa até uma carta defensiva. Para isso, consome um dos dois marcadores de ação da própria facção ainda não utilizados; ele pode estar em qualquer região. A ação correspondente é perdida.
+**Definido; implementado.** Antes dos dados, o defensor decide se usa até uma carta defensiva, consumindo um dos seus marcadores de ação ainda disponíveis na reserva; a ação futura correspondente é perdida. O mesmo custo se aplica a Canção de paz.
 
-**Variante de fluxo dinâmico:** o defensor consome um marcador disponível da reserva, sem precisar colocá-lo previamente no mapa. O custo de uma ação futura permanece; o mesmo vale para Canção de paz.
+**Proposta:** ao adaptar outras cartas para defesa reativa, preservar seu efeito e aplicá-lo à região atacada. A elegibilidade das demais cartas permanece pendente. Os estados específicos de Guarda Imperial, Praga Resistente e cartas piratas pertencem aos respectivos documentos de facção.
 
-**Proposta:** ao adaptar uma carta para defesa reativa, preservar seu efeito e aplicá-lo à região atacada, sem exigir que o marcador esteja lá. A elegibilidade das demais cartas permanece pendente. Os estados específicos de Guarda Imperial, Praga Resistente e cartas piratas pertencem aos respectivos documentos de facção.
-
-**Definido; implementado no protótipo de quatro facções:** após a declaração de qualquer combate e antes da rolagem, o jogador dos Elfos pode usar Canção de paz para cancelá-lo, mesmo quando os Elfos não participam. Como em uma reação, gasta um marcador de ação disponível e descarta a carta. Resolva o combate como 0 a 0, sem dano aos lados: tropas movidas permanecem no destino, recursos gastos não voltam e cartas já declaradas e marcadores gastos não são recuperados, inclusive os de uma reação defensiva declarada anteriormente. A intervenção não torna os Elfos combatentes. A carta está em [Elfos](../faccoes/elfos.md).
+**Definido; implementado no protótipo principal:** após a declaração de qualquer combate e antes da rolagem, o jogador dos Elfos pode usar Canção de paz para cancelá-lo, mesmo quando os Elfos não participam. Como em uma reação, gasta um marcador de ação disponível e descarta a carta. Resolva o combate como 0 a 0, sem dano aos lados: tropas movidas permanecem no destino, recursos gastos não voltam e cartas já declaradas e marcadores gastos não são recuperados, inclusive os de uma reação defensiva declarada anteriormente. A intervenção não torna os Elfos combatentes. A carta está em [Elfos](../faccoes/elfos.md).
 
 ## Rolagem e dano
 
