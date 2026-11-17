@@ -57,8 +57,12 @@ assert(region('R10').innerHTML.includes('title="Madeira"') && !region('R7').inne
 assert.equal(run('screens.length'),8);
 assert.equal(run("factions[active].hand.length"),5);
 assert(get('factions').innerHTML.includes('Sua vez'));
+assert(get('factionInfo').innerHTML.includes('Imposto ativo') && get('factionInfo').innerHTML.includes('Serraria') && get('factionInfo').innerHTML.includes('1 de 3 rodadas'));
+run("active='necromante';drawFactions()");assert(get('factionInfo').innerHTML.includes('Regiões devastadas'));
+run("active='piratas';drawFactions()");assert(get('factionInfo').innerHTML.includes('Bares construídos'));
 run("active='elfos';drawFactions();drawHand()");
 assert(get('factions').innerHTML.includes('Elfos'));
+assert(get('factionInfo').innerHTML.includes('Florestas dominadas') && !get('factionInfo').innerHTML.includes('Imposto ativo'));
 assert(get('hand').innerHTML.includes('Canção de paz'));
 map.children.find(e=>e.attributes['aria-label'].startsWith('R10,')).onclick();
 assert.equal(run('selectedRegion'),'R10');
