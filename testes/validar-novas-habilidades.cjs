@@ -21,6 +21,9 @@ click('reset');run("state.R1.units.imperio=7");set('handSize',5);set('orderChoic
 // Impostos descartados voltam ao baralho e sempre há imposto quando existem cartas.
 run("game=newGame();game.taxes=[];game.taxDiscard=[{g:1,w:0,s:0,p:2}];game.tax={g:0,w:1,s:0,p:3};replaceTax()");
 check("game.tax!==null&&game.taxes.length===1&&game.taxDiscard.length===0");
+// O Salão pode trocar o último imposto do monte usando o descarte reembaralhado.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=factionIds.slice();flow.turn=0;flow.markers=[{f:'imperio',region:null,used:false}];state.R2.tech='Salão Imperial';resources.imperio.ouro=2;game.tax={g:0,w:1,s:0,p:3};game.taxes=[];game.taxDiscard=[{g:1,w:0,s:0,p:2}];renderFlow()");
+assert(element('flow').innerHTML.includes('id=\"hallChange\"'),'Salão deve estar disponível com descarte para reembaralhar.');set('hallResource','ouro');click('hallChange');check("game.tax!==null&&game.hallUsedRound===flow.round&&resources.imperio.ouro===1&&game.taxDiscard.length===0");
 // Perda de controle remove tropas e construções e preserva só a Torre e seus dois zumbis.
 run("state=initial();state.R4.monument=true;state.R4.units.imperio=2;state.R3.units.imperio=2;state.R3.tech='Serraria';state.R3.bar=true;state.R3.buildings.piratas=1");
 check("restoreTowerIfLost()&&state.R3.tower&&state.R3.units.necromante===2&&state.R3.units.imperio===0&&!state.R3.tech&&!state.R3.bar&&state.R3.buildings.piratas===0&&!state.R4.extractor&&!state.R4.monument&&state.R4.units.necromante===0&&state.R4.units.imperio===2");

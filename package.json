@@ -1,0 +1,19 @@
+{
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "prettier": "3.6.2"
+  },
+  "private": true,
+  "scripts": {
+    "test:navegador": "playwright test",
+    "test:visual": "VISUAL_CHECK=1 playwright test --update-snapshots=none",
+    "check:rapido": "node scripts/verificar.cjs rapido",
+    "check:completo": "node scripts/verificar.cjs completo",
+    "check:visual": "npm run test:visual",
+    "test:combate": "node scripts/verificar.cjs combate",
+    "test:elfos": "node scripts/verificar.cjs elfos",
+    "test:mapa": "node scripts/verificar.cjs mapa",
+    "format:aplicacao": "prettier --write jogo/aplicacao/*.js",
+    "format:verificar": "prettier --check jogo/aplicacao/*.js"
+  }
+}

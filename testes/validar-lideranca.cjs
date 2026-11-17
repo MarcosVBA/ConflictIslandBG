@@ -32,6 +32,9 @@ for(const f of seatOrder.split(',')){
 set('orderChoice','imperio');set('handSize',5);click('startRound');if(run("flow.phase==='alistamento'")){set('imperialRecruit','R1');click('confirmImperialRecruit')}check("flow.phase==='leilão'");
 check("factionIds.every(f=>flow.decks[f].hand.every(c=>c.leadership===leadershipValues[c.name]))");
 run("flow.decks.imperio.hand=[{name:'Marcha Imperial',leadership:leadershipValues['Marcha Imperial']},{name:'Tambores de Guerra',leadership:leadershipValues['Tambores de Guerra']}];flow.decks.necromante.hand=[{name:'Ataque Zumbi',leadership:leadershipValues['Ataque Zumbi']},{name:'Infestação',leadership:leadershipValues['Infestação']}];renderFlow()");
+assert(element('handArea').innerHTML.includes('Lance de Império'),'A mão do ofertante deve aparecer no leilão.');
+clearBid();cards[0].onclick();assert(element('bid-0').checked,'A carta da mão deve selecionar a oferta.');cards[0].onclick();assert(!element('bid-0').checked,'A carta deve permitir desfazer a seleção antes do lance.');
+element('bid-0').checked=true;element('bid-0').onchange();assert(cards[0].attributes['aria-pressed']==='true','A seleção pela lista deve atualizar a carta.');element('bid-0').checked=false;element('bid-0').onchange();assert(cards[0].attributes['aria-pressed']==='false','Desmarcar na lista deve atualizar a carta.');
 clearBid();element('bid-0').checked=true;click('submitBid');check("flow.auction.leader==='imperio'&&flow.auction.high===1");
 clearBid();element('bid-1').checked=true;click('submitBid');check("flow.auction.leader==='imperio'&&flow.auction.high===1&&flow.order[flow.auction.turn]==='necromante'");
 clearBid();element('bid-0').checked=true;element('bid-1').checked=true;click('submitBid');check("flow.auction.leader==='necromante'&&flow.auction.high===2");

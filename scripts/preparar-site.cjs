@@ -11,6 +11,9 @@ for (const [source, target] of [
   ['icons/icon-512.png', 'icons/icon-512.png'],
   ['icons/icon-maskable-512.png', 'icons/icon-maskable-512.png'],
 ]) fs.copyFileSync(path.join(root, source), path.join(out, target));
+// Arte opcional conserva os caminhos relativos usados pelo HTML local.
+const artDir = path.join(root, 'artes');
+if (fs.existsSync(artDir)) fs.cpSync(artDir, path.join(out, 'artes'), { recursive: true });
 // A fonte permanece um único HTML local; instalação é adicionada somente à cópia publicada.
 const sourceHtml = fs.readFileSync(path.join(root, 'mapa-fluxo-dinamico.html'), 'utf8');
 const manifestLinks = '<link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png">';

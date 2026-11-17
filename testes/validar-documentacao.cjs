@@ -11,7 +11,7 @@ const elements = new Map();
 let cards = [], previews = [], regions = [], checkedBuildings = [];
 const classes = () => ({ add() {}, remove() {}, toggle() {} });
 function createCard(index, kind) {
-  return { dataset: { [kind === 'preview' ? 'previewIndex' : 'cardIndex']: index }, classList: classes(), disabled: false, setAttribute() {} };
+  return { dataset: { [kind === 'preview' ? 'previewIndex' : 'cardIndex']: index }, classList: classes(), disabled: false, attributes: {}, setAttribute(k,v) { this.attributes[k]=String(v); } };
 }
 function element(id) {
   if (elements.has(id)) return elements.get(id);
@@ -25,9 +25,9 @@ function element(id) {
       if (this.id === 'flow') {
         // No DOM real, renderizar o fluxo recria o botão oculto de carta.
         if (elements.has('showCard')) elements.get('showCard').disabled = false;
-        cards = [...v.matchAll(/data-card-index="(\d+)"/g)].map(x => createCard(x[1], 'card'));
         previews = [...v.matchAll(/data-preview-index="(\d+)"/g)].map(x => createCard(x[1], 'preview'));
       }
+      if (this.id === 'handArea') cards = [...v.matchAll(/data-card-index="(\d+)"/g)].map(x => createCard(x[1], 'card'));
     },
     attributes: {}, setAttribute(k, v) { this.attributes[k] = String(v); }, scrollBy() {},
     focus() { this.focused = true; context.document.activeElement = this; },
@@ -36,7 +36,7 @@ function element(id) {
       return this.id === 'map' && match ? regions.find(x => x.attributes['data-region'] === match[1]) || null : null;
     },
     querySelectorAll(q) {
-      if (this.id === 'flow' && q === '[data-card-index]') return cards;
+      if (this.id === 'handArea' && q === '[data-card-index]') return cards;
       if (this.id === 'flow' && q === '[data-preview-index]') return previews;
       if (this.id === 'map' && q === '.region') return regions;
       if (q === '.destroyBuilding:checked') return checkedBuildings;
@@ -60,6 +60,13 @@ const set = (id, value) => { element(id).value = value; };
 const click = id => { const e = element(id); assert(typeof e.onclick === 'function', `Controle indisponível: ${id}`); e.onclick(); };
 
 // Links dos módulos atuais não dependem dos caminhos históricos antigos.
+assert(element('fullscreen').attributes['aria-label']==='Entrar em tela cheia','Controle de tela cheia ausente.');
+assert((element('lines').innerHTML.match(/<path /g)||[]).length===18,'Todas as conexões devem estar presentes.');
+assert((element('lines').innerHTML.match(/class="selected-connection"/g)||[]).length===2,'Conexões da região inicial devem estar destacadas.');
+run("visualAssets.cartas['Marcha Imperial']='artes/marcha.webp';visualAssets.regioes.R1='artes/praia.webp';render()");
+assert(run("handCard('imperio',{name:'Marcha Imperial',text:'',leadership:1},0,1).includes('src=\"artes/marcha.webp\"')"),'Arte opcional da carta não foi aplicada.');
+assert(regions.find(r=>r.attributes['data-region']==='R1').style.backgroundImage.includes('artes/praia.webp'),'Arte opcional da região não foi aplicada.');
+run("delete visualAssets.cartas['Marcha Imperial'];delete visualAssets.regioes.R1;render()");
 const modules = ['README.md','regras/regras-gerais.md','regras/combate.md','regras/dados.md','regras/mapa.md','regras/pontuacao.md','faccoes/piratas.md','faccoes/necromante.md','faccoes/imperio.md','faccoes/elfos.md','faccoes/dragoes.md','ideias/eventos.md','ideias/pontuacao.md','ideias/tensao-madeira.md','prototipo/estado-e-testes.md','prototipo/plano-quatro-faccoes.md','historico/README.md','historico/prototipos/alocacao-de-marcadores.md'];
 for (const file of modules) for (const match of read(file).matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
   const href = match[1].split('#')[0];
@@ -99,7 +106,7 @@ for(const [,name,a,d] of read('regras/dados.md').matchAll(/^\|\s*([^|]+?)\s*\|\s
 }
 const actualFaces=JSON.parse(run('JSON.stringify([attackFaces,defenseFaces])'));
 for(let i=0;i<2;i++)assert(JSON.stringify(faces[i].sort())===JSON.stringify(actualFaces[i].map(x=>x.join(',')).sort()),'Dados divergentes.');
-assert(!/<(?:script|link|img)\b[^>]*(?:src|href)\s*=/i.test(html),'O HTML principal precisa funcionar sem arquivos externos.');
+assert(!/<(?:script|link|img)\b[^>]*(?:src|href)\s*=/i.test(html.replace(/<script>[\s\S]*?<\/script>/g,'')),'O HTML principal precisa funcionar sem arquivos externos obrigatórios.');
 check("resources.imperio.ouro===1&&resources.necromante.madeira===1&&resources.piratas.ouro===0&&resources.elfos.ouro===0&&resources.elfos.madeira===0");
 console.log('OK: links, quatro baralhos e liderança, 11 regiões, conexões, dados e HTML local.');
 console.log('Limite: DOM substituto; não verifica apresentação visual nem interpreta toda a prosa.');

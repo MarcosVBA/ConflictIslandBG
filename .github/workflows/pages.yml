@@ -26,10 +26,23 @@ jobs:
       - run: node testes/validar-documentacao.cjs
       - run: node testes/validar-lideranca.cjs
       - run: node testes/validar-fluxo-dinamico.cjs
+      - run: node testes/validar-partida.cjs
       - run: node testes/validar-elfos.cjs
       - run: node testes/validar-necromante.cjs
       - run: node testes/validar-novas-habilidades.cjs
       - run: node testes/validar-publicacao.cjs
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium --only-shell
+      - run: npm run test:navegador
+      - name: Guardar evidências dos testes de navegador
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testes-navegador
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
       - run: node scripts/preparar-site.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

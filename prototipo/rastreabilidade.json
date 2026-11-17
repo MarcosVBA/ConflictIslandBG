@@ -1,0 +1,193 @@
+[
+  {
+    "id": "MAPA-CONEXOES",
+    "assunto": "Regiões e conexões",
+    "estado": "definida",
+    "fontes": [
+      "regras/mapa.md"
+    ],
+    "implementacao": [
+      "jogo/dados/mapa.js",
+      "jogo/aplicacao/mapa.js"
+    ],
+    "testes": [
+      "testes/validar-documentacao.cjs",
+      "testes/navegador/mesa.spec.cjs"
+    ]
+  },
+  {
+    "id": "RODADA-LIDERANCA",
+    "assunto": "Rodada e leilão de liderança",
+    "estado": "definida",
+    "fontes": [
+      "regras/regras-gerais.md"
+    ],
+    "implementacao": [
+      "jogo/motor/base.js",
+      "jogo/aplicacao/fluxo.js"
+    ],
+    "testes": [
+      "testes/validar-lideranca.cjs",
+      "testes/navegador/mesa.spec.cjs"
+    ]
+  },
+  {
+    "id": "ACOES-SEM-ALOCACAO",
+    "assunto": "Ações sem alocação prévia",
+    "estado": "definida",
+    "fontes": [
+      "regras/regras-gerais.md"
+    ],
+    "implementacao": [
+      "jogo/aplicacao/fluxo.js",
+      "jogo/aplicacao/acoes.js"
+    ],
+    "testes": [
+      "testes/validar-fluxo-dinamico.cjs",
+      "testes/validar-partida.cjs"
+    ]
+  },
+  {
+    "id": "COMBATE-PAZ",
+    "assunto": "Combate, defesa e Canção de paz",
+    "estado": "definida",
+    "fontes": [
+      "regras/combate.md",
+      "faccoes/elfos.md"
+    ],
+    "implementacao": [
+      "jogo/motor/base.js",
+      "jogo/aplicacao/combate.js"
+    ],
+    "testes": [
+      "testes/validar-fluxo-dinamico.cjs",
+      "testes/navegador/mesa.spec.cjs"
+    ]
+  },
+  {
+    "id": "PONTUACAO-FIM",
+    "assunto": "Pontuação e vitória aos 30 pontos",
+    "estado": "definida",
+    "fontes": [
+      "regras/pontuacao.md"
+    ],
+    "implementacao": [
+      "jogo/motor/base.js",
+      "jogo/aplicacao/acoes.js",
+      "jogo/aplicacao/pontuacao.js"
+    ],
+    "testes": [
+      "testes/validar-partida.cjs",
+      "testes/navegador/mesa.spec.cjs"
+    ]
+  },
+  {
+    "id": "ELFOS-TROCAS",
+    "assunto": "Coleta e trocas élficas",
+    "estado": "definida",
+    "fontes": [
+      "faccoes/elfos.md"
+    ],
+    "implementacao": [
+      "jogo/motor/base.js",
+      "jogo/aplicacao/acoes.js"
+    ],
+    "testes": [
+      "testes/validar-elfos.cjs",
+      "testes/validar-motor-base.cjs"
+    ]
+  },
+  {
+    "id": "NECROMANTE-TORRE",
+    "assunto": "Torre e remanejamento dos mortos",
+    "estado": "definida",
+    "fontes": [
+      "faccoes/necromante.md"
+    ],
+    "implementacao": [
+      "jogo/motor/base.js",
+      "jogo/aplicacao/acoes.js",
+      "jogo/aplicacao/fluxo.js"
+    ],
+    "testes": [
+      "testes/validar-necromante.cjs",
+      "testes/validar-motor-base.cjs"
+    ]
+  },
+  {
+    "id": "IMPERIO-IMPOSTO",
+    "assunto": "Impostos e tecnologias; valores em teste",
+    "estado": "mista",
+    "fontes": [
+      "faccoes/imperio.md"
+    ],
+    "implementacao": [
+      "jogo/dados/imperio.js",
+      "jogo/motor/base.js",
+      "jogo/aplicacao/acoes.js",
+      "jogo/aplicacao/pontuacao.js"
+    ],
+    "testes": [
+      "testes/validar-novas-habilidades.cjs",
+      "testes/validar-partida.cjs"
+    ]
+  },
+  {
+    "id": "PIRATAS-CARTAS",
+    "assunto": "Economia e cartas dos Piratas",
+    "estado": "mista",
+    "fontes": [
+      "faccoes/piratas.md"
+    ],
+    "implementacao": [
+      "jogo/motor/base.js",
+      "jogo/aplicacao/acoes.js"
+    ],
+    "testes": [
+      "testes/validar-novas-habilidades.cjs",
+      "testes/validar-fluxo-dinamico.cjs"
+    ]
+  },
+  {
+    "id": "INTERFACE-MESA",
+    "assunto": "Mesa, acessibilidade e apresentação",
+    "estado": "em-teste",
+    "fontes": [
+      "prototipo/plano-interface.md",
+      "prototipo/estado-e-testes.md"
+    ],
+    "implementacao": [
+      "jogo/apresentacao/mesa.css",
+      "jogo/aplicacao/mapa.js"
+    ],
+    "testes": [
+      "testes/navegador/mesa.spec.cjs",
+      "testes/validar-mesa-conceito.cjs"
+    ]
+  },
+  {
+    "id": "EVENTOS-FINAIS",
+    "assunto": "Eventos de fim de jogo após marco de 20 pontos",
+    "estado": "adiada",
+    "fontes": [
+      "ideias/eventos.md",
+      "regras/pontuacao.md"
+    ],
+    "implementacao": [
+      "jogo/motor/base.js"
+    ],
+    "testes": [
+      "testes/validar-motor-base.cjs"
+    ]
+  },
+  {
+    "id": "IA-FACCOES",
+    "assunto": "IA para facções",
+    "estado": "adiada",
+    "fontes": [
+      "ideias/ia-para-faccoes.md"
+    ],
+    "implementacao": [],
+    "testes": []
+  }
+]

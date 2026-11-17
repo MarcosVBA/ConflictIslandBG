@@ -8,7 +8,7 @@ Este módulo reúne regras comuns fora de combate, dados, mapa e pontuação. Pa
 
 Depois da compra normal, resolvem-se as habilidades de preparação, incluindo o [Alistamento Obrigatório](../faccoes/imperio.md), e o leilão. O líder inicia as ações, que seguem em sentido anti-horário: Império → Necromante → Piratas → Elfos → Império. O primeiro jogador da partida é escolhido manualmente; nas rodadas seguintes, o líder anterior inicia o leilão.
 
-A mão tem cinco cartas por padrão, ajustável de 1 a 10 no protótipo. No início da rodada, completa-se a mão, reembaralhando o descarte quando necessário. Cartas que exigem descartar toda a mão compram imediatamente até cinco cartas durante a resolução. Descartar uma carta com marcador não gera compra imediata. Antes de confirmar o uso da carta, o jogador pode alterar suas escolhas. Depois da confirmação, a ação não pode ser cancelada; no protótipo, confirmar o ataque inicia a resolução sem opção de cancelamento.
+A mão tem cinco cartas por padrão, ajustável de 1 a 10 no protótipo. No início da rodada, completa-se a mão, reembaralhando o descarte quando necessário. Cartas que exigem descartar toda a mão compram imediatamente até cinco cartas durante a resolução. Descartar uma carta usando uma ação não gera compra imediata. Antes de confirmar o uso da carta, o jogador pode alterar suas escolhas. Depois da confirmação, a ação não pode ser cancelada; no protótipo, confirmar o ataque inicia a resolução sem opção de cancelamento.
 
 O sistema anterior de alocação está preservado como [histórico](../historico/prototipos/alocacao-de-marcadores.md).
 
@@ -22,11 +22,11 @@ O líder anterior tem a primeira oportunidade de lance; na primeira rodada, usa-
 
 ## Decisão sobre ações e componentes
 
-**Definido; implementação pendente:** a carta é usada e seu efeito é aplicado no mesmo momento, sem etapa separada de alocação de marcadores. Cada facção mantém duas ações por rodada; as ações de reação também consomem uma delas. O protótipo atual ainda representa essas ações com marcadores virtuais. Por enquanto não há limite digital de peças; futuramente haverá limite a definir. Se uma peça física necessária não estiver disponível, a ação é pulada. A representação dessa disponibilidade no jogo digital ainda precisa ser definida.
+**Definido; parcialmente implementado:** a carta é usada e seu efeito é aplicado no mesmo momento, sem etapa separada de alocação de marcadores. Cada facção mantém duas ações por rodada; as ações de reação também consomem uma delas. O protótipo atual ainda representa essas ações com marcadores virtuais. Por enquanto não há limite digital de peças; futuramente haverá limite a definir. Se uma peça física necessária não estiver disponível, a ação é pulada. A representação dessa disponibilidade no jogo digital ainda precisa ser definida.
 
 ## Demais questões da rodada
 
-**Pendente:** política de reposição e tratamento de ações cujo alvo se torna inválido. O uso de cartas que envolvem múltiplas regiões ou qualquer lugar também precisa de revisão.
+**Pendente:** situações de reposição não cobertas acima e tratamento de ações cujo alvo se torna inválido. O uso de cartas que envolvem múltiplas regiões ou qualquer lugar também precisa de revisão.
 
 ## Domínio e coexistência
 

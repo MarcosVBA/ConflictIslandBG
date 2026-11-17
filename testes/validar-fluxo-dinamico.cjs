@@ -11,10 +11,11 @@ check("byId('R7').name==='Pico Desolado'&&!byId('R7').coast&&byId('R7').resource
 assert(element('diagnostics').innerHTML.includes('Verificações aprovadas'),'Diagnóstico deve refletir a nova distribuição de recursos.');
 set('orderChoice','imperio');set('handSize',5);click('startRound');
 check("flow.phase==='alistamento'&&flow.decks.imperio.hand.length===5&&state.R1.units.imperio===2");
-set('imperialRecruit','R1');click('confirmImperialRecruit');
+regions.find(r=>r.attributes['data-region']==='R1').onclick();assert(element('imperialRecruit').value==='R1','Alistamento deve aceitar escolha direta no mapa.');click('confirmImperialRecruit');
 check("flow.phase==='leilão'&&state.R1.units.imperio===3&&game.imperialRecruitRound===1");
 for(let i=0;i<4;i++)click('passBid');
 check("flow.phase==='resolução'&&activeFaction()==='imperio'&&flow.markers.length===8&&flow.markers.every(m=>!m.used&&m.region===null)");
+assert(element('handArea').innerHTML.includes('Imposto')&&element('handArea').innerHTML.includes('Tecnologias'),'A mão imperial deve mostrar o imposto e as tecnologias.');
 assert(!element('flow').innerHTML.includes('id="addMarker"'),'Alocação antecipada não deve estar disponível.');
 run("flow.decks.imperio.hand=[{name:'Alistamento',text:'Recrutar',leadership:0}];renderFlow()");
 set('actionMarker',0);set('actionRegion','R1');
@@ -46,7 +47,7 @@ console.log('Costa e coleta de Ouro nas regiões alteradas OK');
 // Uma construção sem tropas defensoras é alvo válido e não rola dado de defesa.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.turn=0;flow.markers=[{f:'imperio',region:'R6',used:false}];flow.decks.imperio.hand=[{name:'Tambores de Guerra',text:'Atacar'}];state.R6.units.imperio=1;state.R6.units.elfos=0;state.R6.bar=true;showAttackMovement('imperio',0,0)");
 set('attackDefender','piratas');set('move-R2',0);set('move-R4',0);click('prepareAttack');check("battle&&battle.defender==='piratas'");
-run("Math.random=()=>.99");set('battleReaction','none');click('rollBattle');check("battle.defenseDice.length===0&&battle.destroy===1");checkedBuildings=[{value:'0'}];click('applyBattle');checkedBuildings=[];check("!state.R6.bar&&flow.markers[0].used");
+run("Math.random=()=>.99");click('skipDefense');click('skipPeace');click('rollBattle');check("battle.defenseDice.length===0&&battle.destroy===1");checkedBuildings=[{value:'0'}];click('applyBattle');checkedBuildings=[];check("!state.R6.bar&&flow.markers[0].used");
 // Origem selecionada no momento da ação, inclusive para movimento élfico.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.turn=3;flow.markers=factionIds.flatMap(f=>[{f,region:null,used:false},{f,region:null,used:false}]);flow.decks.elfos.hand=[{name:'Furia da Ilha',text:'Mover',leadership:2}];renderFlow()");
 set('actionMarker',6);set('actionRegion','R10');cards[0].onclick();set('destination','R11');set('quantity',1);set('attackDefender','imperio');click('elfFuryGo');
@@ -56,16 +57,22 @@ console.log('Movimento a partir da região escolhida durante a ação OK');
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.markers=factionIds.flatMap(f=>[{f,region:null,used:false},{f,region:null,used:false}]);flow.decks.imperio.hand=[{name:'Marcha Imperial',text:'Atacar',leadership:1}];flow.decks.necromante.hand=[{name:'Praga Resistente'}];flow.decks.elfos.hand=[{name:'Canção de paz'}];renderFlow()");
 set('actionMarker',0);set('actionRegion','R4');cards[0].onclick();set('attackDefender','necromante');set('move-R2',1);click('prepareAttack');
 check("battle&&state.R4.units.imperio===1&&flow.markers[0].region==='R4'");
-assert(!element('cardDetail').innerHTML.includes('id="cancelBattle"'),'Ataque confirmado não pode ser cancelado.');
-set('battleReaction','defense');set('battleReactionMarker','2');element('peaceUse').checked=true;set('peaceMarker','6');click('rollBattle');click('applyBattle');
+assert(!element('dialogContent').innerHTML.includes('id="cancelBattle"'),'Ataque confirmado não pode ser cancelado.');
+check("flow.markers[0].used&&flow.decks.imperio.discard.some(c=>c.name==='Marcha Imperial')");assert(element('handArea').innerHTML.includes('Mão de Necromante'),'A defesa deve mostrar a mão do defensor.');click('useDefense');check("flow.markers[2].used&&flow.decks.necromante.discard.length===1&&battle.stage==='peace'");assert(element('handArea').innerHTML.includes('Mão de Elfos'),'A intervenção deve mostrar a mão dos Elfos.');click('usePeace');check("flow.markers[6].used&&flow.decks.elfos.discard.length===1&&battle.stage==='roll'");click('rollBattle');click('applyBattle');
 check("state.R4.units.imperio===1&&state.R4.units.necromante===1&&flow.markers[0].used&&flow.markers[2].used&&flow.markers[6].used");
 console.log('Confirmação de ataque e reações com ações da reserva OK');
 // Ação, defesa e Canção de paz utilizam marcadores sem região prévia.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.markers=[{f:'imperio',region:'R3',used:false},{f:'necromante',region:null,used:false},{f:'elfos',region:null,used:false}];flow.decks.imperio.hand=[{name:'Marcha Imperial'}];flow.decks.necromante.hand=[{name:'Praga Resistente'}];flow.decks.elfos.hand=[{name:'Canção de paz'}];state.R3.units.imperio=1;battle={f:'imperio',defender:'necromante',region:'R3',ci:0,mi:0,card:'Marcha Imperial',stage:'reaction'};renderBattle()");
-set('battleReaction','defense');set('battleReactionMarker','1');element('peaceUse').checked=true;set('peaceMarker','2');click('rollBattle');
+click('useDefense');click('usePeace');click('rollBattle');
 check("battle.result.swords===0&&battle.result.crosses===0");click('applyBattle');
 check("flow.markers.every(m=>m.used)&&state.R3.units.imperio===1&&state.R3.units.necromante===2&&flow.decks.necromante.discard.length===1&&flow.decks.elfos.discard.length===1");
 console.log('Defesa e Canção de paz consomem marcadores da reserva OK');
+// Sem ação, uma carta de reação na mão não pode ser usada.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.markers=[{f:'imperio',region:'R4',used:false},{f:'necromante',region:null,used:true},{f:'elfos',region:null,used:true}];flow.decks.imperio.hand=[{name:'Marcha Imperial'}];flow.decks.necromante.hand=[{name:'Praga Resistente'}];flow.decks.elfos.hand=[{name:'Canção de paz'}];state.R4.units.imperio=1;battle={f:'imperio',defender:'necromante',region:'R4',ci:0,mi:0,card:'Marcha Imperial',stage:'reaction'};renderBattle()");
+assert(!element('dialogContent').innerHTML.includes('id="useDefense"'),'Defesa não pode ser usada sem ação.');click('skipDefense');assert(!element('dialogContent').innerHTML.includes('id="usePeace"'),'Canção de paz não pode ser usada sem ação.');click('skipPeace');run('Math.random=()=>0');click('rollBattle');click('applyBattle');check("battle===null&&flow.decks.necromante.hand.length===1&&flow.decks.elfos.hand.length===1");
+// Quando os Elfos defendem, as duas reações precisam gastar ações distintas.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.markers=[{f:'imperio',region:'R6',used:false},{f:'elfos',region:null,used:false},{f:'elfos',region:null,used:false}];flow.decks.imperio.hand=[{name:'Tambores de Guerra'}];flow.decks.elfos.hand=[{name:'Conhecimentos da Floresta'},{name:'Canção de paz'}];state.R6.units.imperio=1;battle={f:'imperio',defender:'elfos',region:'R6',ci:0,mi:0,card:'Tambores de Guerra',stage:'reaction'};renderBattle()");
+click('useDefense');click('usePeace');click('rollBattle');check("battle.stage==='result'&&battle.reaction.marker===1&&battle.peace.marker===2");click('applyBattle');check("flow.markers.every(m=>m.used)&&flow.decks.elfos.discard.length===2");
 click('reset');
 for(let round=1;round<=6;round++){
   set('orderChoice','imperio');set('handSize',5);click('startRound');
@@ -77,8 +84,15 @@ for(let round=1;round<=6;round++){
 check("flow.phase==='preparação'&&flow.round===7&&game.imperialRecruitRound===6");
 run("game.score.elfos=19;addPoints('elfos',1,'teste')");check("game.endEventsReady&&!game.winner");
 run("game.score.elfos=29;addPoints('elfos',1,'teste')");check("game.winner==='elfos'&&flow.phase==='fim'");
+// Vitória durante pagamento encerra antes de executar o movimento combinado.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['piratas','elfos','imperio','necromante'];flow.markers=[{f:'piratas',region:'R5',used:false}];flow.decks.piratas.hand=[{name:'Carta de Corsário'}];state.R5.units.imperio=1;game.score.piratas=29;showCorsair('piratas',0,0)");
+set('corsairAlly','imperio');set('decision','yes');set('price',1);set('destination','R6');set('quantity',1);set('corsairMode','move');set('attackDefender','necromante');click('corsairGo');check("game.winner==='piratas'&&flow.phase==='fim'&&state.R5.units.piratas===1&&state.R6.units.piratas===0&&flow.markers[0].used&&battle===null");
+// O transporte inválido é recusado antes do pagamento, mesmo que ele gerasse a vitória.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();state.R5.units.imperio=1;game.score.piratas=29");
+set('other','imperio');set('decision','yes');set('price',1);set('transportOrigin','R1');set('destination','R1');set('quantity',1);
+check("(()=>{try{executeCard('piratas','Serviço de Transporte Pirata','R5',0);return false}catch(e){return true}})()&&game.winner===null&&resources.imperio.ouro===1&&resources.piratas.ouro===0");
 click('reset');check("flow.round===1&&flow.phase==='preparação'&&flow.markers.length===0&&state.R1.units.imperio===2");
-assert(!/<(?:script|link|img)\b[^>]*(?:src|href)\s*=/i.test(html),'O protótipo deve funcionar em um único HTML.');
+assert(!/<(?:script|link|img)\b[^>]*(?:src|href)\s*=/i.test(html.replace(/<script>[\s\S]*?<\/script>/g,'')),'O protótipo deve funcionar sem dependências externas obrigatórias.');
 console.log('Seis rodadas e reinício OK');
 `;
 vm.runInNewContext(harness + scenario, { require, console, process, __dirname });

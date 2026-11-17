@@ -21,7 +21,7 @@ Sempre que trocar ao menos um recurso com um jogador, receba 1 ponto. Esse bonus
 | --- | ---: | --- | --- |
 | Furia da Ilha | 3 | Região com tropas aliadas | Mova até 3 tropas para uma região adjacente; Se houver tropas inimigas, batalhe com suas tropas |
 | Conhecimentos da Floresta | 4 | Ao ser atacado | Ignore o primeiro dano na batalha |
-| Canção de paz | 1 | Qualquer combate declarado, mesmo sem os Elfos envolvidos; antes da rolagem | Os Elfos gastam um marcador de ação disponível e descartam esta carta para cancelar o combate, como resultado 0 a 0. Movimentos e custos já realizados permanecem; cartas já declaradas e marcadores gastos não são recuperados. |
+| Canção de paz | 1 | Qualquer combate declarado, mesmo sem os Elfos envolvidos; antes da rolagem | Os Elfos gastam uma ação disponível e descartam esta carta para cancelar o combate, como resultado 0 a 0. Movimentos e custos já realizados permanecem; cartas já declaradas e ações gastas não são recuperadas. |
 | Trilhas na Mata | 3 | Qualquer região | Mova tropas de uma região adjacente para essa |
 | Harmônia | 4 | Região com tropas inimigas | Após revelar a carta, troque com o jogador escolhido quantos recursos desejar, incluindo tropas, se ambos concordem |
 | Frutos da Mata | 5 | Qualquer região dominada | Recolha um recurso da região em cada região com tropas élficas, mesmo que não seja floresta; uma região sem recurso não produz. |
@@ -29,7 +29,7 @@ Sempre que trocar ao menos um recurso com um jogador, receba 1 ponto. Esse bonus
 | Milagre da Floresta | 2 | Qualquer região | Converta 3 recursos de um mesmo tipo em 2 de outro mesmo tipo; tropas élficas contam como recurso. |
 | **Total** | **25** | | |
 
-Canção de paz consome um marcador da reserva, sem colocação prévia no mapa.
+Canção de paz consome uma ação disponível e não requer região.
 
 ## Liderança por carta
 

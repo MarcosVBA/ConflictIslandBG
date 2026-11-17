@@ -12,6 +12,8 @@ Cada batalha consiste em uma única rodada de rolagem. Após aplicar os resultad
 
 **Definido:** somente cartas com texto explícito de reação podem ser usadas como reação; cada carta determina seu momento. Reações não têm região. Futuras cartas poderão reagir ao atacar outros jogadores. Os estados específicos de Guarda Imperial, Praga Resistente e cartas piratas pertencem aos respectivos documentos de facção.
 
+**Definido; implementado:** após o ataque ser confirmado e sua carta e ação serem gastas, o defensor decide e, se quiser, gasta sua reação. Em seguida os Elfos decidem sobre Canção de paz; só depois ocorre a rolagem, quando não houver cancelamento. As escolhas e os gastos confirmados não são revertidos pela Canção de paz.
+
 **Definido; implementado no protótipo principal:** após a declaração de qualquer combate e antes da rolagem, o jogador dos Elfos pode usar Canção de paz para cancelá-lo, mesmo quando os Elfos não participam. Como em uma reação, gasta uma ação disponível e descarta a carta. Resolva o combate como 0 a 0, sem dano aos lados: tropas movidas permanecem no destino, recursos gastos não voltam e cartas já declaradas e ações gastas não são recuperadas, inclusive os de uma reação defensiva declarada anteriormente. A intervenção não torna os Elfos combatentes. A carta está em [Elfos](../faccoes/elfos.md).
 
 ## Rolagem e dano

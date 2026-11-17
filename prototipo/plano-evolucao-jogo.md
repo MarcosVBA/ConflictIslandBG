@@ -1,6 +1,6 @@
 # Plano de evolução para o jogo completo
 
-**Estado: planejamento solicitado; não implementado.** Este documento propõe uma sequência de trabalho para evoluir o [protótipo principal](../mapa-fluxo-dinamico.html), preservando seu fluxo aprovado. Não aprova regras pendentes nem transforma os valores provisórios em regras finais. As decisões de jogo continuam nos módulos do [índice](../README.md), e o estado efetivamente entregue permanece em [Estado e testes](estado-e-testes.md).
+**Estado: implementação em andamento.** Este documento orienta a evolução do [protótipo principal](../mapa-fluxo-dinamico.html), preservando seu fluxo aprovado. Não aprova regras pendentes nem transforma os valores provisórios em regras finais. As decisões de jogo continuam nos módulos do [índice](../README.md), e o estado efetivamente entregue permanece em [Estado e testes](estado-e-testes.md).
 
 ## Objetivos e limites
 
@@ -97,10 +97,10 @@ Carregar recursos sob demanda quando houver benefício; evitar dependências rem
 
 O motor deve distinguir regra definida, proposta em teste e pendência; marcar explicitamente qualquer hipótese já usada pelo protótipo. Investigar e apresentar opções para aprovação do usuário antes de fechar lacunas materiais, entre elas:
 
-- duração definitiva, vitória e desempate; atualmente seis rodadas e empate compartilhado são uma proposta;
-- ataque a regiões somente com construções, dano excedente, efeitos posteriores e retirada;
+- vitória imediata aos 30 pontos e marco de 20 pontos estão definidos; o conteúdo e funcionamento dos futuros eventos de fim de jogo permanecem adiados;
+- ataques a regiões somente com construções e dano excedente têm comportamento definido para teste; efeitos posteriores e retirada ainda podem exigir decisão;
 - elegibilidade de outras reações defensivas e detalhes de alvos que se tornam inválidos;
-- procedimento de Remanejando Mortos e demais interações de cartas ainda indicadas como pendentes;
+- Remanejando Mortos já permite movimentos sucessivos entre regiões devastadas adjacentes; demais interações de cartas ainda podem exigir decisão;
 - posição definitiva do extrator inicial e equilíbrio de mapa, facções, custos e liderança;
 - reposição, limites de componentes físicos e situações sem opções legais, onde ainda não estiverem decididos.
 
