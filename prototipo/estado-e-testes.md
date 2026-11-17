@@ -10,13 +10,13 @@ As fontes de regras e conteúdo são os módulos do [índice](../README.md). Est
 
 O cenário inicial é o descrito em [Mapa](../regras/mapa.md). O extrator inicial na floresta é provisório e ajustável. O estado inicial pode ser restaurado; a restauração também reinicia rodada, placar, cartas e impostos.
 
-O fluxo de ações e parâmetros de mão do protótipo estão registrados em [Regras gerais](../regras/regras-gerais.md). Os critérios provisórios de pontuação e fim estão em [Pontuação](../regras/pontuacao.md). Custos, efeitos e hipóteses específicas pertencem aos documentos de cada facção.
+O fluxo de ações e parâmetros de mão do protótipo estão registrados em [Regras gerais](../regras/regras-gerais.md). Os critérios provisórios de pontuação e fim estão em [Pontuação](../regras/pontuacao.md). Custos, efeitos e hipóteses específicas pertencem aos documentos de cada facção. As construções imperiais e suas habilidades usam as adaptações registradas no módulo do Império.
 
 O mesmo HTML pode ser publicado como site estático e instalado como aplicativo web no celular. Após a primeira visita online e instalação do cache, os arquivos do jogo ficam disponíveis offline; o estado da partida continua em memória e é perdido ao recarregar ou fechar o jogo. A instalação usa o navegador e não produz um APK ou aplicativo de loja.
 
-A mão inicia com cinco cartas por padrão, mantendo o ajuste de tamanho disponível. A interface dispõe cinco cartas por linha em telas maiores e quebra em mais linhas em telas pequenas; selecione uma carta para ler o efeito completo.
+O imposto imperial ativo e seu atraso aparecem em um quadro compacto no painel de jogo durante a seleção do Império na alocação e sua vez na resolução. Ao preparar cada rodada, um novo imposto substitui o anterior não pago; após pagamento, o próximo só é revelado na rodada seguinte. A mão inicia com cinco cartas por padrão, mantendo o ajuste de tamanho disponível. A interface dispõe cinco cartas por linha em telas maiores e quebra em mais linhas em telas pequenas; selecione uma carta para ler o efeito completo.
 
-O mapa representa tropas como pontos por facção, com excedente numérico acima de 12 pontos por grupo; domínio, terreno, recursos, construções e marcadores usam símbolos e rótulos acessíveis. Em cartas de movimento compatíveis, o mapa destaca destinos ou origens e permite selecioná-los; quantidades e confirmação continuam no painel. Ao confirmar a alocação, a interface passa à próxima facção pendente; na resolução destaca um marcador da facção ativa. Essas mudanças são de apresentação e não alteram as regras.
+O mapa representa tropas como pontos por facção, com excedente numérico acima de 12 pontos por grupo; domínio, terreno, recursos, construções e marcadores usam símbolos e rótulos acessíveis. As construções têm ícones ampliados e contrastantes no mapa. Em cartas de movimento compatíveis, o mapa destaca destinos ou origens e permite selecioná-los; quantidades e confirmação continuam no painel. Ao confirmar a alocação, a interface passa à próxima facção pendente; na resolução destaca um marcador da facção ativa. Essas mudanças são de apresentação e não alteram as regras.
 
 Durante uma escolha no mapa, uma região inválida ainda pode ser inspecionada: ela não altera o destino ou a quantidade da ação e uma mensagem explica a restrição. O mapa mantém as áreas clicáveis separadas no tamanho mínimo previsto e oferece retorno visual ao selecionar; a animação respeita a preferência por movimento reduzido.
 
@@ -25,7 +25,7 @@ Durante uma escolha no mapa, uma região inválida ainda pode ser inspecionada: 
 - Os combates implementados exigem tropas defensoras presentes. Invasão Costeira também permite movimento para uma costa sem tropas inimigas, sem combate nem saque. O ataque a uma região com apenas construções depende de uma carta ou regra de alvo ainda não definida.
 - Ataques por outros efeitos, além das cartas identificadas, precisam ser adaptados quando houver definição concreta. O fluxo não transforma presença conjunta em combate automático.
 - A conciliação aplicada para dano excedente a construções está em [Combate](../regras/combate.md); ela precisa ser revisada em relação ao registro histórico.
-- A capacidade temática de recuperação da Torre não possui regra operacional definida. Praga Resistente é uma reação implementada; a Guarda Imperial continua uma proposta opcional e a elegibilidade das demais cartas defensivas segue em aberto.
+- A capacidade temática de recuperação da Torre não possui regra operacional definida. Praga Resistente é uma reação implementada; a Guarda Imperial permanece uma reação de teste (1 dano, ou 2 com Quartel controlado); a elegibilidade das demais cartas defensivas segue em aberto.
 - Não há salvamento, semente reproduzível, exportação de relatório ou métricas automáticas de balanceamento. As ferramentas de depuração alteram o estado e não substituem as ações normais do jogo.
 - O protótipo foi validado pelo usuário para continuar o desenvolvimento. As regras provisórias continuam com o estado indicado em seus módulos; validação do programa não é aprovação de todas as hipóteses de design.
 

@@ -6,15 +6,15 @@
 
 | ID | Região de teste | Terreno | Costa | Recurso | Início |
 | --- | --- | --- | --- | --- | --- |
-| R1 | Praia Dourada | Praia | Sim | Ouro | Império: 1 soldado |
+| R1 | Praia Dourada | Praia | Sim | Ouro | Império: 2 soldados |
 | R2 | Mata da Coroa | Floresta | Não | Madeira | Império: 1 soldado |
-| R3 | Torre Esquecida | Montanha | Não | Ouro | Necromante: 1 zumbi e Torre |
+| R3 | Torre Esquecida | Montanha | Não | Ouro | Necromante: 2 zumbis e Torre |
 | R4 | Bosque Morto | Floresta | Não | Madeira | Necromante: 1 zumbi e extrator provisório |
-| R5 | Enseada Safira | Praia | Sim | Nenhum | Piratas: 2 tropas |
+| R5 | Enseada Safira | Praia | Sim | Nenhum | Piratas: 1 tropa |
 | R6 | Floresta Antiga | Floresta | Não | Madeira | Livre |
-| R7 | Pico Partido | Montanha | Não | Ouro | Livre |
+| R7 | Pico Partido | Montanha | Sim | Ouro | Livre |
 | R8 | Praia dos Náufragos | Praia | Sim | Nenhum | Livre |
-| R9 | Baixio Aberto | Planície | Sim | Nenhum | Livre |
+| R9 | Baixio Aberto | Planície | Não | Nenhum | Livre |
 
 O Império começa com 1 Ouro; o Necromante com 1 Madeira; Piratas começam sem recursos. A posição do extrator entre as regiões iniciais do Necromante permanece pendente e o protótipo usa a floresta como hipótese ajustável. A Torre começa na montanha.
 

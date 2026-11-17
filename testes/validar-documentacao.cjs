@@ -80,7 +80,7 @@ for (const [faction, file, section] of [
   const rows = [...text.matchAll(/^\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|/gm)].map(m => [m[1].trim(), Number(m[2])]);
   const implemented = JSON.parse(run(`JSON.stringify(cardDefs.${faction}.map(([name,count])=>[name,count]))`));
   assert(JSON.stringify(rows) === JSON.stringify(implemented), `Cartas ou quantidades divergentes: ${file}`);
-  assert(rows.reduce((n, row) => n + row[1], 0) === (faction === 'piratas' ? 23 : 22), `Quantidade de cartas inesperada: ${file}`);
+  assert(rows.reduce((n, row) => n + row[1], 0) === ({piratas:23,necromante:22,imperio:24}[faction]), `Quantidade de cartas inesperada: ${file}`);
 }
 
 const mapText = read('regras/mapa.md');
@@ -156,22 +156,24 @@ check('factionIds.every(f=>flow.decks[f].hand.length===5)', 'Todas as facções 
 const beforePreview = run('JSON.stringify({markers:flow.markers,decks:flow.decks})');
 previews[0].onclick();
 assert(run('JSON.stringify({markers:flow.markers,decks:flow.decks})') === beforePreview, 'Consulta da mão alterou cartas ou marcadores.');
+// Tropa adicional apenas para exercitar o combate de duas unidades nesta simulação.
+run('state.R5.units.piratas=2');
 marker('imperio', 'R1'); marker('necromante', 'R4'); marker('piratas', 'R5'); confirmAll();
 play('imperio', 'Alistamento', 0); click('executeAction');
 play('necromante', 'Trabalhadores Zumbificado', 1); click('executeAction');
-play('piratas', 'Atrás do Tesouro', 2); set('destination', 'R9'); set('quantity', 2); click('executeAction');
-check('state.R9.units.piratas===2&&state.R1.units.imperio===3&&resources.necromante.madeira===2');
+play('piratas', 'Atrás do Tesouro', 2); set('destination', 'R8'); set('quantity', 2); click('executeAction');
+check('state.R8.units.piratas===2&&state.R1.units.imperio===4&&resources.necromante.madeira===2');
 score(); click('nextRound');
 prepare('piratas,imperio,necromante'); marker('piratas', 'R1'); marker('imperio', 'R2'); marker('necromante', 'R4'); confirmAll();
-play('piratas', 'Invasão Costeira', 0); set('attackDefender', 'imperio'); set('move-R9', 2); click('prepareAttack');
+play('piratas', 'Invasão Costeira', 0); set('attackDefender', 'imperio'); set('move-R8', 2); click('prepareAttack');
 check("battle&&battle.stage==='reaction'"); set('battleReaction', 'guard'); set('battleReactionMarker', 1);
-run("Math.random=(()=>{let a=[0.55,0.55,0.2];return ()=>a.shift()??0.2})()");
+run("Math.random=(()=>{let a=[0.9,0.55,0,0];return ()=>a.shift()??0.2})()");
 click('rollBattle'); click('applyBattle');
-check('state.R1.units.imperio===2&&state.R1.units.piratas===2&&game.score.piratas===1&&flow.markers[1].used', 'Resultado do combate, reação ou saque incorreto.');
+check('state.R1.units.imperio===2&&state.R1.units.piratas===1&&game.score.piratas===1&&flow.markers[1].used', 'Resultado do combate, reação ou saque incorreto.');
 set('actionMarker', 2); click('passAction'); score(); click('nextRound');
 for (let round = 3; round <= 6; round++) { prepare('imperio,necromante,piratas'); confirmAll(); score(); click('nextRound'); }
 check("flow.phase==='fim'&&game.score.necromante===6", 'Encerramento incorreto.');
-click('reset'); check("flow.round===1&&flow.handSize===5&&state.R5.units.piratas===2&&state.R3.tower&&state.R4.extractor&&game.score.piratas===0", 'Reinício incorreto.');
+click('reset'); check("flow.round===1&&flow.handSize===5&&state.R5.units.piratas===1&&state.R1.units.imperio===2&&state.R3.units.necromante===2&&state.R3.tower&&state.R4.extractor&&game.score.piratas===0", 'Reinício incorreto.');
 
 // Visualização e escolhas no mapa: clicar não executa nem consome uma ação.
 const imperialRegion = regions.find(r => r.innerHTML.includes('Praia Dourada'));
@@ -198,13 +200,13 @@ set('destination', 'R2'); element('destination').onchange();
 check("selected==='R2'", 'Mudança no seletor não destacou o destino no mapa.');
 regions.find(r => r.innerHTML.includes('Praia dos Náufragos')).onclick();
 set('quantity', 1); click('executeAction');
-check('state.R1.units.imperio===0&&state.R8.units.imperio===1&&flow.markers[0].used', 'Movimento guiado pelo mapa incorreto.');
-run("state=initial();state.R9.units.piratas=2;state.R5.units.piratas=0;flow.phase='resolução';flow.order=['piratas','imperio','necromante'];flow.turn=0;flow.markers=[{f:'piratas',region:'R1',used:false}];flow.decks.piratas.hand=[{name:'Invasão Costeira',text:'Atacar'}];renderFlow()");
+check('state.R1.units.imperio===1&&state.R8.units.imperio===1&&flow.markers[0].used', 'Movimento guiado pelo mapa incorreto.');
+run("state=initial();state.R7.units.piratas=2;state.R9.units.piratas=1;state.R5.units.piratas=0;flow.phase='resolução';flow.order=['piratas','imperio','necromante'];flow.turn=0;flow.markers=[{f:'piratas',region:'R1',used:false}];flow.decks.piratas.hand=[{name:'Invasão Costeira',text:'Atacar'}];renderFlow()");
 play('piratas', 'Invasão Costeira', 0);
-assert(run("mapChoice&&mapChoice.valid.includes('R9')"), 'Origem de ataque não foi destacada.');
-regions.find(r => r.innerHTML.includes('Baixio Aberto')).onclick();
-assert(element('move-R9').focused, 'Clique na origem de ataque não focou a quantidade.');
-check('!flow.markers[0].used&&state.R9.units.piratas===2', 'Consulta da origem alterou a ação.');
+assert(run("mapChoice&&mapChoice.valid.includes('R7')&&!mapChoice.valid.includes('R9')"), 'Origem de ataque não foi destacada.');
+regions.find(r => r.innerHTML.includes('Pico Partido')).onclick();
+assert(element('move-R7').focused, 'Clique na origem de ataque não focou a quantidade.');
+check('!flow.markers[0].used&&state.R7.units.piratas===2', 'Consulta da origem alterou a ação.');
 click('reset'); prepare('imperio,necromante,piratas');
 click('confirm-imperio');
 check("flow.allocationFaction==='necromante'&&flow.confirmed.imperio", 'A interface não avançou para a próxima facção pendente.');
@@ -226,7 +228,7 @@ check("(()=>{try{refill('necromante');return false}catch(e){return true}})()", '
 run("state=initial();flow.phase='resolução';flow.order=['piratas','imperio','necromante'];flow.turn=0;flow.markers=[{f:'piratas',region:'R8',used:false}];flow.decks.piratas.hand=[{name:'Invasão Costeira',text:'Mover'}];renderFlow()");
 const goldBefore = run('resources.piratas.ouro');
 play('piratas', 'Invasão Costeira', 0); set('move-R5', 1); set('attackDefender', 'imperio'); click('prepareAttack');
-check("state.R8.units.piratas===1&&state.R5.units.piratas===1&&flow.markers[0].used&&!battle", 'Invasão em costa vazia não foi resolvida.');
+check("state.R8.units.piratas===1&&state.R5.units.piratas===0&&flow.markers[0].used&&!battle", 'Invasão em costa vazia não foi resolvida.');
 assert(run('resources.piratas.ouro') === goldBefore, 'Invasão sem inimigo gerou saque.');
 
 // Praga protege o primeiro dano e consome o marcador do defensor no resultado.
@@ -241,7 +243,7 @@ check("flow.markers[1].used&&flow.decks.necromante.discard.some(c=>c.name==='Pra
 
 // Retorno oferece somente as costas com menos tropas e mantém a escolha do jogador.
 run("state=initial();for(const r of definitions)state[r.id].units.piratas=0;flow.phase='resolução';renderFlow()");
-check("mapChoice.kind==='rescue'&&mapChoice.valid.includes('R8')&&!mapChoice.valid.includes('R1')", 'Ilha à Vista não identificou costas elegíveis.');
+check("mapChoice.kind==='rescue'&&mapChoice.valid.includes('R8')&&mapChoice.valid.includes('R7')&&!mapChoice.valid.includes('R9')&&!mapChoice.valid.includes('R1')", 'Ilha à Vista não identificou costas elegíveis.');
 set('rescueRegion', 'R8'); click('rescuePirate');
 check('state.R8.units.piratas===1&&definitions.reduce((n,r)=>n+state[r.id].units.piratas,0)===1', 'Ilha à Vista não adicionou um único pirata.');
 
@@ -252,6 +254,71 @@ run("state=initial();state.R5.units.imperio=1;resources.imperio.ouro=2");
 set('other','imperio'); set('decision','yes'); set('price',1); set('transportOrigin','R2'); set('destination','R6'); set('quantity',1);
 run("executeCard('piratas','Serviço de Transporte Pirata','R5',0)");
 check("state.R2.units.imperio===0&&state.R6.units.imperio===1&&resources.piratas.ouro===1", 'Transporte não permitiu origem distinta e destino adjacente.');
+// Um imposto por rodada: substituição, atraso e pagamento sem revelação imediata.
+click('reset');
+run("game.taxes=[{g:0,w:1,s:0,p:3},{g:1,w:0,s:0,p:2}]");
+prepare('imperio,necromante,piratas');
+check("game.tax.p===2&&game.taxes.length===1&&document.getElementById('flow').innerHTML.includes('Imposto imperial')", 'Primeiro imposto não foi revelado ou destacado.');
+confirmAll(); score();
+check('game.delay===1', 'Imposto não pago deve acumular atraso.');
+click('nextRound'); prepare('imperio,necromante,piratas');
+check('game.tax.p===3&&game.taxes.length===0&&game.delay===1', 'Novo imposto deve substituir o anterior preservando o atraso.');
+run("resources.imperio.madeira=1;executeCard('imperio','Pagamento de Impostos','R1',0)");
+check('game.tax===null&&game.taxPaid&&game.delay===0&&game.score.imperio===3', 'Pagamento deve encerrar o imposto e zerar o atraso sem revelar outro.');
+confirmAll(); score();
+check('game.delay===0', 'Rodada paga não deve acumular atraso.');
+click('nextRound'); prepare('imperio,necromante,piratas');
+check('game.tax===null', 'Baralho esgotado não deve gerar imposto.');
+// O imposto aparece apenas na seleção ou na vez do Império.
+click('reset');
+assert(!element('flow').innerHTML.includes('class="tax-card"'), 'Imposto não deve aparecer na preparação.');
+prepare('imperio,necromante,piratas');
+assert(element('flow').innerHTML.includes('class="tax-card"'), 'Imposto deve aparecer na seleção do Império.');
+set('markerFaction','piratas'); element('markerFaction').onchange();
+assert(!element('flow').innerHTML.includes('class="tax-card"'), 'Imposto não deve aparecer na seleção de outra facção.');
+marker('imperio','R1'); marker('piratas','R5'); confirmAll();
+assert(element('flow').innerHTML.includes('class="tax-card"'), 'Imposto deve aparecer na vez do Império.');
+set('actionMarker',0); click('passAction');
+assert(!element('flow').innerHTML.includes('class="tax-card"'), 'Imposto não deve aparecer na vez de outra facção.');
+set('actionMarker',1); click('passAction'); score();
+assert(!element('flow').innerHTML.includes('class="tax-card"'), 'Imposto não deve aparecer na pontuação.');
+// Construções imperiais: custos, pré-requisitos, pontuação e coleta.
+click('reset');
+run("resources.imperio={ouro:10,madeira:10};state.R6.units.imperio=1");
+set('tech','Mercado Local');
+check("(()=>{try{executeCard('imperio','O Progresso','R6',0);return false}catch(e){return true}})()", 'Mercado exige Serraria.');
+set('tech','Serraria'); run("executeCard('imperio','O Progresso','R2',0)");
+set('tech','Mercado Local'); run("executeCard('imperio','O Progresso','R6',0)");
+check("state.R2.tech==='Serraria'&&state.R6.tech==='Mercado Local'&&game.score.imperio===2&&resources.imperio.madeira===8&&resources.imperio.ouro===9", 'Construções ou custos incorretos.');
+set('extra',0);
+run("flow.decks.imperio.hand=[{name:'Assegurar Recursos para o Rei'}];executeCard('imperio','Assegurar Recursos para o Rei','R1',0)");
+check('resources.imperio.ouro===11', 'Mercado deve adicionar um Ouro à coleta.');
+// Penalidade não remove recurso quando um tipo está zerado; desempate é escolhido.
+run("state.R6.tech='Quartel';game.tax={g:1,w:0,s:0,p:2};game.delay=2;game.taxPaid=false;game.scored=0;flow.round=1;resources.imperio={ouro:2,madeira:0};scoreRound('R6')");
+check("state.R6.tech===null&&resources.imperio.ouro===2&&game.delay===0", 'Penalidade com recurso zerado incorreta.');
+run("state.R6.tech='Quartel';game.tax={g:1,w:0,s:0,p:2};game.delay=2;game.taxPaid=false;game.scored=0;resources.imperio={ouro:2,madeira:2};scoreRound('R6','madeira')");
+check('resources.imperio.ouro===2&&resources.imperio.madeira===1', 'Penalidade deve respeitar escolha em empate.');
+// Salão troca o imposto sem consumir marcador e uma vez por rodada.
+run("state.R6.tech='Salão Imperial';game.tax={g:1,w:0,s:0,p:2};game.taxes=[{g:0,w:1,s:0,p:3},{g:1,w:1,s:0,p:4}];game.taxPaid=false;game.hallUsedRound=0;flow.phase='resolução';flow.order=['imperio','piratas','necromante'];flow.turn=0;flow.markers=[{f:'imperio',region:'R1',used:false}];renderFlow()");
+set('hallResource','ouro'); click('hallChange');
+check('game.tax.p===4&&game.hallUsedRound===flow.round&&resources.imperio.ouro===1&&!flow.markers[0].used', 'Salão não trocou imposto corretamente.');
+assert(!element('flow').innerHTML.includes('id="hallChange"'), 'Salão não pode ser usado duas vezes na rodada.');
+// Fortaleza oferece uma única nova rolagem de um dado de qualquer tipo.
+run("state=initial();state.R2.tech='Fortaleza';state.R1.units.piratas=3;flow.phase='resolução';flow.order=['imperio','piratas','necromante'];flow.turn=0;flow.markers=[{f:'imperio',region:'R1',used:false}];flow.decks.imperio.hand=[{name:'Marcha Imperial',text:'Atacar'}];renderFlow()");
+play('imperio','Marcha Imperial',0); set('attackDefender','piratas'); set('move-R2',0); click('prepareAttack'); set('battleReaction','none');
+run('Math.random=()=>0'); click('rollBattle');
+assert(element('cardDetail').innerHTML.includes('id="rerollBattle"'), 'Fortaleza não ofereceu rerrolagem.');
+set('rerollDie','d0'); run('Math.random=()=>0.99'); click('rerollBattle');
+check('battle.rerolled&&battle.defenseDice[0][0]===1&&battle.defenseDice[0][1]===1', 'Rerrolagem do dado de defesa incorreta.');
+assert(!element('cardDetail').innerHTML.includes('id="rerollBattle"'), 'Fortaleza permitiu nova rerrolagem.');
+// Guarda com Quartel controlado e acordo acima do antigo limite.
+run("battle=null;state=initial();state.R2.tech='Quartel';state.R1.units.piratas=1;flow.phase='resolução';flow.order=['piratas','imperio','necromante'];flow.turn=0;flow.markers=[{f:'piratas',region:'R1',used:false},{f:'imperio',region:'R2',used:false}];flow.decks.piratas.hand=[{name:'Trabalhe enquanto eles dormem',text:'Atacar'}];flow.decks.imperio.hand=[{name:'Guarda Imperial',text:'Defesa'}];renderFlow()");
+play('piratas','Trabalhe enquanto eles dormem',0); set('attackDefender','imperio'); click('prepareAttack'); set('battleReaction','guard'); set('battleReactionMarker',1); click('rollBattle');
+check('battle.defProtection===2', 'Quartel controlado deve ampliar a Guarda.');
+run("battle=null;state=initial();state.R1.units.piratas=1;resources=initialResources();resources.imperio.ouro=5;resources.piratas.madeira=5");
+set('other','piratas'); set('decision','yes'); set('giveType','ouro'); set('takeType','madeira'); set('give',4); set('take',4);
+run("executeCard('imperio','Aliança com o Império','R1',0)");
+check('resources.imperio.ouro===1&&resources.imperio.madeira===4&&resources.piratas.madeira===1', 'Aliança deve permitir troca acima de dois recursos.');
 console.log('OK: documentação, dados, mapa, domínio, combate, saque e partida simulada de seis rodadas.');
 console.log('Limite: DOM substituto e dados controlados; não verifica apresentação visual nem todas as regras.');
 
