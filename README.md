@@ -21,6 +21,8 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Ideias gerais em exploração ou adiadas | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) · [IA para facções](ideias/ia-para-faccoes.md) |
 | Estado, hipóteses, divergências e testes do jogo | [Estado do protótipo](prototipo/estado-e-testes.md) |
 | Planejamento do protótipo para quatro facções | [Plano de quatro facções](prototipo/plano-quatro-faccoes.md) |
+| Evolução para o jogo completo | [Plano de evolução](prototipo/plano-evolucao-jogo.md) |
+| Conceito de mesa e telas | [Plano de interface](prototipo/plano-interface.md) · [Abrir demonstração visual](prototipo/mesa-conceito.html) |
 
 [Abrir o protótipo principal](mapa-fluxo-dinamico.html): quatro facções, controle manual e fluxo sem alocação prévia. O jogo funciona em um único HTML local, sem servidor ou IA. As versões com alocação prévia estão preservadas como [legado](historico/prototipos/alocacao-de-marcadores.md), sem atualizações futuras.
 
@@ -46,4 +48,4 @@ Os documentos anteriores foram preservados em [histórico](historico/README.md).
 
 ## Verificação local
 
-Com Node.js instalado, execute `node testes/validar-documentacao.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-fluxo-dinamico.cjs`, `node testes/validar-elfos.cjs`, `node testes/validar-necromante.cjs`, `node testes/validar-novas-habilidades.cjs` e `node testes/validar-publicacao.cjs`. Os testes verificam dados e cenários centrais do protótipo principal; não substituem uma partida real nem inspeção visual.
+Com Node.js instalado, execute `node testes/validar-documentacao.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-fluxo-dinamico.cjs`, `node testes/validar-elfos.cjs`, `node testes/validar-necromante.cjs`, `node testes/validar-novas-habilidades.cjs`, `node testes/validar-publicacao.cjs` e `node testes/validar-mesa-conceito.cjs`. Os testes verificam dados e cenários centrais do protótipo principal; não substituem uma partida real nem inspeção visual.

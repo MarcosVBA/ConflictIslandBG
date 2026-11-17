@@ -29,3 +29,5 @@ A distribuição do site é preparada a partir do HTML principal. A cópia publi
 ## Verificações
 
 Execute `node testes/validar-documentacao.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-fluxo-dinamico.cjs`, `node testes/validar-elfos.cjs`, `node testes/validar-necromante.cjs`, `node testes/validar-novas-habilidades.cjs` e `node testes/validar-publicacao.cjs`. Eles verificam dados documentados, regras centrais, leilão, reserva de ações, cenários de combate, seis rodadas simuladas e a preparação da versão publicável. Os testes não interpretam toda a prosa nem substituem verificações específicas de cada alteração.
+
+O [conceito de mesa e telas](mesa-conceito.html) é uma demonstração separada, com dados ilustrativos, descrita no [plano de interface](plano-interface.md). `node testes/validar-mesa-conceito.cjs` verifica os componentes e exemplos com DOM substituto. O acesso automatizado a navegador não estava disponível nesta execução; tela cheia, aparência, foco e responsividade ainda precisam ser conferidos visualmente em navegadores e dispositivos reais.

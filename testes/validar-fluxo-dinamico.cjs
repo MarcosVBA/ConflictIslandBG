@@ -6,6 +6,7 @@ const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8');
 const harness = source.split('// Links dos módulos atuais')[0];
 const scenario = String.raw`
+check("edges.length===18&&!neighbors('R3').includes('R7')&&!neighbors('R7').includes('R3')&&!neighbors('R9').includes('R11')&&!neighbors('R11').includes('R9')&&!neighbors('R7').includes('R9')&&!neighbors('R9').includes('R7')&&!neighbors('R1').includes('R9')&&!neighbors('R9').includes('R1')&&!neighbors('R6').includes('R8')&&!neighbors('R8').includes('R6')&&neighbors('R7').includes('R11')&&neighbors('R11').includes('R7')&&neighbors('R3').includes('R4')&&neighbors('R4').includes('R7')");
 check("byId('R7').name==='Pico Desolado'&&!byId('R7').coast&&byId('R7').resource==='Sem recurso'&&byId('R9').name==='Baixio dos Garimpeiros'&&byId('R9').terrain==='planicie'&&byId('R11').name==='Costa do Ouro Perdido'&&['R9','R11'].every(id=>byId(id).coast&&byId(id).resource==='Ouro')");
 assert(element('diagnostics').innerHTML.includes('Verificações aprovadas'),'Diagnóstico deve refletir a nova distribuição de recursos.');
 set('orderChoice','imperio');set('handSize',5);click('startRound');
