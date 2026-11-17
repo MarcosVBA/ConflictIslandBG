@@ -1,0 +1,31 @@
+- Pontuar por recursos/extração
+	- Um recurso se transforma em pontuação
+		- Piratas
+	- Recursos são gastos para comprar pontos (construções, tecnologia e impostos como pontuação)
+		- Gran' Vália
+- Pontuar por dominar regiões
+	- Expansão como foco
+		- Necromante
+	- Defender pontos disputados (ex: 1pt por rodada para o jogador que dominar a região, inicia sob dominio de um jogador, com bonus de mais 1 ponto)
+		- Dragões
+		- Elfos
+- Pontuar por combate/destruição
+	- Resultado da batalha permite ação de pontuar
+		- Piratas
+	- Remover construções de inimigos
+		- Gran' Vália
+		- Dragões
+- Pontuar por movimentação
+	- Alcançar pontos aleatório no mapa (com bonus de movimentação)
+		- Dragões
+- Pontuar por unidades/trabalhadores
+	- Usa unidades como recurso de troca
+		- Elfos
+		- Gran' Vália
+- Pontuar por interação positiva com jogadores
+	- Trocar recursos
+		- Elfos
+	- Apoiar combates
+		- Piratas
+	- Apoiar movimentação
+		- Piratas
