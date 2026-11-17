@@ -20,7 +20,7 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 
 ## Baralho registrado
 
-**Conteúdo registrado; implementado com adaptações de teste.** Os textos preservam os efeitos documentados; os limites de movimento não substituem a regra de participação no combate.
+**Conteúdo registrado; implementado com adaptações de teste.** Novas Comandante a Bordo recompõe a mão até cinco cartas após descartá-la. Os textos preservam os efeitos documentados; os limites de movimento não substituem a regra de participação no combate.
 
 | Carta | Cópias | Alvo ou condição | Efeito |
 | --- | ---: | --- | --- |
@@ -32,6 +32,6 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 | Pirata Aprendiz | 3 | Região sob seu controle ou sem dominio | Adicione 1 pirata na região. |
 | Mercenários Piratas | 2 | Local com Bar Pirata | Adicione 2 piratas. Você pode movê-los para uma região costeira. |
 | Atrás do Tesouro | 3 | Local com piratas | Mova até 3 piratas dessa região para outra adjacente. |
-| Novas Comandante a Bordo | 2 | Qualquer lugar | Descarte toda a mão. |
+| Novas Comandante a Bordo | 2 | Qualquer lugar | Descarte toda a mão e compre até ter 5 cartas. |
 | Taverna Pirata | 3 | Região sobre seu controle | Adicione um bar pirata na região |
 | **Total** | **23** | | |

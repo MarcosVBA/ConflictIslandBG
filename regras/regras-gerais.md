@@ -8,7 +8,7 @@ Este módulo reúne regras comuns fora de combate, dados, mapa e pontuação. Pa
 
 O protótipo usa marcadores públicos, ordem escolhida manualmente e alternância entre facções com marcadores disponíveis. A configuração padrão da mão é cinco cartas, ajustável de 1 a 10; no início de cada rodada, o jogo completa a mão e reembaralha o descarte se necessário. Passar consome o marcador escolhido. Consultar uma carta durante a alocação não a joga.
 
-**Definido; implementado:** as cartas são compradas somente antes da fase de alocação de marcadores. Durante a resolução, o jogador pode descartar uma carta da mão usando um marcador disponível, inclusive quando não puder jogar nenhuma carta. O descarte não gera compra imediata.
+**Definido; implementado:** a compra normal de cartas ocorre antes da fase de alocação de marcadores. Como exceção, as cartas que mandam descartar toda a mão também compram imediatamente até ter cinco cartas, mesmo durante a resolução. Durante a resolução, o jogador pode descartar uma carta da mão usando um marcador disponível, inclusive quando não puder jogar nenhuma carta. O descarte de uma carta com marcador não gera compra imediata.
 
 **Pendente:** procedimento de liderança, passagem de liderança, ordem definitiva de alocação e resolução, visibilidade dos marcadores, quantidade e política de reposição, passe e tratamento de ações cujo alvo se torna inválido. O uso de cartas que envolvem múltiplas regiões ou qualquer lugar também precisa de revisão.
 

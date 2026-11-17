@@ -319,6 +319,17 @@ run("battle=null;state=initial();state.R1.units.piratas=1;resources=initialResou
 set('other','piratas'); set('decision','yes'); set('giveType','ouro'); set('takeType','madeira'); set('give',4); set('take',4);
 run("executeCard('imperio','Aliança com o Império','R1',0)");
 check('resources.imperio.ouro===1&&resources.imperio.madeira===4&&resources.piratas.madeira===1', 'Aliança deve permitir troca acima de dois recursos.');
+// Cartas que descartam a mão recompram cinco, sem depender do tamanho configurado.
+for (const [f, name, region] of [['piratas','Novas Comandante a Bordo','R5'],['necromante','Remanejando Mortos','R3'],['necromante','Monumento a Morte','R3']]) {
+  click('reset');
+  run(`flow.phase='resolução';flow.handSize=3;flow.order=[${JSON.stringify(f)},...factionIds.filter(x=>x!==${JSON.stringify(f)})];flow.turn=0;flow.markers=[{f:${JSON.stringify(f)},region:${JSON.stringify(region)},used:false}];flow.decks[${JSON.stringify(f)}]={hand:[{name:${JSON.stringify(name)},text:'Efeito'},{name:'Descartada',text:''}],draw:Array.from({length:6},(_,i)=>({name:'Nova '+i,text:''})),discard:[]};renderFlow()`);
+  play(f,name,0); if (name==='Remanejando Mortos') set('destination','R4'); click('executeAction');
+  check(`flow.decks[${JSON.stringify(f)}].hand.length===5&&flow.decks[${JSON.stringify(f)}].hand.every(c=>c.name.startsWith('Nova '))&&flow.decks[${JSON.stringify(f)}].discard.length===2&&flow.markers[0].used`, 'Descarte e compra incorretos: '+name);
+}
+// Se o monte terminar, o descarte pode ser reembaralhado, sem inventar cartas.
+run("flow.phase='resolução';flow.order=['piratas','imperio','necromante'];flow.turn=0;flow.markers=[{f:'piratas',region:'R5',used:false}];flow.decks.piratas={hand:[{name:'Novas Comandante a Bordo',text:''},{name:'Antiga',text:''}],draw:[{name:'Nova',text:''}],discard:[]};renderFlow()");
+play('piratas','Novas Comandante a Bordo',0); click('executeAction');
+check('flow.decks.piratas.hand.length===3&&flow.decks.piratas.draw.length===0&&flow.decks.piratas.discard.length===0', 'Reembaralhamento ou falta de cartas incorretos.');
 console.log('OK: documentação, dados, mapa, domínio, combate, saque e partida simulada de seis rodadas.');
 console.log('Limite: DOM substituto e dados controlados; não verifica apresentação visual nem todas as regras.');
 

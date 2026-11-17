@@ -20,6 +20,8 @@ Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inic
 
 ## Baralho registrado
 
+**Definido; implementado:** Remanejando Mortos e Monumento a Morte recompõem a mão até cinco cartas após descartá-la.
+
 
 | Carta | Cópias | Alvo ou condição | Efeito |
 | --- | ---: | --- | --- |
@@ -31,8 +33,8 @@ Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inic
 | Trabalhadores Zumbificado | 3 | Região com extrator | Colete 1 recurso por extrator colocado no mapa. |
 | Projeto de Poder Maligno | 3 | Região com suas unidades e algum recurso | Adicione 1 extrator, no limite de 1 por região. |
 | Despertar para a Morte | 1 | Região com pelo menos uma unidade inimiga | Converta 1 unidade inimiga em zumbi. |
-| Remanejando Mortos | 3 | Qualquer lugar; troca entre regiões devastadas | Descarte toda a mão e troque a posição de suas tropas nas regiões devastadas. |
-| Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento, pontue 2 por região com monumento e descarte toda a mão. |
+| Remanejando Mortos | 3 | Qualquer lugar; troca entre regiões devastadas | Descarte toda a mão, troque a posição de suas tropas nas regiões devastadas e compre até ter 5 cartas. |
+| Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento, pontue 2 por região com monumento, descarte toda a mão e compre até ter 5 cartas. |
 | **Total** | **22** | | |
 
 ## Magias das Trevas
