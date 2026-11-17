@@ -22,6 +22,27 @@ flowPanel.className = "panel flow-panel";
 flowPanel.innerHTML =
   '<h2>Sua vez de jogar</h2><p class="muted">Controle as quatro facções e escolha cada ação.</p><div id="flow"></div><p id="flowMessage" class="flow-message" role="status"></p>';
 $("flowSlot").appendChild(flowPanel);
+const handHome = $("handArea").parentElement;
+function syncPhaseDialog(phase) {
+  const dialog = $("phaseDialog");
+  if (typeof dialog.showModal !== "function") return;
+  const inDialog = phase === "preparação" || phase === "leilão";
+  if (inDialog) {
+    $("phaseDialogPanel").appendChild(flowPanel);
+    if (phase === "leilão") $("phaseDialogCards").appendChild($("handArea"));
+    else if (handHome) handHome.appendChild($("handArea"));
+    dialog.setAttribute(
+      "aria-label",
+      phase === "leilão" ? "Leilão de liderança" : "Preparação da rodada",
+    );
+    dialog.oncancel = (event) => event.preventDefault();
+    if (!dialog.open) dialog.showModal();
+  } else {
+    if (dialog.open) dialog.close();
+    $("flowSlot").appendChild(flowPanel);
+    if (handHome) handHome.appendChild($("handArea"));
+  }
+}
 function drawTo(f, target) {
   const d = flow.decks[f];
   Object.assign(d, ConflictIslandBase.comprarAte(d, target, shuffle));
@@ -66,9 +87,14 @@ function renderFactionStatus(active) {
   $("statusBar").innerHTML = factionIds
     .map(
       (f) =>
-        `<div class="faction-status ${f} ${active === f ? "current" : ""}"><span class="faction-crest ${f}" aria-hidden="true">${factionCrests[f]}</span><div><strong>${names[f]}${active === f ? " · vez" : ""}</strong><span>◈ ${resources[f].ouro} ouro &nbsp; · &nbsp; ◇ ${resources[f].madeira} madeira</span></div><b>${game.score[f]} <small>pts</small></b></div>`,
+        `<div class="faction-status ${f} ${active === f ? "current" : ""}"><button type="button" class="faction-crest ${f}" data-faction-info="${f}" aria-label="Informações: ${names[f]}" aria-haspopup="dialog">${factionCrests[f]}</button><div><strong>${names[f]}${active === f ? " · vez" : ""}</strong><span>◈ ${resources[f].ouro} ouro &nbsp; · &nbsp; ◇ ${resources[f].madeira} madeira</span></div><b>${game.score[f]} <small>pts</small></b></div>`,
     )
     .join("");
+  $("statusBar")
+    .querySelectorAll("[data-faction-info]")
+    .forEach((button) => {
+      button.onclick = () => showFactionInfo(button.dataset.factionInfo);
+    });
 }
 function factionInfo(f) {
   const owned = definitions.filter((r) => calcOwner(state[r.id]) === f).length,
@@ -95,7 +121,21 @@ function factionInfo(f) {
     const forest = elfForestPoints(definitions, state);
     details = `<p><strong>${forest.owned}</strong> florestas dominadas · <strong>${forest.points}</strong> pontos na pontuação de rodada</p><small>Canção de paz pode ser usada antes dos dados.</small>`;
   }
-  return `<aside class="faction-info" aria-label="Informações de ${names[f]}"><h3>${names[f]}</h3><p><strong>◆ ${res.ouro}</strong> ouro · <strong>♣ ${res.madeira}</strong> madeira</p><p>${troops} tropas · ${owned} regiões dominadas</p>${details}</aside>`;
+  const rules = {
+    imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
+    necromante: `<p><strong>Devastação:</strong> uma região é devastada quando há peças do Necromante e nenhuma peça adversária. No fim da rodada, 2–3 regiões rendem 1 ponto; 4 rendem 2; 5 rendem 3; 6 ou mais rendem 4.</p><p><strong>Magia da Torre:</strong> ao perder seu domínio, remova as peças indicadas pela magia; a Torre permanece e recebe 2 zumbis. Se for sua única região dominada, após comprar cartas adicione 1 zumbi nela, até 5.</p>`,
+    piratas: `<p><strong>Ouro:</strong> cada Ouro recebido rende 1 ponto. Cada Bar controlado gera 1 Ouro por rodada; há limite de 2 Bares.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
+    elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; todas rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
+  };
+  const deck = flow.decks[f];
+  return `<div class="faction-info" aria-label="Informações de ${names[f]}"><h2>${names[f]}</h2><p><strong>${game.score[f]} pontos</strong> · ◆ ${res.ouro} ouro · ♣ ${res.madeira} madeira</p><p>${troops} tropas · ${owned} regiões dominadas</p><p>Baralho: ${deck.draw.length} · mão: ${deck.hand.length} · descarte: ${deck.discard.length}</p>${details}<h3>Regras da facção</h3>${rules[f]}</div>`;
+}
+function showFactionInfo(f) {
+  if (!factionIds.includes(f)) return;
+  $("factionInfoContent").innerHTML = factionInfo(f);
+  const dialog = $("factionDialog");
+  if (typeof dialog.showModal === "function" && !dialog.open)
+    dialog.showModal();
 }
 function cardMeta(f, name) {
   if (isAttackCard(f, name)) return { kind: "Ataque", symbol: "⚔" };
@@ -140,21 +180,6 @@ function handCard(f, c, i, total, preview = false) {
         ? `<img class="card-art-image" src="${escapeAttribute(image)}" alt="" onerror="this.hidden=true">`
         : "";
   return `<button type="button" class="hand-card" data-faction="${f}" data-${preview ? "preview" : "card"}-index="${i}" style="--tilt:${tilt}deg" aria-pressed="false" aria-label="${c.name}. Liderança ${c.leadership}. ${c.text}"><span class="card-top"><span>${meta.kind}</span><span class="card-number" title="Liderança">${c.leadership}</span></span><span class="card-art" aria-hidden="true"><span>${meta.symbol}</span>${art}</span><strong>${c.name}</strong><span class="card-effect">${c.text}</span><span class="card-bottom">Liderança ${c.leadership} · ${meta.kind}</span></button>`;
-}
-function bindHandScroll() {
-  for (const [id, direction] of [
-    ["handPrev", -1],
-    ["handNext", 1],
-  ])
-    $(id).onclick = () => {
-      const reduced =
-        window.matchMedia &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      $("handViewport").scrollBy({
-        left: direction * 180,
-        behavior: reduced ? "auto" : "smooth",
-      });
-    };
 }
 function rescueRegions() {
   const eligible = ConflictIslandBase.opcoesIlhaAVista(state, definitions);
@@ -283,7 +308,6 @@ function renderRoundPhases(phase) {
     )
     .join('<span class="round-separator" aria-hidden="true">›</span>')}`;
   $("headerPhases").innerHTML = content;
-  $("fullscreenPhases").innerHTML = content;
 }
 function renderFlow() {
   if (!battle) closeActionDialog();
@@ -297,6 +321,7 @@ function renderFlow() {
   if (feedback) feedback.textContent = "Selecione uma região para inspecionar.";
   const target = $("flow"),
     phase = flow.phase;
+  syncPhaseDialog(phase);
   renderRoundPhases(phase);
   $("gameTools").innerHTML =
     gameSummary() +
@@ -410,8 +435,8 @@ function renderFlow() {
       $("handArea").hidden = false;
       $("handArea").setAttribute("data-faction", f);
       $("handArea").innerHTML =
-        `<div class="hand-content"><div class="hand-heading"><div><strong>Sua mão</strong> <small>· ${d.hand.length} ${d.hand.length === 1 ? "carta" : "cartas"}</small></div><div class="hand-tools"><button type="button" id="handPrev" aria-label="Ver cartas anteriores">‹</button><button type="button" id="handNext" aria-label="Ver próximas cartas">›</button></div></div><select id="actionCard" class="hand-select" hidden aria-label="Carta selecionada">${d.hand.map((c, i) => `<option value="${i}">${c.name}</option>`).join("")}</select><div class="hand-wrap"><div class="hand" id="handViewport" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length)).join("") || '<p class="hand-empty">Sua mão está vazia. Você pode passar.</p>'}</div></div><small class="hand-tip">Escolha uma carta para ver o efeito completo e preparar a ação.</small></div>${factionInfo(f)}`;
-      html += `<h3>Vez: ${names[f]}</h3><p><strong>Ações disponíveis: ${markers.length}</strong></p><select id="actionMarker" hidden aria-label="Ação disponível">${markers.map(({ m, i }, n) => `<option value="${i}">Ação ${n + 1}</option>`).join("")}</select> <label>Região da próxima ação <select id="actionRegion">${definitions.map((r) => `<option value="${r.id}" ${r.id === selected ? "selected" : ""}>${r.id} · ${r.name}</option>`).join("")}</select></label> <button id="showCard" class="hand-select" hidden ${d.hand.length ? "" : "disabled"}>Examinar carta selecionada</button><div id="cardDetail" class="card-detail"></div><div class="row"><button id="passAction">Passar ação</button><button id="discardAction" disabled>Descartar carta escolhida</button></div><p class="muted">Compra: ${d.draw.length} · mão: ${d.hand.length} · descarte: ${d.discard.length}. Escolha a carta somente ao chegar sua vez.</p>`;
+        `<div class="hand-content"><div class="hand-heading"><div><strong>Sua mão</strong> <small>· ${d.hand.length} ${d.hand.length === 1 ? "carta" : "cartas"}</small></div></div><select id="actionCard" class="hand-select" hidden aria-label="Carta selecionada">${d.hand.map((c, i) => `<option value="${i}">${c.name}</option>`).join("")}</select><div class="hand-wrap"><div class="hand" id="handViewport" tabindex="0" role="region" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length)).join("") || '<p class="hand-empty">Sua mão está vazia. Você pode passar.</p>'}</div></div><small class="hand-tip">Escolha uma carta para ver o efeito completo e preparar a ação.</small></div>`;
+      html += `<h3>Vez: ${names[f]}</h3><p><strong>Ações disponíveis: ${markers.length}</strong></p><select id="actionMarker" hidden aria-label="Ação disponível">${markers.map(({ m, i }, n) => `<option value="${i}">Ação ${n + 1}</option>`).join("")}</select> <label>Região da próxima ação <select id="actionRegion"><option value="" disabled ${selected === null ? "selected" : ""}>Selecione uma região</option>${definitions.map((r) => `<option value="${r.id}" ${r.id === selected ? "selected" : ""}>${r.id} · ${r.name}</option>`).join("")}</select></label> <button id="showCard" class="hand-select" hidden ${d.hand.length ? "" : "disabled"}>Examinar carta selecionada</button><div id="cardDetail" class="card-detail"></div><div class="row"><button id="passAction">Passar ação</button><button id="discardAction" disabled>Descartar carta escolhida</button></div><p class="muted">Compra: ${d.draw.length} · mão: ${d.hand.length} · descarte: ${d.discard.length}. Escolha a carta somente ao chegar sua vez.</p>`;
     } else
       html +=
         '<p>Todas as ações foram resolvidas ou passadas.</p><button id="toScore">Ir à pontuação</button>';
@@ -512,7 +537,6 @@ function renderFlow() {
         $("flowMessage").textContent =
           "Carta descartada; a ação foi consumida. Esse descarte não compra cartas.";
       };
-      bindHandScroll();
       $("actionRegion").onchange = () => {
         const id = $("actionRegion").value;
         if (!byId(id)) return;
@@ -564,17 +588,21 @@ function renderFlow() {
           c = flow.decks[f].hand[ci],
           m = flow.markers[mi],
           id = $("actionRegion").value;
-        if (!c || !m || m.used || m.f !== f || !byId(id)) return;
+        if (!c || !m || m.used || m.f !== f) return;
+        const semRegiao = [
+          "Guarda Imperial",
+          "Praga Resistente",
+          "Conhecimentos da Floresta",
+          "Canção de paz",
+          "Novas Comandante a Bordo",
+        ].includes(c.name);
+        if (!semRegiao && !byId(id)) {
+          $("cardDetail").innerHTML =
+            "<p>Selecione uma região no mapa antes de preparar esta ação.</p>";
+          return;
+        }
         for (const x of flow.markers) if (x.f === f && !x.used) x.region = null;
-        if (
-          ![
-            "Guarda Imperial",
-            "Praga Resistente",
-            "Conhecimentos da Floresta",
-            "Canção de paz",
-            "Novas Comandante a Bordo",
-          ].includes(c.name)
-        ) {
+        if (!semRegiao) {
           m.region = id;
           selected = id;
         }

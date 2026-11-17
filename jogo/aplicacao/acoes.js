@@ -1045,15 +1045,24 @@ function showAttackMovement(f, ci, mi) {
 }
 
 const fullscreenButton = $("fullscreen");
-const exitFullscreenButton = $("exitFullscreen");
-const toolsDrawer = $("toolsDrawer");
-const toolsHome = toolsDrawer.parentElement;
+const phaseFullscreenButton = $("phaseFullscreen");
+$("closeFactionInfo").onclick = () => {
+  const dialog = $("factionDialog");
+  if (typeof dialog.close === "function") dialog.close();
+};
 function updateFullscreenLabel() {
   const active = !!document.fullscreenElement;
   fullscreenButton.textContent = active
     ? "⛶ Sair da tela cheia"
     : "⛶ Tela cheia";
   fullscreenButton.setAttribute(
+    "aria-label",
+    active ? "Sair da tela cheia" : "Entrar em tela cheia",
+  );
+  phaseFullscreenButton.textContent = active
+    ? "⛶ Sair da tela cheia"
+    : "⛶ Tela cheia";
+  phaseFullscreenButton.setAttribute(
     "aria-label",
     active ? "Sair da tela cheia" : "Entrar em tela cheia",
   );
@@ -1074,17 +1083,26 @@ fullscreenButton.onclick = async () => {
       "Não foi possível alterar a tela cheia neste navegador.";
   }
 };
-exitFullscreenButton.onclick = fullscreenButton.onclick;
-if (document.addEventListener)
+phaseFullscreenButton.onclick = fullscreenButton.onclick;
+if (document.addEventListener) {
   document.addEventListener("fullscreenchange", () => {
-    if (document.fullscreenElement && document.body)
-      document.body.appendChild(toolsDrawer);
-    else if (toolsHome) toolsHome.appendChild(toolsDrawer);
     updateFullscreenLabel();
-    (document.fullscreenElement
-      ? exitFullscreenButton
-      : fullscreenButton
-    ).focus();
+    if (!document.fullscreenElement)
+      ($("phaseDialog").open
+        ? phaseFullscreenButton
+        : fullscreenButton
+      ).focus();
   });
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key !== "Escape" || !document.fullscreenElement) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    },
+    true,
+  );
+}
 updateFullscreenLabel();
 renderFlow();

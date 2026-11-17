@@ -15,7 +15,7 @@ regions.find(r=>r.attributes['data-region']==='R1').onclick();assert(element('im
 check("flow.phase==='leilão'&&state.R1.units.imperio===3&&game.imperialRecruitRound===1");
 for(let i=0;i<4;i++)click('passBid');
 check("flow.phase==='resolução'&&activeFaction()==='imperio'&&flow.markers.length===8&&flow.markers.every(m=>!m.used&&m.region===null)");
-assert(element('handArea').innerHTML.includes('Imposto')&&element('handArea').innerHTML.includes('Tecnologias'),'A mão imperial deve mostrar o imposto e as tecnologias.');
+check("factionInfo('imperio').includes('Imposto')&&factionInfo('imperio').includes('Tecnologias')");assert(element('statusBar').innerHTML.includes('data-faction-info="imperio"'),'O símbolo deve oferecer acesso às informações imperiais.');
 assert(!element('flow').innerHTML.includes('id="addMarker"'),'Alocação antecipada não deve estar disponível.');
 run("flow.decks.imperio.hand=[{name:'Alistamento',text:'Recrutar',leadership:0}];renderFlow()");
 set('actionMarker',0);set('actionRegion','R1');

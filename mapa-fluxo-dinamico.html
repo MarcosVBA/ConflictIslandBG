@@ -166,15 +166,79 @@ html:fullscreen body>.debug-drawer{position:fixed;top:10px;right:10px;z-index:41
 html:fullscreen body>.debug-drawer>summary{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:112px;height:36px;padding:0 .8rem;background:#182d28ee;color:#eee9d5;border:1px solid #a7ac87;font:600 .75rem system-ui}
 html:fullscreen #exitFullscreen{right:130px}
 @media(max-width:700px){html:fullscreen body>.debug-drawer{top:52px}html:fullscreen #exitFullscreen{right:10px}}
+
+/* Mão transparente sobre o mapa; lateral ocupa toda a altura da mesa. */
+@media(min-width:1101px) and (min-height:650px){
+  .board-panel:has(#handArea:not([hidden])) .mapwrap{padding-bottom:200px}
+  .board-panel .hand-area:not([hidden]){position:absolute;left:0;right:0;bottom:0;z-index:6;display:block;width:100%;max-width:none;margin:0;padding:0 10px 8px;background:transparent;border:0;box-shadow:none;pointer-events:none}
+  .board-panel .hand-area .hand-content{min-width:0}
+  .board-panel .hand-area .hand{max-width:none;margin:0;padding:5px 4px 3px}
+  .board-panel .hand-area .hand-card,.board-panel .hand-area .hand-tools button{pointer-events:auto}
+  .board-panel .hand-area .hand-heading{margin:0;color:#e8e0c2;text-shadow:0 1px 4px #000}
+  .board-panel .hand-area .hand-tip{display:none}
+  .board-panel:has(#handArea:not([hidden])) .region-info{bottom:198px}
+  .board-panel:has(#handArea:not([hidden])) .legend{bottom:193px}
+}
+@media(max-width:1100px){.board-panel .hand-area:not([hidden]){display:block;margin:0;padding:.6rem;background:transparent;border:0}.board-panel .hand-area .hand{max-width:none}}
+.faction-dialog .faction-info{border:0;padding:0;font-size:.85rem}
+.faction-dialog .faction-info h2{font:26px Georgia,serif;color:#f4e7c9;margin:0 0 .7rem}
+.faction-dialog .faction-info h3{font:18px Georgia,serif;color:#dfc78f;margin:1rem 0 .4rem}
+.faction-dialog .faction-info p{margin:.45rem 0;line-height:1.45}
+@media(max-width:1100px){.sidebar{grid-template-columns:minmax(0,1fr)}.sidebar-heading,#flowSlot,.board-panel .hand-content{min-width:0;max-width:100%}}
+/* Preparação e liderança surgem sobre o mapa; as cartas participam do leilão. */
+.phase-dialog{width:min(900px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:22px;background:linear-gradient(145deg,#213630,#122421);color:#e6dfc9;border:1px solid #c0ab72a8;box-shadow:0 20px 60px #000a;border-radius:4px}
+.phase-dialog::backdrop{background:#081512a6}
+.phase-dialog #phaseFullscreen{float:right;margin:0 0 .5rem .75rem;background:#1b302b;color:#e5e6cf;border:1px solid #647b69;font-size:.75rem}
+.phase-dialog .flow-panel{padding:0;border:0;background:transparent;box-shadow:none}
+.phase-dialog .hand-area:not([hidden]){display:block;width:100%;max-width:none;margin:.7rem 0 0;padding:0;background:transparent;border:0;box-shadow:none}
+.phase-dialog .hand-area .hand{display:flex;max-width:none;margin:0;overflow-x:auto}
+.phase-dialog .hand-card{flex:0 0 150px}
+@media(max-width:700px){.phase-dialog{padding:14px}.phase-dialog .hand-card{flex-basis:126px}}
+.faction-status button.faction-crest{padding:0;box-sizing:border-box;line-height:1;vertical-align:middle;align-self:center}
+.faction-status button.faction-crest svg{margin:0;flex:none}
+@media(min-width:1101px) and (min-height:650px){.board-panel .legend,.board-panel:has(#handArea:not([hidden])) .legend{top:60px;bottom:auto;right:22px;max-width:55%}}
+/* As facções formam uma faixa acima da mesa, com acesso pelos símbolos. */
+main>.statusbar{position:static;grid-column:1/-1;min-width:0;width:100%;max-width:none;margin:0;padding:.35rem .75rem;gap:.4rem;background:#142321}
+@media(min-width:1101px) and (min-height:650px){
+  body>main{grid-template-rows:auto minmax(0,1fr)}
+  main>.statusbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-row:1}
+  main>.board-panel{grid-column:1;grid-row:2}
+  main>.sidebar{grid-column:2;grid-row:2}
+  html:fullscreen body>main{padding-top:52px}
+}
+@media(max-width:1100px){main>.statusbar{display:flex;overflow-x:auto;grid-column:1;padding:.4rem}}
+/* O andamento da rodada fica logo abaixo da faixa de facções. */
+body>header>div:first-child{margin-right:auto}
+main>.round-phases{grid-column:1/-1;justify-content:center;min-height:28px;padding:.25rem .6rem;background:#142321;border-bottom:1px solid #64705b75}
+@media(min-width:1101px) and (min-height:650px){
+  body>main{grid-template-rows:auto auto minmax(0,1fr)}
+  main>.round-phases{grid-row:2}
+  main>.board-panel{grid-row:3}
+  main>.sidebar{grid-row:3}
+}
+@media(max-width:1100px){main>.round-phases{overflow-x:auto;justify-content:flex-start}}
+.board-panel .hand-area .hand{pointer-events:auto}
+/* Tela cheia ocupa toda a janela; Esc retorna ao modo normal. */
+html:fullscreen body>main{padding-top:0}
+html:fullscreen #phaseFullscreen,html:fullscreen #toolsDrawer{display:none}
+/* O título e o subtítulo compartilham a altura do cabeçalho sem encostar na borda. */
+body>header>div:first-child{display:flex;flex-direction:column;justify-content:center;gap:4px;line-height:1}
+body>header h1{margin:0;line-height:1.1}
+body>header small{display:block;line-height:1.1}
+@media(min-width:1101px) and (min-height:650px){.board-panel .map{overflow:visible}.board-panel .map-feedback{top:53px}}
+@media(min-width:1101px) and (min-height:650px){
+  .region,.region.praia,.region.floresta,.region.montanha,.region.planicie{min-height:96px;padding:7px 9px}
+  .region .region-top{margin-top:3px}.region .region-top strong{font-size:13px}
+  .region .region-meta{margin-top:4px}.region .region-pieces{min-height:30px;margin-top:4px}
+}
 /* FIM ESTILO MESA */
 </style></head><body>
-<header><div><h1>Conflict Island</h1><small>A ILHA DE CÂLEPOO</small></div><nav id="headerPhases" class="round-phases" aria-label="Fases da rodada"></nav><div class="row"><button id="fullscreen" type="button" aria-label="Entrar em tela cheia">⛶ Tela cheia</button><button id="reset">Restaurar cenário inicial</button><details id="toolsDrawer" class="debug-drawer"><summary>Ferramentas</summary><footer><section id="gameTools" class="panel utility" aria-label="Informações da partida"></section><details class="panel utility"><summary>Ajustar recursos manualmente</summary><p class="muted">Saldos atualizados pelas ações; ajustes manuais ficam disponíveis para depuração.</p><div id="resources"></div><button id="applyResources">Aplicar recursos</button><p id="resourceMessage" role="status"></p></details><details class="panel utility"><summary>Histórico e desfazer</summary><div class="row"><h2>Histórico</h2><button id="undo">Desfazer última alteração</button></div><ol id="history" class="list"></ol></details><details class="panel utility"><summary>Diagnóstico do cenário inicial</summary><ul id="diagnostics" class="list"></ul><p class="muted">Nomes, distribuição das regiões livres e demais regras permanecem em teste. As conexões foram aprovadas.</p></details><details class="tools"><summary>Ferramentas de teste e ajustes manuais</summary><p class="notice">Ajustes manuais mudam peças; o domínio é recalculado. O extrator começa provisoriamente na floresta do Necromante; sua posição ainda não foi aprovada.</p><p>O domínio é calculado automaticamente a partir das peças.</p><label>Soldados imperiais <input id="imperio" type="number" min="0" step="1" value="0"></label><label>Zumbis <input id="necromante" type="number" min="0" step="1" value="0"></label><label>Piratas <input id="piratas" type="number" min="0" step="1" value="0"></label><label>Elfos <input id="elfos" type="number" min="0" step="1" value="0"></label><label><input id="tower" type="checkbox"> Torre do Necromante</label><label><input id="extractor" type="checkbox"> Extrator do Necromante</label><label>Outras construções imperiais <input id="build-imperio" type="number" min="0" step="1"></label><label>Outras construções do Necromante <input id="build-necromante" type="number" min="0" step="1"></label><label>Construções piratas <input id="build-piratas" type="number" min="0" step="1"></label><label>Construções élficas <input id="build-elfos" type="number" min="0" step="1"></label><div class="row"><button id="apply">Aplicar alterações</button><button id="clear">Limpar região</button></div><p id="message" role="status"></p></details></footer></details></div></header>
-<nav id="fullscreenPhases" class="round-phases fullscreen-phases" aria-label="Fases da rodada"></nav>
-<button id="exitFullscreen" type="button" aria-label="Sair da tela cheia" title="Sair da tela cheia">⛶ Sair da tela cheia</button>
+<header><div><h1>Conflict Island</h1><small>A ILHA DE CÂLEPOO</small></div><div class="row"><button id="fullscreen" type="button" aria-label="Entrar em tela cheia">⛶ Tela cheia</button><button id="reset">Restaurar cenário inicial</button><details id="toolsDrawer" class="debug-drawer"><summary>Ferramentas</summary><footer><section id="gameTools" class="panel utility" aria-label="Informações da partida"></section><details class="panel utility"><summary>Ajustar recursos manualmente</summary><p class="muted">Saldos atualizados pelas ações; ajustes manuais ficam disponíveis para depuração.</p><div id="resources"></div><button id="applyResources">Aplicar recursos</button><p id="resourceMessage" role="status"></p></details><details class="panel utility"><summary>Histórico e desfazer</summary><div class="row"><h2>Histórico</h2><button id="undo">Desfazer última alteração</button></div><ol id="history" class="list"></ol></details><details class="panel utility"><summary>Diagnóstico do cenário inicial</summary><ul id="diagnostics" class="list"></ul><p class="muted">Nomes, distribuição das regiões livres e demais regras permanecem em teste. As conexões foram aprovadas.</p></details><details class="tools"><summary>Ferramentas de teste e ajustes manuais</summary><p class="notice">Ajustes manuais mudam peças; o domínio é recalculado. O extrator começa provisoriamente na floresta do Necromante; sua posição ainda não foi aprovada.</p><p>O domínio é calculado automaticamente a partir das peças.</p><label>Soldados imperiais <input id="imperio" type="number" min="0" step="1" value="0"></label><label>Zumbis <input id="necromante" type="number" min="0" step="1" value="0"></label><label>Piratas <input id="piratas" type="number" min="0" step="1" value="0"></label><label>Elfos <input id="elfos" type="number" min="0" step="1" value="0"></label><label><input id="tower" type="checkbox"> Torre do Necromante</label><label><input id="extractor" type="checkbox"> Extrator do Necromante</label><label>Outras construções imperiais <input id="build-imperio" type="number" min="0" step="1"></label><label>Outras construções do Necromante <input id="build-necromante" type="number" min="0" step="1"></label><label>Construções piratas <input id="build-piratas" type="number" min="0" step="1"></label><label>Construções élficas <input id="build-elfos" type="number" min="0" step="1"></label><div class="row"><button id="apply">Aplicar alterações</button><button id="clear">Limpar região</button></div><p id="message" role="status"></p></details></footer></details></div></header>
 <dialog id="actionDialog" class="action-dialog" aria-label="Ação em andamento"><div id="dialogContent"></div></dialog>
-<main><section class="panel board-panel"><div class="board-head"><div><h2>Ilha de Câlepoo</h2><p class="muted">Selecione uma região para explorar a ilha.</p></div><button id="toggleRegionInfo" type="button" aria-controls="regionInfo" aria-pressed="false">Mostrar informações das regiões</button></div><p id="mapFeedback" class="map-feedback" role="status">Selecione uma região para inspecionar.</p><div class="mapwrap"><div class="map" id="map"><svg id="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg></div></div><div class="legend"><span><i class="dot" style="background:#e7b44d"></i>Império</span><span><i class="dot" style="background:#8b59bd"></i>Necromante</span><span><i class="dot" style="background:#d65b55"></i>Piratas</span><span><i class="dot" style="background:#38a9a5"></i>Elfos</span><span><i class="dot" style="background:#c7c9be"></i>Livre (sem controle)</span><span>⚓ Costa</span><span>● tropas · ⚑ domínio</span><span>♜ Torre · ⚙ extrator · ✝ monumento · ⚒ tecnologia · ♨ Bar</span><span>Verde: floresta · cinza: montanha · areia: praia · azul: planície</span></div><section id="regionInfo" class="region-info" aria-label="Informações da região selecionada" hidden><div id="details"></div></section></section>
-<aside class="sidebar"><div id="statusBar" class="statusbar" aria-label="Placar e recursos"></div><div id="flowSlot"></div></aside></main>
-<section id="handArea" class="hand-area" aria-label="Mão da facção atual"></section>
+<dialog id="factionDialog" class="action-dialog faction-dialog" aria-label="Informações da facção"><div id="factionInfoContent"></div><button id="closeFactionInfo" type="button">Fechar</button></dialog>
+<dialog id="phaseDialog" class="phase-dialog" aria-label="Etapa da rodada"><button id="phaseFullscreen" type="button">⛶ Tela cheia</button><div id="phaseDialogPanel"></div><div id="phaseDialogCards"></div></dialog>
+<main><div id="statusBar" class="statusbar" aria-label="Placar e recursos"></div><nav id="headerPhases" class="round-phases" aria-label="Fases da rodada"></nav><section class="panel board-panel"><div class="board-head"><div><h2>Ilha de Câlepoo</h2><p class="muted">Selecione uma região para explorar a ilha.</p></div><button id="toggleRegionInfo" type="button" aria-controls="regionInfo" aria-pressed="false">Mostrar informações das regiões</button></div><p id="mapFeedback" class="map-feedback" role="status">Selecione uma região para inspecionar.</p><div class="mapwrap" id="mapArea"><div class="map" id="map"><svg id="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg></div></div><div class="legend"><span><i class="dot" style="background:#e7b44d"></i>Império</span><span><i class="dot" style="background:#8b59bd"></i>Necromante</span><span><i class="dot" style="background:#d65b55"></i>Piratas</span><span><i class="dot" style="background:#38a9a5"></i>Elfos</span><span><i class="dot" style="background:#c7c9be"></i>Livre (sem controle)</span><span>⚓ Costa</span><span>● tropas · ⚑ domínio</span><span>♜ Torre · ⚙ extrator · ✝ monumento · ⚒ tecnologia · ♨ Bar</span><span>Verde: floresta · cinza: montanha · areia: praia · azul: planície</span></div><section id="regionInfo" class="region-info" aria-label="Informações da região selecionada" hidden><div id="details"></div></section><section id="handArea" class="hand-area" aria-label="Mão da facção atual"></section></section>
+<aside class="sidebar"><div id="flowSlot"></div></aside></main>
 
 <!-- INÍCIO MOTOR BASE -->
 <script>
@@ -943,12 +1007,16 @@ function render() {
   const r = byId(selected),
     s = state[selected];
   $("details").innerHTML =
-    `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${names[s.owner]}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`;
-  $("tower").checked = s.tower;
-  $("extractor").checked = s.extractor;
-  for (const f of sides) $("build-" + f).value = s.buildings[f];
+    r && s
+      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${names[s.owner]}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
+      : "<p>Selecione uma região para ver suas informações.</p>";
+  $("apply").disabled = !s;
+  $("clear").disabled = !s;
+  $("tower").checked = !!s?.tower;
+  $("extractor").checked = !!s?.extractor;
+  for (const f of sides) $("build-" + f).value = s ? s.buildings[f] : "";
   for (const f of ["imperio", "necromante", "piratas", "elfos"])
-    $(f).value = s.units[f];
+    $(f).value = s ? s.units[f] : "";
   $("resources").innerHTML = ["imperio", "necromante", "piratas", "elfos"]
     .map(
       (f) =>
@@ -1057,6 +1125,10 @@ function describe(s) {
   return `${names[s.owner]}; soldados ${s.units.imperio}, zumbis ${s.units.necromante}, piratas ${s.units.piratas}; torre ${s.tower ? "sim" : "não"}, extrator ${s.extractor ? "sim" : "não"}, construções ${sides.map((f) => names[f] + " " + s.buildings[f]).join(", ")}`;
 }
 function change(next) {
+  if (!state[selected]) {
+    $("message").textContent = "Selecione uma região antes de alterar peças.";
+    return;
+  }
   const before = clone(state[selected]);
   if (JSON.stringify(before) === JSON.stringify(next)) {
     $("message").textContent = "Nenhuma alteração.";
@@ -1199,6 +1271,19 @@ $("toggleRegionInfo").onclick = () => {
     ? "Ocultar informações das regiões"
     : "Mostrar informações das regiões";
 };
+$("mapArea").onclick = (event) => {
+  if (event.target.closest?.(".region") || battle) return;
+  selected = null;
+  regionPulse = null;
+  if (flow.phase === "resolução") {
+    renderFlow();
+  } else {
+    if (mapChoice?.kind === "recruit") $("imperialRecruit").value = "";
+    if (mapChoice?.kind === "rescue") $("rescueRegion").value = "";
+    render();
+  }
+  $("mapFeedback").textContent = "Selecione uma região para inspecionar.";
+};
 diagnostics();
 render();
 </script>
@@ -1239,6 +1324,27 @@ flowPanel.className = "panel flow-panel";
 flowPanel.innerHTML =
   '<h2>Sua vez de jogar</h2><p class="muted">Controle as quatro facções e escolha cada ação.</p><div id="flow"></div><p id="flowMessage" class="flow-message" role="status"></p>';
 $("flowSlot").appendChild(flowPanel);
+const handHome = $("handArea").parentElement;
+function syncPhaseDialog(phase) {
+  const dialog = $("phaseDialog");
+  if (typeof dialog.showModal !== "function") return;
+  const inDialog = phase === "preparação" || phase === "leilão";
+  if (inDialog) {
+    $("phaseDialogPanel").appendChild(flowPanel);
+    if (phase === "leilão") $("phaseDialogCards").appendChild($("handArea"));
+    else if (handHome) handHome.appendChild($("handArea"));
+    dialog.setAttribute(
+      "aria-label",
+      phase === "leilão" ? "Leilão de liderança" : "Preparação da rodada",
+    );
+    dialog.oncancel = (event) => event.preventDefault();
+    if (!dialog.open) dialog.showModal();
+  } else {
+    if (dialog.open) dialog.close();
+    $("flowSlot").appendChild(flowPanel);
+    if (handHome) handHome.appendChild($("handArea"));
+  }
+}
 function drawTo(f, target) {
   const d = flow.decks[f];
   Object.assign(d, ConflictIslandBase.comprarAte(d, target, shuffle));
@@ -1283,9 +1389,14 @@ function renderFactionStatus(active) {
   $("statusBar").innerHTML = factionIds
     .map(
       (f) =>
-        `<div class="faction-status ${f} ${active === f ? "current" : ""}"><span class="faction-crest ${f}" aria-hidden="true">${factionCrests[f]}</span><div><strong>${names[f]}${active === f ? " · vez" : ""}</strong><span>◈ ${resources[f].ouro} ouro &nbsp; · &nbsp; ◇ ${resources[f].madeira} madeira</span></div><b>${game.score[f]} <small>pts</small></b></div>`,
+        `<div class="faction-status ${f} ${active === f ? "current" : ""}"><button type="button" class="faction-crest ${f}" data-faction-info="${f}" aria-label="Informações: ${names[f]}" aria-haspopup="dialog">${factionCrests[f]}</button><div><strong>${names[f]}${active === f ? " · vez" : ""}</strong><span>◈ ${resources[f].ouro} ouro &nbsp; · &nbsp; ◇ ${resources[f].madeira} madeira</span></div><b>${game.score[f]} <small>pts</small></b></div>`,
     )
     .join("");
+  $("statusBar")
+    .querySelectorAll("[data-faction-info]")
+    .forEach((button) => {
+      button.onclick = () => showFactionInfo(button.dataset.factionInfo);
+    });
 }
 function factionInfo(f) {
   const owned = definitions.filter((r) => calcOwner(state[r.id]) === f).length,
@@ -1312,7 +1423,21 @@ function factionInfo(f) {
     const forest = elfForestPoints(definitions, state);
     details = `<p><strong>${forest.owned}</strong> florestas dominadas · <strong>${forest.points}</strong> pontos na pontuação de rodada</p><small>Canção de paz pode ser usada antes dos dados.</small>`;
   }
-  return `<aside class="faction-info" aria-label="Informações de ${names[f]}"><h3>${names[f]}</h3><p><strong>◆ ${res.ouro}</strong> ouro · <strong>♣ ${res.madeira}</strong> madeira</p><p>${troops} tropas · ${owned} regiões dominadas</p>${details}</aside>`;
+  const rules = {
+    imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
+    necromante: `<p><strong>Devastação:</strong> uma região é devastada quando há peças do Necromante e nenhuma peça adversária. No fim da rodada, 2–3 regiões rendem 1 ponto; 4 rendem 2; 5 rendem 3; 6 ou mais rendem 4.</p><p><strong>Magia da Torre:</strong> ao perder seu domínio, remova as peças indicadas pela magia; a Torre permanece e recebe 2 zumbis. Se for sua única região dominada, após comprar cartas adicione 1 zumbi nela, até 5.</p>`,
+    piratas: `<p><strong>Ouro:</strong> cada Ouro recebido rende 1 ponto. Cada Bar controlado gera 1 Ouro por rodada; há limite de 2 Bares.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
+    elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; todas rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
+  };
+  const deck = flow.decks[f];
+  return `<div class="faction-info" aria-label="Informações de ${names[f]}"><h2>${names[f]}</h2><p><strong>${game.score[f]} pontos</strong> · ◆ ${res.ouro} ouro · ♣ ${res.madeira} madeira</p><p>${troops} tropas · ${owned} regiões dominadas</p><p>Baralho: ${deck.draw.length} · mão: ${deck.hand.length} · descarte: ${deck.discard.length}</p>${details}<h3>Regras da facção</h3>${rules[f]}</div>`;
+}
+function showFactionInfo(f) {
+  if (!factionIds.includes(f)) return;
+  $("factionInfoContent").innerHTML = factionInfo(f);
+  const dialog = $("factionDialog");
+  if (typeof dialog.showModal === "function" && !dialog.open)
+    dialog.showModal();
 }
 function cardMeta(f, name) {
   if (isAttackCard(f, name)) return { kind: "Ataque", symbol: "⚔" };
@@ -1357,21 +1482,6 @@ function handCard(f, c, i, total, preview = false) {
         ? `<img class="card-art-image" src="${escapeAttribute(image)}" alt="" onerror="this.hidden=true">`
         : "";
   return `<button type="button" class="hand-card" data-faction="${f}" data-${preview ? "preview" : "card"}-index="${i}" style="--tilt:${tilt}deg" aria-pressed="false" aria-label="${c.name}. Liderança ${c.leadership}. ${c.text}"><span class="card-top"><span>${meta.kind}</span><span class="card-number" title="Liderança">${c.leadership}</span></span><span class="card-art" aria-hidden="true"><span>${meta.symbol}</span>${art}</span><strong>${c.name}</strong><span class="card-effect">${c.text}</span><span class="card-bottom">Liderança ${c.leadership} · ${meta.kind}</span></button>`;
-}
-function bindHandScroll() {
-  for (const [id, direction] of [
-    ["handPrev", -1],
-    ["handNext", 1],
-  ])
-    $(id).onclick = () => {
-      const reduced =
-        window.matchMedia &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      $("handViewport").scrollBy({
-        left: direction * 180,
-        behavior: reduced ? "auto" : "smooth",
-      });
-    };
 }
 function rescueRegions() {
   const eligible = ConflictIslandBase.opcoesIlhaAVista(state, definitions);
@@ -1500,7 +1610,6 @@ function renderRoundPhases(phase) {
     )
     .join('<span class="round-separator" aria-hidden="true">›</span>')}`;
   $("headerPhases").innerHTML = content;
-  $("fullscreenPhases").innerHTML = content;
 }
 function renderFlow() {
   if (!battle) closeActionDialog();
@@ -1514,6 +1623,7 @@ function renderFlow() {
   if (feedback) feedback.textContent = "Selecione uma região para inspecionar.";
   const target = $("flow"),
     phase = flow.phase;
+  syncPhaseDialog(phase);
   renderRoundPhases(phase);
   $("gameTools").innerHTML =
     gameSummary() +
@@ -1627,8 +1737,8 @@ function renderFlow() {
       $("handArea").hidden = false;
       $("handArea").setAttribute("data-faction", f);
       $("handArea").innerHTML =
-        `<div class="hand-content"><div class="hand-heading"><div><strong>Sua mão</strong> <small>· ${d.hand.length} ${d.hand.length === 1 ? "carta" : "cartas"}</small></div><div class="hand-tools"><button type="button" id="handPrev" aria-label="Ver cartas anteriores">‹</button><button type="button" id="handNext" aria-label="Ver próximas cartas">›</button></div></div><select id="actionCard" class="hand-select" hidden aria-label="Carta selecionada">${d.hand.map((c, i) => `<option value="${i}">${c.name}</option>`).join("")}</select><div class="hand-wrap"><div class="hand" id="handViewport" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length)).join("") || '<p class="hand-empty">Sua mão está vazia. Você pode passar.</p>'}</div></div><small class="hand-tip">Escolha uma carta para ver o efeito completo e preparar a ação.</small></div>${factionInfo(f)}`;
-      html += `<h3>Vez: ${names[f]}</h3><p><strong>Ações disponíveis: ${markers.length}</strong></p><select id="actionMarker" hidden aria-label="Ação disponível">${markers.map(({ m, i }, n) => `<option value="${i}">Ação ${n + 1}</option>`).join("")}</select> <label>Região da próxima ação <select id="actionRegion">${definitions.map((r) => `<option value="${r.id}" ${r.id === selected ? "selected" : ""}>${r.id} · ${r.name}</option>`).join("")}</select></label> <button id="showCard" class="hand-select" hidden ${d.hand.length ? "" : "disabled"}>Examinar carta selecionada</button><div id="cardDetail" class="card-detail"></div><div class="row"><button id="passAction">Passar ação</button><button id="discardAction" disabled>Descartar carta escolhida</button></div><p class="muted">Compra: ${d.draw.length} · mão: ${d.hand.length} · descarte: ${d.discard.length}. Escolha a carta somente ao chegar sua vez.</p>`;
+        `<div class="hand-content"><div class="hand-heading"><div><strong>Sua mão</strong> <small>· ${d.hand.length} ${d.hand.length === 1 ? "carta" : "cartas"}</small></div></div><select id="actionCard" class="hand-select" hidden aria-label="Carta selecionada">${d.hand.map((c, i) => `<option value="${i}">${c.name}</option>`).join("")}</select><div class="hand-wrap"><div class="hand" id="handViewport" tabindex="0" role="region" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length)).join("") || '<p class="hand-empty">Sua mão está vazia. Você pode passar.</p>'}</div></div><small class="hand-tip">Escolha uma carta para ver o efeito completo e preparar a ação.</small></div>`;
+      html += `<h3>Vez: ${names[f]}</h3><p><strong>Ações disponíveis: ${markers.length}</strong></p><select id="actionMarker" hidden aria-label="Ação disponível">${markers.map(({ m, i }, n) => `<option value="${i}">Ação ${n + 1}</option>`).join("")}</select> <label>Região da próxima ação <select id="actionRegion"><option value="" disabled ${selected === null ? "selected" : ""}>Selecione uma região</option>${definitions.map((r) => `<option value="${r.id}" ${r.id === selected ? "selected" : ""}>${r.id} · ${r.name}</option>`).join("")}</select></label> <button id="showCard" class="hand-select" hidden ${d.hand.length ? "" : "disabled"}>Examinar carta selecionada</button><div id="cardDetail" class="card-detail"></div><div class="row"><button id="passAction">Passar ação</button><button id="discardAction" disabled>Descartar carta escolhida</button></div><p class="muted">Compra: ${d.draw.length} · mão: ${d.hand.length} · descarte: ${d.discard.length}. Escolha a carta somente ao chegar sua vez.</p>`;
     } else
       html +=
         '<p>Todas as ações foram resolvidas ou passadas.</p><button id="toScore">Ir à pontuação</button>';
@@ -1729,7 +1839,6 @@ function renderFlow() {
         $("flowMessage").textContent =
           "Carta descartada; a ação foi consumida. Esse descarte não compra cartas.";
       };
-      bindHandScroll();
       $("actionRegion").onchange = () => {
         const id = $("actionRegion").value;
         if (!byId(id)) return;
@@ -1781,17 +1890,21 @@ function renderFlow() {
           c = flow.decks[f].hand[ci],
           m = flow.markers[mi],
           id = $("actionRegion").value;
-        if (!c || !m || m.used || m.f !== f || !byId(id)) return;
+        if (!c || !m || m.used || m.f !== f) return;
+        const semRegiao = [
+          "Guarda Imperial",
+          "Praga Resistente",
+          "Conhecimentos da Floresta",
+          "Canção de paz",
+          "Novas Comandante a Bordo",
+        ].includes(c.name);
+        if (!semRegiao && !byId(id)) {
+          $("cardDetail").innerHTML =
+            "<p>Selecione uma região no mapa antes de preparar esta ação.</p>";
+          return;
+        }
         for (const x of flow.markers) if (x.f === f && !x.used) x.region = null;
-        if (
-          ![
-            "Guarda Imperial",
-            "Praga Resistente",
-            "Conhecimentos da Floresta",
-            "Canção de paz",
-            "Novas Comandante a Bordo",
-          ].includes(c.name)
-        ) {
+        if (!semRegiao) {
           m.region = id;
           selected = id;
         }
@@ -1931,7 +2044,7 @@ function showAuctionHand(f, hand, committed) {
   const area = $("handArea");
   area.hidden = false;
   area.setAttribute("data-faction", f);
-  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Lance de ${names[f]}</strong> <small>· selecione cartas para acrescentar</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]} para o leilão">${hand.map((c, i) => handCard(f, c, i, hand.length)).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>${factionInfo(f)}`;
+  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Lance de ${names[f]}</strong> <small>· selecione cartas para acrescentar</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]} para o leilão">${hand.map((c, i) => handCard(f, c, i, hand.length)).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>`;
   renderFactionStatus(f);
   area.querySelectorAll("[data-card-index]").forEach((button) => {
     const i = Number(button.dataset.cardIndex);
@@ -1957,7 +2070,7 @@ function showBattleHand(f) {
     area = $("handArea");
   area.hidden = false;
   area.setAttribute("data-faction", f);
-  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Mão de ${names[f]}</strong> <small>· ${d.hand.length} cartas</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length).replace('<button type="button"', '<button type="button" disabled')).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>${factionInfo(f)}`;
+  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Mão de ${names[f]}</strong> <small>· ${d.hand.length} cartas</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length).replace('<button type="button"', '<button type="button" disabled')).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>`;
   renderFactionStatus(f);
 }
 function consumeActionCard(f, markerIndex, cardIndex, expected) {
@@ -3462,15 +3575,24 @@ function showAttackMovement(f, ci, mi) {
 }
 
 const fullscreenButton = $("fullscreen");
-const exitFullscreenButton = $("exitFullscreen");
-const toolsDrawer = $("toolsDrawer");
-const toolsHome = toolsDrawer.parentElement;
+const phaseFullscreenButton = $("phaseFullscreen");
+$("closeFactionInfo").onclick = () => {
+  const dialog = $("factionDialog");
+  if (typeof dialog.close === "function") dialog.close();
+};
 function updateFullscreenLabel() {
   const active = !!document.fullscreenElement;
   fullscreenButton.textContent = active
     ? "⛶ Sair da tela cheia"
     : "⛶ Tela cheia";
   fullscreenButton.setAttribute(
+    "aria-label",
+    active ? "Sair da tela cheia" : "Entrar em tela cheia",
+  );
+  phaseFullscreenButton.textContent = active
+    ? "⛶ Sair da tela cheia"
+    : "⛶ Tela cheia";
+  phaseFullscreenButton.setAttribute(
     "aria-label",
     active ? "Sair da tela cheia" : "Entrar em tela cheia",
   );
@@ -3491,18 +3613,27 @@ fullscreenButton.onclick = async () => {
       "Não foi possível alterar a tela cheia neste navegador.";
   }
 };
-exitFullscreenButton.onclick = fullscreenButton.onclick;
-if (document.addEventListener)
+phaseFullscreenButton.onclick = fullscreenButton.onclick;
+if (document.addEventListener) {
   document.addEventListener("fullscreenchange", () => {
-    if (document.fullscreenElement && document.body)
-      document.body.appendChild(toolsDrawer);
-    else if (toolsHome) toolsHome.appendChild(toolsDrawer);
     updateFullscreenLabel();
-    (document.fullscreenElement
-      ? exitFullscreenButton
-      : fullscreenButton
-    ).focus();
+    if (!document.fullscreenElement)
+      ($("phaseDialog").open
+        ? phaseFullscreenButton
+        : fullscreenButton
+      ).focus();
   });
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key !== "Escape" || !document.fullscreenElement) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    },
+    true,
+  );
+}
 updateFullscreenLabel();
 renderFlow();
 </script>

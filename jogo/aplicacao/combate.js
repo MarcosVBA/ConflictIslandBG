@@ -96,7 +96,7 @@ function showAuctionHand(f, hand, committed) {
   const area = $("handArea");
   area.hidden = false;
   area.setAttribute("data-faction", f);
-  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Lance de ${names[f]}</strong> <small>· selecione cartas para acrescentar</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]} para o leilão">${hand.map((c, i) => handCard(f, c, i, hand.length)).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>${factionInfo(f)}`;
+  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Lance de ${names[f]}</strong> <small>· selecione cartas para acrescentar</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]} para o leilão">${hand.map((c, i) => handCard(f, c, i, hand.length)).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>`;
   renderFactionStatus(f);
   area.querySelectorAll("[data-card-index]").forEach((button) => {
     const i = Number(button.dataset.cardIndex);
@@ -122,7 +122,7 @@ function showBattleHand(f) {
     area = $("handArea");
   area.hidden = false;
   area.setAttribute("data-faction", f);
-  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Mão de ${names[f]}</strong> <small>· ${d.hand.length} cartas</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length).replace('<button type="button"', '<button type="button" disabled')).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>${factionInfo(f)}`;
+  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Mão de ${names[f]}</strong> <small>· ${d.hand.length} cartas</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length).replace('<button type="button"', '<button type="button" disabled')).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>`;
   renderFactionStatus(f);
 }
 function consumeActionCard(f, markerIndex, cardIndex, expected) {

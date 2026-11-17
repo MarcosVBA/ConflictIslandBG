@@ -315,12 +315,16 @@ function render() {
   const r = byId(selected),
     s = state[selected];
   $("details").innerHTML =
-    `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${names[s.owner]}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`;
-  $("tower").checked = s.tower;
-  $("extractor").checked = s.extractor;
-  for (const f of sides) $("build-" + f).value = s.buildings[f];
+    r && s
+      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${names[s.owner]}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
+      : "<p>Selecione uma região para ver suas informações.</p>";
+  $("apply").disabled = !s;
+  $("clear").disabled = !s;
+  $("tower").checked = !!s?.tower;
+  $("extractor").checked = !!s?.extractor;
+  for (const f of sides) $("build-" + f).value = s ? s.buildings[f] : "";
   for (const f of ["imperio", "necromante", "piratas", "elfos"])
-    $(f).value = s.units[f];
+    $(f).value = s ? s.units[f] : "";
   $("resources").innerHTML = ["imperio", "necromante", "piratas", "elfos"]
     .map(
       (f) =>
@@ -429,6 +433,10 @@ function describe(s) {
   return `${names[s.owner]}; soldados ${s.units.imperio}, zumbis ${s.units.necromante}, piratas ${s.units.piratas}; torre ${s.tower ? "sim" : "não"}, extrator ${s.extractor ? "sim" : "não"}, construções ${sides.map((f) => names[f] + " " + s.buildings[f]).join(", ")}`;
 }
 function change(next) {
+  if (!state[selected]) {
+    $("message").textContent = "Selecione uma região antes de alterar peças.";
+    return;
+  }
   const before = clone(state[selected]);
   if (JSON.stringify(before) === JSON.stringify(next)) {
     $("message").textContent = "Nenhuma alteração.";
@@ -570,6 +578,19 @@ $("toggleRegionInfo").onclick = () => {
   $("toggleRegionInfo").textContent = visible
     ? "Ocultar informações das regiões"
     : "Mostrar informações das regiões";
+};
+$("mapArea").onclick = (event) => {
+  if (event.target.closest?.(".region") || battle) return;
+  selected = null;
+  regionPulse = null;
+  if (flow.phase === "resolução") {
+    renderFlow();
+  } else {
+    if (mapChoice?.kind === "recruit") $("imperialRecruit").value = "";
+    if (mapChoice?.kind === "rescue") $("rescueRegion").value = "";
+    render();
+  }
+  $("mapFeedback").textContent = "Selecione uma região para inspecionar.";
 };
 diagnostics();
 render();

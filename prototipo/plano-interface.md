@@ -10,11 +10,11 @@ Não foram geradas imagens: a demonstração usa cores, gradientes e formas loca
 
 ## Direção da mesa
 
-A mesa ocupa a área disponível e pode entrar em tela cheia quando o navegador permitir. O mapa é o elemento principal e, no desktop, deve caber por inteiro sem rolagem interna; em telas pequenas, a rolagem preserva a legibilidade. Cada unidade aparece como um meeple tradicional na cor da facção; as conexões representam apenas as ligações aprovadas, sem ligações diretas R3–R7, R9–R11, R7–R9, R1–R9 ou R6–R8 e com ligação R7–R11; construções usam tokens maiores na mesma cor e os recursos fixos usam ícones menores coloridos. À direita ficam as facções, pontuação e informações essenciais; a facção ativa recebe cartão maior, cor e recursos destacados. Na parte inferior, a mão permanece visível e permite selecionar uma carta; ao lado, um painel contextual mostra recursos e informações específicas da facção ativa, incluindo imposto e árvore de tecnologias para o Império. Em telas estreitas, os indicadores passam para uma faixa horizontal e a mão permite rolagem lateral.
+A mesa ocupa a área disponível e pode entrar em tela cheia quando o navegador permitir. O mapa é o elemento principal e, no desktop, deve caber por inteiro sem rolagem interna; em telas pequenas, a rolagem preserva a legibilidade. Cada unidade aparece como um meeple tradicional na cor da facção; as conexões representam apenas as ligações aprovadas, sem ligações diretas R3–R7, R9–R11, R7–R9, R1–R9 ou R6–R8 e com ligação R7–R11; construções usam tokens maiores na mesma cor e os recursos fixos usam ícones menores coloridos. À direita ficam as facções, pontuação e informações essenciais; a facção ativa recebe cartão maior, cor e recursos destacados. A mão permanece visível na parte inferior, sobre o mapa e com fundo transparente. Um botão na lateral abre informações e regras da facção atual, incluindo imposto e árvore de tecnologias para o Império. Em telas estreitas, os indicadores passam para uma faixa horizontal e a mão permite rolagem lateral.
 
 No uso normal o HUD se mantém discreto. As ações abrem orientações contextuais: somente depois de uma escolha aparece o que é necessário decidir, seu custo e a consequência. Sempre que possível, o jogador seleciona regiões, cartas, facções e quantidades com elementos do próprio jogo. Botões de confirmação continuam previstos quando a decisão tiver custos ou consequências; a interface não exige campos de texto para fazer jogadas usuais.
 
-O cabeçalho apresenta a rodada e a sequência Preparação, Liderança, Ações e Pontuação; o alistamento integra a preparação. Em tela cheia, o cabeçalho é ocultado, e uma faixa discreta mantém o progresso e o controle de saída acessíveis.
+A faixa de facções fica acima do mapa e permite consultar os dados de qualquer uma pelo respectivo símbolo. Logo abaixo, o indicador mostra a rodada e a sequência Preparação, Liderança, Ações e Pontuação; o alistamento integra a preparação. Em tela cheia, o cabeçalho e seus controles ficam ocultos; a tecla Esc retorna ao modo normal. Preparação e liderança são apresentadas sobre o mapa; o alistamento conserva a seleção direta de região.
 
 ## Exemplos de tela
 
@@ -39,7 +39,7 @@ A preparação obrigatória, acordos, seleção de tropas e escolhas de constru�
 - **Camada contextual:** representar cada escolha pedida pelo motor, com foco controlado, retorno de foco, opção de cancelar apenas quando permitido e informações de consequências. Não deixar um diálogo impedir indefinidamente uma escolha que precisa ser feita no mapa.
 - **Dados e animação:** receber eventos e resultados já calculados do motor, animar rolagem, movimento e pontuação, permitir aceleração e respeitar movimento reduzido. Resultados não podem mudar em redesenho ou ao reproduzir a animação.
 - **Acessibilidade e telas pequenas:** testar leitores de tela, foco preso em diálogos quando aplicável, teclado, contraste, zoom, alvos de toque e orientação retrato/paisagem. A disposição responsiva do conceito precisa ser verificada em dispositivos reais.
-- **Tela cheia:** o botão usa a API do navegador e permite sair pelo mesmo controle ou pelo mecanismo do navegador. Não pressupor suporte em todos os navegadores ou em abertura local.
+- **Tela cheia:** o botão usa a API do navegador; a saída ocorre pelo mecanismo do navegador, como Esc no desktop. Não pressupor suporte em todos os navegadores ou em abertura local.
 
 ## Artes finais e separação técnica
 
