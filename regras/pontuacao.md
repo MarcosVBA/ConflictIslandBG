@@ -4,6 +4,6 @@
 
 **Definido:** há uma fase de pontuação após a resolução de ações. As formas específicas de pontuar ficam nos documentos de cada facção, acessíveis pelo [índice](../README.md).
 
-**Proposta implementada para teste:** a partida dura seis rodadas e vence a maior pontuação ao final; empates são compartilhados. A duração, o critério de vitória e desempate definitivos estão pendentes. Não há teto de pontuação implementado.
+**Definido; implementado:** a partida termina imediatamente quando uma facção atinge 30 pontos de vitória. Ao alcançar 20 pontos, preparar a futura utilização de cartas de eventos de final de jogo; seus efeitos e seu baralho ainda não foram definidos. O protótipo registra o marco de 20 pontos; as cartas de evento ainda não foram definidas nem implementadas.
 
 **Adiado:** [eventos por marcos de pontuação](../ideias/eventos.md). Outras direções ainda não aprovadas estão em [Ideias para formas de pontuar](../ideias/pontuacao.md).

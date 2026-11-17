@@ -1,0 +1,22 @@
+'use strict';
+const assert = require('node:assert/strict');
+const motor = require('../jogo/motor/base.js');
+function regiao() { return { units:{imperio:0,necromante:0,piratas:0,elfos:0},buildings:{imperio:0,necromante:0,piratas:0,elfos:0},tower:false,extractor:false,monument:false,tech:null,bar:false }; }
+let s=regiao();assert.equal(motor.dominio(s),'livre');assert.equal(motor.devastada(s),false);
+s.units.necromante=1;assert.equal(motor.dominio(s),'necromante');assert.equal(motor.devastada(s),true);
+s.units.elfos=1;assert.equal(motor.dominio(s),'livre');assert.equal(motor.devastada(s),false);
+s.units.elfos=2;assert.equal(motor.dominio(s),'elfos');
+s=regiao();s.tower=true;s.extractor=true;assert.equal(motor.construcoes(s,'necromante'),2);assert.equal(motor.dominio(s),'necromante');assert.equal(motor.devastada(s),true);
+s.tech='Serraria';assert.equal(motor.dominio(s),'livre');assert.equal(motor.devastada(s),false);
+s.units.piratas=1;assert.equal(motor.dominio(s),'piratas');
+const edges=[['R1','R2'],['R2','R3']];assert.deepEqual(motor.vizinhos(edges,'R2'),['R1','R3']);assert.deepEqual(motor.vizinhos(edges,'R1'),['R2']);assert.deepEqual(motor.vizinhos(edges,'R9'),[]);
+const saldo={madeira:2,ouro:1};assert.deepEqual(motor.pagar(saldo,1,1),{madeira:1,ouro:0});assert.deepEqual(saldo,{madeira:2,ouro:1});assert.throws(()=>motor.pagar(saldo,1,2),/Recursos insuficientes/);assert.deepEqual(saldo,{madeira:2,ouro:1});assert.deepEqual(motor.receber(saldo,'ouro',2),{madeira:2,ouro:3});assert.deepEqual(saldo,{madeira:2,ouro:1});
+const ordem=['imperio','necromante','piratas','elfos'],markers=[{f:'imperio',used:true},{f:'piratas',used:false}];
+assert.deepEqual(motor.proximaFacção(ordem,0,markers),{faccao:'piratas',indice:2});assert.equal(motor.proximaFacção(ordem,0,[]),null);
+const deck={draw:['a'],hand:['b'],discard:['c','d']};const resultado=motor.comprarAte(deck,4,c=>c.reverse());assert.deepEqual(resultado.hand,['b','a','c','d']);assert.deepEqual(deck,{draw:['a'],hand:['b'],discard:['c','d']});
+const dados=motor.calcularDano(3,1,[[2,1],[2,1],[1,1]],[],0,2);assert.equal(dados.defenderLoss,1);assert.equal(dados.attackerLoss,1);assert.equal(dados.overflow,3);
+const leilao={turn:0,leader:null,high:0,passed:{},offers:{imperio:[],necromante:[]}};
+const mao=[{leadership:1},{leadership:2}],lance=motor.registrarLance(leilao,'imperio',mao,[0]);
+assert.equal(lance.high,1);assert.deepEqual(leilao.offers.imperio,[]);assert.equal(motor.proximoLance(lance,['imperio','necromante']),1);
+assert.throws(()=>motor.registrarLance(lance,'imperio',mao,[0]),/Acrescente cartas/);assert.throws(()=>motor.registrarLance(lance,'necromante',[{leadership:1}],[0]),/Acrescente cartas/);
+console.log('Motor independente: domínio, construções, devastação, vizinhança e recursos verificados.');

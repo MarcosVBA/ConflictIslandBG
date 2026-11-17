@@ -48,4 +48,6 @@ Os documentos anteriores foram preservados em [histórico](historico/README.md).
 
 ## Verificação local
 
-Com Node.js instalado, execute `node testes/validar-documentacao.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-fluxo-dinamico.cjs`, `node testes/validar-elfos.cjs`, `node testes/validar-necromante.cjs`, `node testes/validar-novas-habilidades.cjs`, `node testes/validar-publicacao.cjs` e `node testes/validar-mesa-conceito.cjs`. Os testes verificam dados e cenários centrais do protótipo principal; não substituem uma partida real nem inspeção visual.
+Após editar `jogo/motor/base.js`, execute `node scripts/sincronizar-motor.cjs` para atualizar a cópia incorporada no HTML. Use `node scripts/sincronizar-motor.cjs --verificar` para verificar a sincronização.
+
+Com Node.js instalado, execute `node testes/validar-motor-base.cjs`, `node testes/validar-documentacao.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-fluxo-dinamico.cjs`, `node testes/validar-elfos.cjs`, `node testes/validar-necromante.cjs`, `node testes/validar-novas-habilidades.cjs`, `node testes/validar-publicacao.cjs` e `node testes/validar-mesa-conceito.cjs`. Os testes verificam dados e cenários centrais do protótipo principal; não substituem uma partida real nem inspeção visual.

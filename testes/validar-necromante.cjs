@@ -29,6 +29,14 @@ check("!state.R3.monument&&resources.necromante.madeira===0&&game.score.necroman
 assert(element('actionError').textContent.includes('Recursos insuficientes'),'A interface deve explicar o custo não pago.');
 run("resources.necromante.madeira=1");click('executeAction');
 check("state.R3.monument&&resources.necromante.madeira===0&&game.score.necromante===2&&flow.markers[0].used&&flow.decks.necromante.hand.length===5&&flow.decks.necromante.discard.length===2");
+// Remanejamento permite movimentos repetidos entre regiões devastadas adjacentes.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['necromante',...factionIds.filter(f=>f!=='necromante')];flow.turn=0;flow.markers=[{f:'necromante',region:'R3',used:false}];flow.decks.necromante.hand=[{name:'Remanejando Mortos',text:''}];showRemanejamento('necromante',0,0)");
+set('remOrigin','R3');set('remDestination','R4');set('remQuantity',1);click('remMove');check("state.R3.units.necromante===1&&state.R4.units.necromante===2");
+set('remOrigin','R4');set('remDestination','R3');set('remQuantity',2);click('remMove');check("state.R3.units.necromante===3&&state.R4.units.necromante===0");click('remFinish');check("flow.markers[0].used&&flow.decks.necromante.hand.length===5");
+// Região que estava devastada continua elegível mesmo após esvaziar durante o efeito.
+run("state=initial();state.R6.units.elfos=0;state.R6.units.necromante=1;game=newGame();flow=newFlow();flow.phase='resolução';flow.markers=[{f:'necromante',region:'R4',used:false}];flow.decks.necromante.hand=[{name:'Remanejando Mortos',text:''}];showRemanejamento('necromante',0,0)");
+set('remOrigin','R6');set('remDestination','R4');set('remQuantity',1);click('remMove');check("state.R6.units.necromante===0&&!devastated(state.R6)");
+set('remOrigin','R4');set('remDestination','R6');set('remQuantity',1);click('remMove');check("state.R6.units.necromante===1");click('remCancel');check("state.R6.units.necromante===1&&!flow.markers[0].used");
 console.log('Baralho, magia e custo do Monumento verificados: ${file}');
 `;
   vm.runInNewContext(base + scenario, { require, console, process, __dirname });

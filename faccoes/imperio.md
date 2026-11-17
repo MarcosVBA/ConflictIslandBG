@@ -7,7 +7,7 @@ O cenário inicial está em [Mapa](../regras/mapa.md); as regras comuns de domí
 ## Componentes e funcionamento propostos
 
 - Ao coletar, receba um recurso do tipo disponível na região escolhida.
-- Cada construção de tecnologia exige tropas imperiais na região ao ser construída. Máximo de uma construção imperial por região. Efeitos de construções do mesmo tipo não se acumulam; escolha uma para cada efeito. Os pré-requisitos precisam estar em outra região controlada.
+- Cada construção de tecnologia exige tropas imperiais na região ao ser construída. Máximo de uma construção imperial por região. Efeitos de construções do mesmo tipo não se acumulam; escolha uma para cada efeito. Os pré-requisitos precisam existir em outra região, mesmo que o Império não a domine.
 - **Definido; implementado:** no início de cada rodada, revele um novo imposto para o Império, descarte e substitua o imposto anterior. O imposto ativo pode ser pago uma vez com a ação correspondente, entregando os recursos e removendo o soldado indicado; pontue o valor impresso. 
 - **Prazo para teste; implementado:** após três rodadas consecutivas sem pagar imposto ativo, remova uma construção imperial de maior nível, escolhida pelo jogador em caso de empate, e descarte um recurso do tipo com menor quantidade. Se Ouro e Madeira estiverem empatados acima de zero, o jogador escolhe; se algum tipo estiver em zero, não descarte recurso. Descarte o imposto sem pontuar e zere o atraso; o próximo será revelado no início da rodada seguinte. Sem construção, não há perda adicional de recurso.
 - Ao destruir uma construção inimiga, pontue 2 por construção, sujeito às regras comuns de combate e às pendências de destruição.
@@ -24,7 +24,7 @@ O cenário inicial está em [Mapa](../regras/mapa.md); as regras comuns de domí
 
 Efeitos de coleta aplicam-se uma vez por ação e não criam recurso sem coleta válida.
 
-Durante a construção: Mercado Local e Quartel exigem Serraria; Salão Imperial exige Mercado Local; Fortaleza exige Quartel, em outra região controlada.
+Durante a construção: Mercado Local e Quartel exigem Serraria; Salão Imperial exige Mercado Local; Fortaleza exige Quartel, em outra região.
 Pontue 1 ponto sempre que construir
 
 ## Alistamento Obrigatório
@@ -78,4 +78,4 @@ Se não houver regiões controladas, adicione duas tropas em uma região com men
 | 1 Madeira, 1 Ouro e 1 soldado | 4 | 1 |
 
 
-**Adaptações de teste:** os efeitos das construções dependem de controle; Guarda Imperial usa um marcador defensivo disponível, conforme Combate. Ataques continuam exigindo tropas defensoras, conforme a limitação comum. O baralho de impostos descartados não é reposto durante a partida de teste.
+**Definido; implementado:** as tecnologias imperiais produzem seus efeitos enquanto a construção existir, mesmo sem domínio da região. Os pré-requisitos também exigem apenas a existência da construção em outra região. O Império mantém a penalidade de atraso e os impostos descartados são reembaralhados. O protótipo revela o próximo imposto após um pagamento, mantendo o limite confirmado de um pagamento por rodada.

@@ -4,11 +4,11 @@ Este módulo reúne regras comuns fora de combate, dados, mapa e pontuação. Pa
 
 ## Rodada e ações
 
-**Definido como sistema padrão; implementado no protótipo principal.** Não há fase de alocação prévia. Cada facção começa a rodada com dois marcadores de ação em reserva, fora do mapa. Na sua vez, escolhe uma região e um marcador disponível ao preparar a carta; verifica-se a condição da carta no estado atual do tabuleiro. Um marcador disponível também pode ser consumido para passar, descartar uma carta ou realizar uma reação permitida, perdendo-se a ação correspondente.
+**Definido; parcialmente implementado.** Não há alocação prévia nem marcadores físicos. Cada facção tem duas ações por rodada; na sua vez, escolhe carta e região. Passar, descartar uma carta ou executar uma reação permitida também consome uma ação. A escolha é validada antes de confirmar e gastar a carta, custos e ação. O protótipo ainda usa marcadores virtuais internamente.
 
 Depois da compra normal, resolvem-se as habilidades de preparação, incluindo o [Alistamento Obrigatório](../faccoes/imperio.md), e o leilão. O líder inicia as ações, que seguem em sentido anti-horário: Império → Necromante → Piratas → Elfos → Império. O primeiro jogador da partida é escolhido manualmente; nas rodadas seguintes, o líder anterior inicia o leilão.
 
-A mão tem cinco cartas por padrão, ajustável de 1 a 10 no protótipo. No início da rodada, completa-se a mão, reembaralhando o descarte quando necessário. Cartas que exigem descartar toda a mão compram imediatamente até cinco cartas durante a resolução. Descartar uma carta com marcador não gera compra imediata. Ao cancelar uma preparação de combate antes dos dados, o marcador volta à reserva, salvo se a Magia da Torre já tiver sido resolvida.
+A mão tem cinco cartas por padrão, ajustável de 1 a 10 no protótipo. No início da rodada, completa-se a mão, reembaralhando o descarte quando necessário. Cartas que exigem descartar toda a mão compram imediatamente até cinco cartas durante a resolução. Descartar uma carta com marcador não gera compra imediata. Antes de confirmar o uso da carta, o jogador pode alterar suas escolhas. Depois da confirmação, a ação não pode ser cancelada; no protótipo, confirmar o ataque inicia a resolução sem opção de cancelamento.
 
 O sistema anterior de alocação está preservado como [histórico](../historico/prototipos/alocacao-de-marcadores.md).
 
@@ -19,6 +19,10 @@ O sistema anterior de alocação está preservado como [histórico](../historico
 As facções revelam cartas para disputar a liderança; um novo lance precisa superar o anterior. Cartas oferecidas permanecem abertas até o fim do leilão e não podem ser substituídas: o jogador pode acrescentar cartas ao próprio lance. O vencedor joga primeiro e descarta suas cartas comprometidas; os demais recuperam as suas. O leilão não implica compra imediata após o descarte. Após o líder, segue-se a ordem anti-horária da mesa. Se ninguém fizer um lance positivo, mantém-se o líder anterior; na primeira rodada, ele é escolhido manualmente.
 
 O líder anterior tem a primeira oportunidade de lance; na primeira rodada, usa-se o jogador inicial escolhido manualmente. A vez de ofertar segue a ordem anti-horária da mesa, pulando quem já passou e quem detém o maior lance. Passar retira o jogador do leilão. A disputa termina quando ninguém pode ou precisa cobrir o maior lance, ou quando todos passam sem lance positivo.
+
+## Decisão sobre ações e componentes
+
+**Definido; implementação pendente:** a carta é usada e seu efeito é aplicado no mesmo momento, sem etapa separada de alocação de marcadores. Cada facção mantém duas ações por rodada; as ações de reação também consomem uma delas. O protótipo atual ainda representa essas ações com marcadores virtuais. Por enquanto não há limite digital de peças; futuramente haverá limite a definir. Se uma peça física necessária não estiver disponível, a ação é pulada. A representação dessa disponibilidade no jogo digital ainda precisa ser definida.
 
 ## Demais questões da rodada
 

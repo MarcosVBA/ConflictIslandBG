@@ -38,7 +38,7 @@ Ao perder o domínio da Torre, inclusive por empate, remova imediatamente todas 
 | Magia das Trevas | 3 | Qualquer região, conforme a magia | Escolha uma magia, pague seu custo e execute o efeito. |
 | Trabalhadores Zumbificado | 3 | Região com extrator | Colete 1 recurso por extrator colocado no mapa. |
 | Projeto de Poder Maligno | 3 | Região com suas unidades e algum recurso | Adicione 1 extrator, no limite de 1 por região. |
-| Remanejando Mortos | 2 | Qualquer lugar; troca entre regiões devastadas | Descarte toda a mão, troque a posição de suas tropas nas regiões devastadas e compre até ter 5 cartas. |
+| Remanejando Mortos | 2 | Qualquer região | Descarte a mão e distribua zumbis entre regiões devastadas conectadas, movendo quantas tropas e quantas vezes desejar; compre até ter 5 cartas. |
 | Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento por 1 madeira, pontue 2 por região com monumento, descarte toda a mão e compre até ter 5 cartas. |
 | **Total** | **20** | | |
 
@@ -73,4 +73,4 @@ Despertar para a Morte continua disponível como magia escolhida pela carta Magi
 
 **Praga Resistente implementada:** ao receber um ataque, o Necromante pode usar a carta antes dos dados, consumindo um de seus marcadores ainda disponíveis; a proteção vale para esse combate.
 
-**Pendente:** detalhe da troca em Remanejando Mortos, adaptação de origem/destino e marcadores, revisão das demais interações das cartas.
+**Definido; implementado para teste:** Remanejando Mortos permite distribuir qualquer quantidade de zumbis entre regiões devastadas adjacentes, com quantos movimentos desejar. As regiões elegíveis são as devastadas ao iniciar o efeito; mesmo que uma delas fique vazia durante os movimentos, permanece elegível até a resolução terminar. Cada movimento usa uma ligação direta entre regiões elegíveis. Permanecem em revisão as demais interações das cartas.

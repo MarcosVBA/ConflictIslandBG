@@ -31,3 +31,13 @@ A distribuição do site é preparada a partir do HTML principal. A cópia publi
 Execute `node testes/validar-documentacao.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-fluxo-dinamico.cjs`, `node testes/validar-elfos.cjs`, `node testes/validar-necromante.cjs`, `node testes/validar-novas-habilidades.cjs` e `node testes/validar-publicacao.cjs`. Eles verificam dados documentados, regras centrais, leilão, reserva de ações, cenários de combate, seis rodadas simuladas e a preparação da versão publicável. Os testes não interpretam toda a prosa nem substituem verificações específicas de cada alteração.
 
 O [conceito de mesa e telas](mesa-conceito.html) é uma demonstração separada, com dados ilustrativos, descrita no [plano de interface](plano-interface.md). `node testes/validar-mesa-conceito.cjs` verifica os componentes e exemplos com DOM substituto. O acesso automatizado a navegador não estava disponível nesta execução; tela cheia, aparência, foco e responsividade ainda precisam ser conferidos visualmente em navegadores e dispositivos reais.
+
+## Separação inicial do motor
+
+Domínio, contagem de construções, devastação, vizinhança, operações de recursos, compra, escolha da próxima facção, validação de lances, próximo ofertante e cálculo de dano foram extraídos para `jogo/motor/base.js`, independentes do DOM e usados pelo HTML jogável. `node scripts/sincronizar-motor.cjs` incorpora o módulo ao HTML local; `node scripts/sincronizar-motor.cjs --verificar` detecta divergências. O estado, cartas, transições completas de rodada, combate e apresentação ainda estão acoplados e precisam ser migrados. A mesa conceitual ainda não está ligada ao motor. Os testes `node testes/validar-motor-base.cjs` e a suíte existente verificam a extração; não comprovam todas as interações nem substituem teste visual.
+
+O [inventário inicial](inventario-motor.md) relaciona responsabilidades, cobertura e trabalho restante.
+
+## Decisões recentes e limitações
+
+O protótipo encerra a partida aos 30 pontos e registra o marco de 20 pontos; as cartas de evento ainda não foram definidas. Ataques aceitam construções sem tropas, sem dados de defesa nesse caso. Remanejando Mortos permite movimentos sucessivos entre regiões devastadas adjacentes, com regiões inicialmente devastadas permanecendo elegíveis até o fim do efeito. Tecnologias concedem bônus enquanto existirem e impostos são reembaralhados. O pagamento permanece limitado a uma vez por rodada, conforme confirmado. O protótipo mantém dois contadores virtuais de ação e ainda exibe referências a marcadores; a reformulação completa da interface para apresentar apenas ações ainda permanece pendente. A disponibilidade de peças físicas não é simulada por um estoque digital.
