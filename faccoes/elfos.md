@@ -29,6 +29,8 @@ Sempre que trocar ao menos um recurso com um jogador, receba 1 ponto. Esse bonus
 | Milagre da Floresta | 2 | Qualquer região | Converta 3 recursos de um mesmo tipo em 2 de outro mesmo tipo; tropas élficas contam como recurso. |
 | **Total** | **25** | | |
 
+Na variante de fluxo dinâmico, Canção de paz consome um marcador da reserva, sem colocação prévia no mapa; as demais consequências são as mesmas.
+
 ## Liderança por carta
 
 **Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.

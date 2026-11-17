@@ -32,14 +32,16 @@ R1-R2, R1-R8, R1-R9, R2-R4, R2-R6, R2-R9, R3-R4, R3-R7, R4-R6, R4-R7, R5-R6, R5-
 
 **Definido e implementado no novo cenário:** os Elfos começam dominando duas florestas, com duas unidades em uma e uma unidade na outra.
 
-**Distribuição para teste:** manter R1–R9, seus terrenos, recursos e posições iniciais, exceto que R6 passa de livre a inicial dos Elfos, com uma unidade. No mapa de quatro facções, removem-se as ligações R5–R8 e R9–R2 e substitui-se R2–R6 por R2–R10. Acrescentam-se as duas regiões seguintes; nomes e distribuição estão sujeitos a revisão.
+**Distribuição para teste:** manter os terrenos e as posições iniciais de R1–R9, exceto que R6 passa de livre a inicial dos Elfos, com uma unidade. R7 e R9 recebem os nomes e modificadores abaixo. No mapa de quatro facções, removem-se as ligações R5–R8 e R9–R2 e substitui-se R2–R6 por R2–R10. Acrescentam-se R10 e R11; nomes e distribuição estão sujeitos a revisão.
 
 | ID | Região proposta | Terreno | Costa | Recurso | Início proposto |
 | --- | --- | --- | --- | --- | --- |
+| R7 | Pico Desolado | Montanha | Não | Nenhum | Livre |
+| R9 | Baixio dos Garimpeiros | Planície | Sim | Ouro | Livre |
 | R10 | Bosque Élfico | Floresta | Não | Madeira | Elfos: 2 unidades |
-| R11 | Costa das Brumas | Praia | Sim | Nenhum | Livre |
+| R11 | Costa do Ouro Perdido | Praia | Sim | Ouro | Livre |
 
-**Conexões adicionais de teste, bidirecionais:** R2–R10, R10–R6, R10–R8, R10–R11, R11–R5 e R11–R8. Junto às conexões do cenário anterior, exceto as removidas ou substituídas acima, o mapa tem quatro florestas, cinco costas, duas montanhas e 21 ligações. A Torre Esquecida permanece em R3. A legibilidade da disposição precisa ser validada em navegador e em partida.
+**Conexões adicionais de teste, bidirecionais:** R2–R10, R10–R6, R10–R8, R10–R11, R11–R5 e R11–R8. Junto às conexões do cenário anterior, exceto as removidas ou substituídas acima, o mapa tem quatro florestas, cinco costas, duas montanhas, quatro fontes de Ouro e 21 ligações. A Torre Esquecida permanece em R3. A legibilidade da disposição precisa ser validada em navegador e em partida.
 
 **Definido:** os Elfos começam sem recursos.
 

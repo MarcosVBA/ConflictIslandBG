@@ -14,8 +14,8 @@ for (const [file, seats] of [
 const seats = ${JSON.stringify(seats)};
 for(const leader of seats){
   click('reset');set('orderChoice',leader);set('handSize',5);click('startRound');
+  set('imperialRecruit','R1');click('confirmImperialRecruit');
   for(let i=0;i<seats.length;i++)click('passBid');
-  ${seats.length === 4 ? "set('imperialRecruit','R1');click('confirmImperialRecruit');" : ''}
   const index=seats.indexOf(leader),order=seats.slice(index).concat(seats.slice(0,index)),expected=order.slice(1).concat(order[0]);
   assert(run('flow.allocationFaction')===expected[0],'Primeira alocação deve caber ao próximo jogador.');
   click('finishAllocation');check("flow.phase==='alocação'");

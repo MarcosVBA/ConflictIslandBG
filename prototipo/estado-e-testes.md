@@ -6,11 +6,15 @@
 
 As fontes de regras e conteúdo são os módulos do [índice](../README.md). Este arquivo registra o que o protótipo faz, as escolhas provisórias e suas limitações, sem substituir os textos desses módulos.
 
+Uma [IA para controlar facções](../ideias/ia-para-faccoes.md) foi registrada como direção futura e está adiada; ambos os protótipos continuam com controle manual.
+
 ## Configuração e adaptações em teste
 
 O cenário inicial é o descrito em [Mapa](../regras/mapa.md). O extrator inicial na floresta é provisório e ajustável. O estado inicial pode ser restaurado; a restauração também reinicia rodada, placar, cartas e impostos.
 
 O fluxo de ações e parâmetros de mão do protótipo estão registrados em [Regras gerais](../regras/regras-gerais.md). Os critérios provisórios de pontuação e fim estão em [Pontuação](../regras/pontuacao.md). Custos, efeitos e hipóteses específicas pertencem aos documentos de cada facção. As construções imperiais e suas habilidades usam as adaptações registradas no módulo do Império.
+
+Os três protótipos usam o baralho atualizado do [Necromante](../faccoes/necromante.md), com 20 cartas e duas cópias de Remanejando Mortos. Monumento a Morte exige e consome 1 Madeira. Despertar para a Morte permanece como magia de Magia das Trevas, mas não é uma carta independente.
 
 Ambos os protótipos têm leilão de liderança antes da alocação. A pessoa escolhe o primeiro jogador da partida; nas demais rodadas, o líder anterior começa os lances. O leilão e as ações seguem o sentido anti-horário a partir do líder, usando a sequência fixa de facções registrada em [Regras gerais](../regras/regras-gerais.md). As cartas oferecidas ficam visíveis e só as do vencedor são descartadas; a mão não é recomposta após o leilão. Os valores nas cartas foram definidos pelo usuário para teste e estão registrados em cada módulo de facção; o balanceamento não é final.
 
@@ -18,9 +22,13 @@ Na alocação, o próximo jogador após o líder começa; cada facção coloca u
 
 O mesmo HTML pode ser publicado como site estático e instalado como aplicativo web no celular. Após a primeira visita online e instalação do cache, os arquivos do jogo ficam disponíveis offline; o estado da partida continua em memória e é perdido ao recarregar ou fechar o jogo. A instalação usa o navegador e não produz um APK ou aplicativo de loja.
 
-O [novo protótipo de quatro facções](../mapa-quatro-faccoes.html) é outro HTML local independente, com 11 regiões e os Elfos; não depende de servidor ou arquivos adicionais. O cenário anterior permanece preservado. O novo usa as duas cópias de Alistamento documentadas para o Império e implementa o Alistamento Obrigatório uma vez por rodada, durante a alocação, como adaptação de teste; o HTML anterior mantém três cópias e não inclui essa habilidade. As regras do Império continuam propostas, não aprovadas como finais.
+O [novo protótipo de quatro facções](../mapa-quatro-faccoes.html) é outro HTML local independente, com 11 regiões e os Elfos; não depende de servidor ou arquivos adicionais. O cenário anterior permanece preservado. O novo usa as duas cópias de Alistamento documentadas para o Império; o HTML anterior mantém três cópias. Os três aplicam o Alistamento Obrigatório após a compra, antes do leilão, com limite de sete tropas para a habilidade. As regras do Império continuam propostas, não aprovadas como finais.
+
+O [protótipo de fluxo dinâmico](../mapa-fluxo-dinamico.html) é uma variante separada do cenário de quatro facções, também em um único HTML local. A fase de alocação é substituída por dois marcadores em reserva por facção; a região é escolhida ao preparar cada carta, e reações consomem marcadores ainda disponíveis. O Alistamento Obrigatório ocorre durante a preparação da rodada, após a compra e antes do leilão. Os protótipos com alocação prévia continuam disponíveis para comparação.
 
 No mapa de quatro facções, R5–R8, R9–R2 e R2–R6 não são adjacentes; R2 liga-se a R10. O cenário de três facções mantém suas conexões originais.
+
+Nas duas versões de quatro facções, R9 e R11 são costeiras e fornecem Ouro; R7 é uma montanha sem costa nem recurso. R9 continua sendo planície. O cenário de três facções mantém os terrenos e recursos anteriores.
 
 No novo protótipo, Canção de paz, as cartas élficas e suas pontuações estão implementadas para teste. A seção [Elfos](../faccoes/elfos.md) registra as decisões e adaptações; o [plano](plano-quatro-faccoes.md) e o [mapa](../regras/mapa.md) descrevem o escopo e o cenário. As trocas de tropas usam regiões dominadas pelo recebedor e convertem as unidades para sua facção. A versão nova não está ligada à publicação ou instalação da versão anterior.
 
@@ -35,7 +43,7 @@ Durante uma escolha no mapa, uma região inválida ainda pode ser inspecionada: 
 - Os combates implementados exigem tropas defensoras presentes. Invasão Costeira também permite movimento para uma costa sem tropas inimigas, sem combate nem saque. O ataque a uma região com apenas construções depende de uma carta ou regra de alvo ainda não definida.
 - Ataques por outros efeitos, além das cartas identificadas, precisam ser adaptados quando houver definição concreta. O fluxo não transforma presença conjunta em combate automático.
 - A conciliação aplicada para dano excedente a construções está em [Combate](../regras/combate.md); ela precisa ser revisada em relação ao registro histórico.
-- A capacidade temática de recuperação da Torre não possui regra operacional definida. Praga Resistente é uma reação implementada; a Guarda Imperial permanece uma reação de teste (1 dano, ou 2 com Quartel controlado); a elegibilidade das demais cartas defensivas segue em aberto.
+- A Magia da Torre e sua recuperação estão implementadas nos três protótipos. Ajustes manuais de depuração podem criar estados intermediários e não simulam automaticamente a perda de domínio; Praga Resistente é uma reação implementada; a Guarda Imperial permanece uma reação de teste (1 dano, ou 2 com Quartel controlado); a elegibilidade das demais cartas defensivas segue em aberto.
 - Não há salvamento, semente reproduzível, exportação de relatório ou métricas automáticas de balanceamento. As ferramentas de depuração alteram o estado e não substituem as ações normais do jogo.
 - O protótipo foi validado pelo usuário para continuar o desenvolvimento. As regras provisórias continuam com o estado indicado em seus módulos; validação do programa não é aprovação de todas as hipóteses de design.
 
@@ -54,3 +62,9 @@ Para o novo cenário, execute também `node testes/validar-quatro-faccoes.cjs`. 
 Execute `node testes/validar-lideranca.cjs` para conferir os valores documentados nas duas versões e os cenários de leilão com aumento de lance, lance inválido, passagem, cartas retornadas e descarte do vencedor. Essa simulação também usa DOM substituto e não valida a apresentação visual ou o balanceamento dos valores.
 
 Execute `node testes/validar-alocacao.cjs` para conferir as duas voltas de marcadores, o líder por último e a possibilidade de desfazer, em ambas as versões e com cada facção como líder. O teste usa DOM substituto e não valida a apresentação visual.
+
+Execute `node testes/validar-fluxo-dinamico.cjs` para verificar preparação e alistamento, reserva de marcadores, escolha e troca de região, ação inválida, ações e reações, Canção de paz, seis rodadas sem ações e reinício. A validação usa DOM substituto: ainda são necessárias inspeção visual e partidas reais para avaliar ritmo, equilíbrio e combinações de cartas.
+
+Execute `node testes/validar-necromante.cjs` para comparar o baralho nos três HTMLs com a documentação e verificar a magia Despertar para a Morte e o custo de Monumento a Morte, incluindo a tentativa sem recursos. A validação simulada não cobre todas as interações e combinações do baralho.
+
+As mudanças de Magia da Torre, alistamento e condições de cartas são exercitadas por `node testes/validar-novas-habilidades.cjs`, com DOM substituto; não substitui validação visual nem cobre todas as interações entre cartas.

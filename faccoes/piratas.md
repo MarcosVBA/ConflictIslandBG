@@ -25,7 +25,7 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 | Carta | Cópias | Alvo ou condição | Efeito |
 | --- | ---: | --- | --- |
 | Invasão Costeira | 3 | Região costeira | Mova até 3 unidades de uma região costeira, se houver alvos, faça um saque. |
-| Ataque a Linha de Suprimentos | 2 | Região com inimigos; O inimigo precisa ter ouro | Saqueie um inimigo. Em caso de sucesso, adicione 1 Ouro aos espólios. |
+| Ataque a Linha de Suprimentos | 2 | Região com inimigos e tropas aliadas; O inimigo precisa ter ouro | Saqueie um inimigo. Em caso de sucesso, adicione 1 Ouro aos espólios. |
 | Trabalhe enquanto eles dormem | 1 | Região com inimigo e tropas aliadas | Saqueie; Ignore o primeiro dano recebido em combate. |
 | Carta de Corsário | 2 | Região com outro jogador presente | Proponha um preço de 0 a 3 Ouros. Se aceitar, receba o valor; O jogador que pagou a oferta pode mover piratas para areas adjacentes e realizar um saque (ouro vai para os piratas). |
 | Serviço de Transporte Pirata | 2 | Região com outro jogador presente | Proponha um preço de 0 a 3 Ouros. Se aceitar, receba o valor; O jogador que pagou a oferta pode mover unidades de uma região qualqer para outra costeira ou adjacente |

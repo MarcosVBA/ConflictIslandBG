@@ -18,15 +18,15 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Facção, tecnologias, baralhos e impostos do Império | [Império — proposta](faccoes/imperio.md) |
 | Facção e baralho dos Elfos | [Elfos](faccoes/elfos.md) |
 | Ideias para facções futuras | [Dragões](faccoes/dragoes.md) |
-| Ideias gerais em exploração | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) |
+| Ideias gerais em exploração ou adiadas | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) · [IA para facções](ideias/ia-para-faccoes.md) |
 | Estado, hipóteses, divergências e testes do jogo | [Estado do protótipo](prototipo/estado-e-testes.md) |
 | Planejamento do protótipo para quatro facções | [Plano de quatro facções](prototipo/plano-quatro-faccoes.md) |
 
-[Abrir o protótipo de quatro facções](mapa-quatro-faccoes.html) · [Abrir o protótipo anterior de três facções](mapa-conflito.html). As facções são controladas manualmente, sem IA. Cada jogo está em um único HTML que pode ser aberto localmente sem servidor; a nova versão não depende dos arquivos de instalação da anterior.
+[Abrir o protótipo de fluxo dinâmico](mapa-fluxo-dinamico.html) · [Abrir o protótipo de quatro facções com alocação prévia](mapa-quatro-faccoes.html) · [Abrir o protótipo de três facções](mapa-conflito.html). As facções são controladas manualmente, sem IA. Cada jogo está em um único HTML que pode ser aberto localmente sem servidor; os protótipos de quatro facções não dependem dos arquivos de instalação da versão anterior.
 
 ## Site e instalação no celular
 
-O fluxo em `.github/workflows/pages.yml` publica a versão anterior de três facções no GitHub Pages quando há alteração na branch `main`; o novo protótipo de quatro facções ainda não faz parte da publicação. Em **Settings → Pages**, selecione **GitHub Actions** como origem. O endereço esperado é `https://marcosvba.github.io/ConflictIslandBG/`.
+O fluxo em `.github/workflows/pages.yml` publica a versão anterior de três facções no GitHub Pages quando há alteração na branch `main`; os dois protótipos de quatro facções ainda não fazem parte da publicação. Em **Settings → Pages**, selecione **GitHub Actions** como origem. O endereço esperado é `https://marcosvba.github.io/ConflictIslandBG/`.
 
 O site pode ser instalado pelo menu do navegador no Android ou, no iPhone, pelo Safari em **Compartilhar → Adicionar à Tela de Início**. Após a primeira visita online, o jogo pode abrir offline. A partida não é salva ao fechar ou recarregar. Trata-se de um aplicativo web instalável, sem APK ou distribuição por loja.
 
@@ -46,4 +46,4 @@ Os documentos anteriores foram preservados em [histórico](historico/README.md).
 
 ## Verificação local
 
-Com Node.js instalado, execute `node testes/validar-documentacao.cjs`, `node testes/validar-quatro-faccoes.cjs`, `node testes/validar-lideranca.cjs` e `node testes/validar-alocacao.cjs`. Os testes verificam dados e cenários centrais das duas versões; não substituem uma partida real nem inspeção visual.
+Com Node.js instalado, execute `node testes/validar-documentacao.cjs`, `node testes/validar-quatro-faccoes.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-alocacao.cjs`, `node testes/validar-fluxo-dinamico.cjs` e `node testes/validar-necromante.cjs` e `node testes/validar-novas-habilidades.cjs`. Os testes verificam dados e cenários centrais dos protótipos; não substituem uma partida real nem inspeção visual.

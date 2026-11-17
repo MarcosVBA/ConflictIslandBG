@@ -7,7 +7,7 @@ O cenário inicial está em [Mapa](../regras/mapa.md); as regras comuns de domí
 ## Componentes e funcionamento propostos
 
 - Ao coletar, receba um recurso do tipo disponível na região escolhida.
-- Cada construção de tecnologia ocupa uma região controlada. Máximo de uma construção imperial por região. Efeitos de construções do mesmo tipo não se acumulam; escolha uma para cada efeito. Os pré-requisitos precisam estar em outra região controlada.
+- Cada construção de tecnologia exige tropas imperiais na região ao ser construída. Máximo de uma construção imperial por região. Efeitos de construções do mesmo tipo não se acumulam; escolha uma para cada efeito. Os pré-requisitos precisam estar em outra região controlada.
 - **Definido; implementado:** no início de cada rodada, revele um novo imposto para o Império, descarte e substitua o imposto anterior. O imposto ativo pode ser pago uma vez com a ação correspondente, entregando os recursos e removendo o soldado indicado; pontue o valor impresso. 
 - **Prazo para teste; implementado:** após três rodadas consecutivas sem pagar imposto ativo, remova uma construção imperial de maior nível, escolhida pelo jogador em caso de empate, e descarte um recurso do tipo com menor quantidade. Se Ouro e Madeira estiverem empatados acima de zero, o jogador escolhe; se algum tipo estiver em zero, não descarte recurso. Descarte o imposto sem pontuar e zere o atraso; o próximo será revelado no início da rodada seguinte. Sem construção, não há perda adicional de recurso.
 - Ao destruir uma construção inimiga, pontue 2 por construção, sujeito às regras comuns de combate e às pendências de destruição.
@@ -29,11 +29,11 @@ Pontue 1 ponto sempre que construir
 
 ## Alistamento Obrigatório
 
-Todo turno, durante a alocação de marcadores, adicione uma tropa em qualquer região controlada.
+Todo turno até o jogador ter 7 tropas no mapa, após a compra de carta no inicio da rodada, adicione uma tropa em qualquer região controlada.
 
 Se não houver regiões controladas, adicione duas tropas em uma região com menos tropas inimigas, no caso de empate, o jogador decide.
 
-**Implementação para teste:** o novo protótipo de quatro facções aplica essa habilidade uma vez por rodada, no início da alocação; o HTML anterior de três facções ainda não a inclui.
+**Definido para teste; implementado nos três protótipos:** ocorre uma vez por rodada, após a compra e antes do leilão. O máximo de sete vale para essa habilidade: se restar apenas uma vaga, a recuperação sem região dominada adiciona apenas uma tropa; com sete ou mais, não há alistamento. As cartas podem aumentar o total além de sete. As condições de O Progresso e Assegurar Recursos para o Rei também estão implementadas nos três protótipos.
 
 ## Baralho principal proposto
 
@@ -43,8 +43,8 @@ Se não houver regiões controladas, adicione duas tropas em uma região com men
 | Guarda Imperial | 2 | Ao ser atacado | Ignore até 1 danos às suas unidades nessa batalha. |
 | Tambores de Guerra | 2 | Região qualquer | Mova até 2 soldados adjacentes; Inicie batalha na região; ignore 1 dano às suas unidades na batalha. |
 | Alistamento | 2 | Região controlada | Pague 1 Ouro e adicione 2 soldados. |
-| O Progresso | 3 | Região controlada sem construção imperial | Pague o custo de uma tecnologia disponível e construa-a. |
-| Assegurar Recursos para o Rei | 5 | Região com recurso disponível | Colete 1 recurso; descarte cópias adicionais da mão para coletar mais 1 do mesmo tipo por cópia. |
+| O Progresso | 3 | Região com tropas aliadas e sem construção imperial | Pague o custo de uma tecnologia disponível e construa-a. |
+| Assegurar Recursos para o Rei | 5 | Região com recurso disponível e tropas/construção aliada | Colete 1 recurso; descarte cópias adicionais da mão para coletar mais 1 do mesmo tipo por cópia. |
 | Reorganizar Contingente | 2 | Região com soldados imperiais | Mova até 3 soldados para uma região adjacente. |
 | Aliança com o Império | 1 | Região com outro jogador | Façam uma troca imediata de recursos sem limite, desde que ambos concordem |
 | Pagamento de Impostos | 3 | Região controlada | Pague o imposto ativo e pontue seu valor se puder arcar com o custo. |

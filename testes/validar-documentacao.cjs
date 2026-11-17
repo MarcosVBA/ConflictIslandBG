@@ -82,7 +82,7 @@ for (const [faction, file, section] of [
   // O HTML de três facções é preservado: sua versão anterior usa uma cópia adicional de Alistamento.
   const legacyRows = rows.map(([name, count]) => [name, faction === 'imperio' && name === 'Alistamento' ? count + 1 : count]);
   assert(JSON.stringify(legacyRows) === JSON.stringify(implemented), `Cartas ou quantidades divergentes no protótipo de três facções: ${file}`);
-  assert(rows.reduce((n, row) => n + row[1], 0) === ({piratas:23,necromante:22,imperio:23}[faction]), `Quantidade de cartas inesperada: ${file}`);
+  assert(rows.reduce((n, row) => n + row[1], 0) === ({piratas:23,necromante:20,imperio:23}[faction]), `Quantidade de cartas inesperada: ${file}`);
 }
 
 // A proposta de quatro facções é documentada separadamente e ainda não está no HTML.
@@ -137,7 +137,7 @@ function prime(f, name) {
 }
 function prepare(order) {
   const first = order.split(',')[0];
-  set('orderChoice', first); set('handSize', 5); click('startRound');
+  set('orderChoice', first); set('handSize', 5); click('startRound'); if (run("flow.phase==='alistamento'")) { set('imperialRecruit','R1'); click('confirmImperialRecruit'); }
   const needsNewLeader = run('flow.order[0]') !== first;
   if (needsNewLeader) run(`flow.decks[${JSON.stringify(first)}].hand.push({name:'Carta de teste',leadership:1,text:''});renderFlow()`);
   while (run("flow.phase==='leilão'")) {
@@ -184,7 +184,7 @@ marker('imperio', 'R1'); marker('necromante', 'R4'); marker('piratas', 'R5'); co
 play('imperio', 'Alistamento', 0); click('executeAction');
 play('necromante', 'Trabalhadores Zumbificado', 1); click('executeAction');
 play('piratas', 'Atrás do Tesouro', 2); set('destination', 'R8'); set('quantity', 2); click('executeAction');
-check('state.R8.units.piratas===2&&state.R1.units.imperio===4&&resources.necromante.madeira===2');
+check('state.R8.units.piratas===2&&state.R1.units.imperio===5&&resources.necromante.madeira===2');
 score(); click('nextRound');
 prepare('piratas,imperio,necromante'); marker('piratas', 'R1'); marker('imperio', 'R2'); marker('necromante', 'R4'); confirmAll();
 play('piratas', 'Invasão Costeira', 0); set('attackDefender', 'imperio'); set('move-R8', 2); click('prepareAttack');
@@ -235,7 +235,7 @@ set('markerRegion','R4');click('addMarker');
 check("flow.allocationFaction==='piratas'&&flow.markers.length===1", 'A interface não avançou para a próxima facção.');
 click('undoAllocation');
 check("flow.allocationFaction==='necromante'&&flow.markers.length===0", 'Desfazer não restaurou a vez anterior.');
-click('reset'); set('orderChoice', 'imperio'); set('handSize', 3); click('startRound'); for (let i = 0; i < 3; i++) click('passBid');
+click('reset'); set('orderChoice', 'imperio'); set('handSize', 3); click('startRound'); set('imperialRecruit','R1');click('confirmImperialRecruit'); for (let i = 0; i < 3; i++) click('passBid');
 check('flow.handSize===3&&factionIds.every(f=>flow.decks[f].hand.length===3)', 'O tamanho ajustável da mão deixou de funcionar.');
 click('reset'); check('flow.handSize===5', 'Restaurar deve retornar ao padrão de cinco cartas.');
 

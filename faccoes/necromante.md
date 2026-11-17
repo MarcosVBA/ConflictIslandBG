@@ -2,9 +2,15 @@
 
 ## Identidade e região devastada
 
-Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inicial está em [Mapa](../regras/mapa.md). A fantasia de recuperar a Torre pelo *renascer das trevas* está registrada, mas seu procedimento não foi definido nem implementado.
+Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inicial está em [Mapa](../regras/mapa.md). A recuperação da Torre segue a Magia da Torre abaixo.
 
 **Condição registrada; implementada.** Uma região devastada contém apenas tropas ou construções do Necromante: exige presença de ao menos uma de suas peças e ausência de peças de outras facções. Uma região vazia não é devastada. Essa condição é distinta de domínio por maioria, definido em [Regras gerais](../regras/regras-gerais.md).
+
+## Magia da Torre
+
+**Definida; implementada nos três protótipos.** Se a Torre for a única região dominada pelo Necromante, após a compra normal de cartas adicione um zumbi ali, até cinco zumbis na região.
+
+Ao perder o domínio da Torre, inclusive por empate, remova imediatamente todas as tropas e construções da sua região e todas as tropas e construções do Necromante no mapa; a própria Torre permanece e recebe dois zumbis. Se a perda ocorrer na movimentação anterior a um combate e eliminar um dos combatentes, a ação é consumida sem rolagem. Uma preparação de combate que já acionou a magia não pode ser cancelada.
 
 ## Pontuação territorial
 
@@ -32,10 +38,11 @@ Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inic
 | Magia das Trevas | 3 | Qualquer região, conforme a magia | Escolha uma magia, pague seu custo e execute o efeito. |
 | Trabalhadores Zumbificado | 3 | Região com extrator | Colete 1 recurso por extrator colocado no mapa. |
 | Projeto de Poder Maligno | 3 | Região com suas unidades e algum recurso | Adicione 1 extrator, no limite de 1 por região. |
-| Despertar para a Morte | 1 | Região com pelo menos uma unidade inimiga | Converta 1 unidade inimiga em zumbi. |
-| Remanejando Mortos | 3 | Qualquer lugar; troca entre regiões devastadas | Descarte toda a mão, troque a posição de suas tropas nas regiões devastadas e compre até ter 5 cartas. |
-| Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento, pontue 2 por região com monumento, descarte toda a mão e compre até ter 5 cartas. |
-| **Total** | **22** | | |
+| Remanejando Mortos | 2 | Qualquer lugar; troca entre regiões devastadas | Descarte toda a mão, troque a posição de suas tropas nas regiões devastadas e compre até ter 5 cartas. |
+| Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento por 1 madeira, pontue 2 por região com monumento, descarte toda a mão e compre até ter 5 cartas. |
+| **Total** | **20** | | |
+
+**Implementado nos três protótipos:** Monumento a Morte exige e consome 1 Madeira. Sem o recurso, a ação não é realizada e a carta e o marcador permanecem disponíveis.
 
 ## Liderança por carta
 
@@ -50,7 +57,6 @@ Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inic
 | Magia das Trevas | 1 |
 | Trabalhadores Zumbificado | 0 |
 | Projeto de Poder Maligno | 1 |
-| Despertar para a Morte | 2 |
 | Remanejando Mortos | 0 |
 | Monumento a Morte | 1 |
 
@@ -63,6 +69,8 @@ Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inic
 | Devastar | 1 Madeira e 2 Ouros | Elimine todas as tropas inimigas em uma região com pelo menos uma unidade aliada e remova 1 zumbi da região. |
 | Trabalhadores incansáveis | 3 Madeiras | Adicione 1 extrator em uma região com recursos e colete 1 recurso imediatamente. |
 
+Despertar para a Morte continua disponível como magia escolhida pela carta Magia das Trevas; não integra o baralho como carta independente.
+
 **Praga Resistente implementada:** ao receber um ataque, o Necromante pode usar a carta antes dos dados, consumindo um de seus marcadores ainda disponíveis; a proteção vale para esse combate.
 
-**Pendente:** detalhe da troca em Remanejando Mortos, adaptação de origem/destino e marcadores, efeito de perda da Torre e revisão das demais interações das cartas.
+**Pendente:** detalhe da troca em Remanejando Mortos, adaptação de origem/destino e marcadores, revisão das demais interações das cartas.
