@@ -18,6 +18,9 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 ## Pontuação
 
 **Definido:** na fase de pontuação, após receber a renda do Bar, os Piratas devolvem à reserva todo o Ouro que possuem e recebem 1 ponto por Ouro devolvido. Durante a rodada, podem trocar o Ouro recebido antes da pontuação. Um Bar controlado gera 1 Ouro por rodada; os Piratas podem ter no máximo um Bar no mapa. O acordo de Corsário concede uma operação imediata de movimento.
+**Definido:** quando um Bar é destruído, os Piratas perdem todo o Ouro que possuem e 1 ponto de vitória. Isso inclui a remoção do Bar pela recuperação da Torre.
+
+**Pendente:** definir se a pontuação pode ficar negativa. No protótipo, a penalidade é aplicada integralmente, inclusive abaixo de zero, como hipótese de teste.
 
 ## Baralho vigente
 

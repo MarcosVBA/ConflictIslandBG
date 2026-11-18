@@ -16,7 +16,9 @@ for (const [name, file] of [['MAPA','mapa.js'],['FLUXO','fluxo.js'],['COMBATE','
     const placeholder = '// @aplicacao PONTUACAO';
     if (!source.includes(placeholder)) throw Error('Marcador de pontuação ausente na aplicação.');
     const scoring = fs.readFileSync(path.join(root, 'jogo/aplicacao/pontuacao.js'), 'utf8').trimEnd();
-    source = source.replace(placeholder, () => `// INÍCIO PONTUAÇÃO\n${scoring}\n// FIM PONTUAÇÃO`);
+    const eventData = fs.readFileSync(path.join(root, 'jogo/dados/eventos.js'), 'utf8').trimEnd();
+    const eventApp = fs.readFileSync(path.join(root, 'jogo/aplicacao/eventos.js'), 'utf8').trimEnd();
+    source = source.replace(placeholder, () => `// INÍCIO PONTUAÇÃO\n${scoring}\n// FIM PONTUAÇÃO\n// INÍCIO EVENTOS\n${eventData}\n${eventApp}\n// FIM EVENTOS`);
   }
   for (const [dataName, dataFile] of [['MAPA','mapa.js'],['CARTAS','cartas.js'],['IMPERIO','imperio.js']]) {
     const placeholder = `// @dados ${dataName}`;

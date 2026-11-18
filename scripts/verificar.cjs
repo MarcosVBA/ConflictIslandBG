@@ -11,6 +11,7 @@ const suites = {
     ['Formatação da aplicação', 'node_modules/prettier/bin/prettier.cjs', '--check', ...applicationFiles],
     ['Documentação', 'testes/validar-documentacao.cjs'],
     ['Motor', 'testes/validar-motor-base.cjs'],
+    ['Eventos', 'testes/validar-eventos.cjs'],
   ],
   combate: [['Combate e fluxo', 'testes/validar-fluxo-dinamico.cjs']],
   elfos: [['Elfos', 'testes/validar-elfos.cjs']],

@@ -5,6 +5,10 @@ function newGame() {
     score: { imperio: 0, necromante: 0, piratas: 0, elfos: 0 },
     victoryTarget: 30,
     endEventsReady: false,
+    eventPending: false,
+    eventDeck: [],
+    eventDiscard: [],
+    eventFlags: { pirateWealth: false, goldScarce: false, noWood: [] },
     winner: null,
     taxes: shuffle(imperialTaxes.map((t) => ({ ...t }))),
     tax: null,
@@ -24,13 +28,18 @@ function addPoints(f, n, reason) {
   if (game.winner) return;
   const result = ConflictIslandBase.registrarPontos(game, f, n);
   Object.assign(game, result.partida);
-  game.scoreLog.push(`Rodada ${flow.round}: ${names[f]} +${n} — ${reason}`);
-  if (result.marco)
-    flowLog("Marco de 20 pontos alcançado; eventos de fim aguardam definição.");
+  game.scoreLog.push(
+    `Rodada ${flow.round}: ${names[f]} ${n >= 0 ? "+" : ""}${n} — ${reason}`,
+  );
   if (result.venceu) {
     flow.phase = "fim";
     flowLog(names[f] + " alcançou " + game.victoryTarget + " pontos e venceu.");
   }
+}
+function penalidadeBar() {
+  if (game.eventFlags.pirateWealth) return;
+  resources.piratas.ouro = 0;
+  addPoints("piratas", -1, "Bar destruído");
 }
 function addResource(f, type, n, reason) {
   Object.assign(
@@ -62,7 +71,7 @@ function taxCard() {
   return `<div class="tax-card" aria-label="Imposto imperial proposto"><strong>Imposto imperial · proposta</strong><span>${game.tax ? taxText(game.tax) : flow.phase === "preparação" && game.taxes.length ? "Revelado ao preparar a rodada" : game.taxPaid ? "Pago nesta rodada" : "Nenhum imposto ativo"}</span><small>Atraso: ${game.delay} de 3 rodadas</small>${flow.phase === "resolução" && activeFaction() === "imperio" && hasTech("Salão Imperial") && game.tax && !game.taxPaid && (game.taxes.length || game.taxDiscard.length) && game.hallUsedRound !== flow.round ? '<label>Recurso a descartar <select id="hallResource"><option value="ouro">Ouro</option><option value="madeira">Madeira</option></select></label><button id="hallChange">Alterar imposto</button><small id="hallMessage" role="status"></small>' : ""}</div>`;
 }
 function gameSummary() {
-  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste. Eventos de fim de jogo ainda não foram definidos.</p></details>`;
+  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details><p>Eventos ativos: ${[game.eventFlags.pirateWealth ? "Riqueza Pirata" : "", game.eventFlags.goldScarce ? "Escassez de Ouro" : "", ...game.eventFlags.noWood.map((r) => "Sem Madeira em " + r)].filter(Boolean).join(" · ") || "nenhum"}</p></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império, eventos e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste.</p></details>`;
 }
 // Cálculo separado da interface para facilitar testes e futuras automações.
 function elfForestPoints(regions, position) {
@@ -146,6 +155,17 @@ function beginScoring() {
   const finish = (id, type) => {
     const before = { ...game.score };
     scoreRound(id, type);
+    if (
+      !game.winner &&
+      !game.endEventsReady &&
+      factionIds.some((f) => game.score[f] >= 20)
+    ) {
+      game.endEventsReady = true;
+      game.eventPending = true;
+      flowLog(
+        "Marco de 20 pontos verificado na pontuação; um evento será revelado.",
+      );
+    }
     game.roundScoreDelta = Object.fromEntries(
       factionIds.map((f) => [f, game.score[f] - before[f]]),
     );
@@ -167,7 +187,7 @@ function beginScoring() {
   } else finish(candidates[0]?.id || null, null);
 }
 function scoreView() {
-  return `<section class="round-score"><small>FIM DA RODADA ${flow.round}</small><h3>Pontuação da rodada</h3><div class="round-score-list">${factionIds.map((f) => `<div class="round-score-row ${f}"><strong>${names[f]}</strong><span>+${game.roundScoreDelta?.[f] ?? 0} nesta pontuação</span><b>${game.score[f]} pontos</b></div>`).join("")}</div><p>Cada facção pode descartar toda a mão antes da próxima rodada.</p>${factionIds.map((f) => `<label><input type="checkbox" id="discardRemaining-${f}"> ${names[f]} · descartar ${flow.decks[f].hand.length} carta(s)</label>`).join("")}<button id="nextRound">Próxima rodada</button></section>`;
+  return `<section class="round-score"><small>FIM DA RODADA ${flow.round}</small><h3>Pontuação da rodada</h3><div class="round-score-list">${factionIds.map((f) => `<div class="round-score-row ${f}"><strong>${names[f]}</strong><span>+${game.roundScoreDelta?.[f] ?? 0} nesta pontuação</span><b>${game.score[f]} pontos</b></div>`).join("")}</div><p>Cada facção pode descartar toda a mão antes da próxima rodada.</p>${factionIds.map((f) => `<label><input type="checkbox" id="discardRemaining-${f}"> ${names[f]} · descartar ${flow.decks[f].hand.length} carta(s)</label>`).join("")}<div class="row"><button id="nextRound">Próxima rodada</button><button id="abrirEventosPontuacao" type="button" onclick="abrirSeletorEventos()">Testar evento</button></div></section>`;
 }
 function endView() {
   const max = game.winner

@@ -71,7 +71,7 @@ Com Node.js e dependências instaladas, use `npm run check:rapido` para sincroni
 - A partida não é salva ao fechar ou recarregar; não há semente reproduzível, relatório ou métricas automáticas de equilíbrio. Ajustes manuais de depuração podem criar estados intermediários e não simulam automaticamente a perda da Torre. O estoque de peças físicas não é simulado.
 - No teste de navegador a reação de combate parte de um estado preparado, sem percorrer toda a declaração pela interface. A proteção do atacante por Defesa Global e o saque sem movimento da Invasão não têm cenário automatizado específico. Outras cartas defensivas e detalhes de alvos que se tornam inválidos ainda precisam de definição; Guarda Imperial é uma adaptação de teste.
 - O motor foi parcialmente extraído: apresentação, orquestração do combate, algumas escolhas e transições ainda ficam na aplicação. A disponibilidade de ações ainda usa dois registros virtuais por facção.
-- Os testes usam DOM substituto e Chromium com dados controlados; não interpretam toda a prosa nem comprovam todas as combinações, a instalação em dispositivos físicos ou uma partida real. Conteúdo dos eventos após o marco de 20 pontos e IA permanecem adiados; reposição, limites de componentes e casos sem opções legais dependem de definição onde não documentados.
+- Os testes usam DOM substituto e Chromium com dados controlados; não interpretam toda a prosa nem comprovam todas as combinações, a instalação em dispositivos físicos ou uma partida real. Os eventos após o marco de 20 pontos são hipóteses em teste; IA permanece adiada; reposição, limites de componentes e casos sem opções legais dependem de definição onde não documentados.
 
 ### Testes em navegador
 

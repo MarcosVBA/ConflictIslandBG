@@ -31,18 +31,32 @@
   function pontosFlorestas(regioes, estado) {
     const florestas = regioes.filter(r => r.terrain === 'floresta');
     const dominadas = florestas.filter(r => dominio(estado[r.id]) === 'elfos').length;
-    return { owned: dominadas, points: florestas.length && dominadas === florestas.length ? 2 : dominadas >= 2 ? 1 : 0 };
+    return { owned: dominadas, points: dominadas >= 2 && florestas.every(r => estado[r.id].units.elfos > 0) ? 2 : dominadas >= 2 ? 1 : 0 };
   }
   function pontosDevastacao(estado) {
     const quantidade = Object.values(estado).filter(devastada).length;
     return { quantidade, pontos: quantidade >= 6 ? 4 : quantidade >= 5 ? 3 : quantidade >= 4 ? 2 : quantidade >= 2 ? 1 : 0 };
   }
+  function condicaoEvento(id, placar, mapa, participantes = faccoes) {
+    if (!Array.isArray(participantes) || !participantes.every(f => faccoes.includes(f))) throw Error('Participantes inválidos.');
+    const presente = f => participantes.includes(f);
+    const maior = Math.max(...participantes.map(f => placar[f]));
+    const atras = f => presente(f) && placar[f] < maior;
+    if (id === 'morte') return atras('necromante');
+    if (id === 'vinganca') return atras('elfos');
+    if (id === 'riqueza') return atras('piratas');
+    if (id === 'colonizacao') return atras('imperio');
+    if (id === 'fome') return !presente('necromante') || Object.values(mapa).reduce((n, r) => n + r.units.necromante, 0) < 5;
+    if (id === 'incendio') return presente('elfos');
+    if (id === 'escassez') return !presente('imperio') || participantes.filter(f => placar[f] > placar.imperio).length < 2;
+    if (id === 'guerra') return true;
+    throw Error('Evento desconhecido.');
+  }
   function registrarPontos(partida, faccao, quantidade) {
-    if (partida.winner) return { partida, marco: false, venceu: false };
+    if (partida.winner) return { partida, venceu: false };
     const pontos = partida.score[faccao] + quantidade;
-    const marco = pontos >= 20 && !partida.endEventsReady;
     const venceu = pontos >= partida.victoryTarget;
-    return { partida:{ ...partida, score:{...partida.score,[faccao]:pontos}, endEventsReady:partida.endEventsReady || marco, winner:venceu ? faccao : null }, marco, venceu };
+    return { partida:{ ...partida, score:{...partida.score,[faccao]:pontos}, winner:venceu ? faccao : null }, venceu };
   }
   function vizinhos(ligacoes, id) {
     return ligacoes.flatMap(([a,b]) => a === id ? [b] : b === id ? [a] : []);
@@ -58,7 +72,7 @@
     if (!Number.isSafeInteger(quantidade) || quantidade < 0 || origem < quantidade) throw Error('Movimento inválido.');
     return { origem: origem - quantidade, destino: destino + quantidade };
   }
-  function cartaLocal(nome, faccao, regiao, saldo, mapa, recurso) {
+  function cartaLocal(nome, faccao, regiao, saldo, mapa, recurso, limiteBares = 1) {
     const expected = {'Pirata Aprendiz':'piratas','Taverna Pirata':'piratas','Projeto de Poder Maligno':'necromante','Alistamento':'imperio'};
     if (expected[nome] !== faccao || !regiao || !saldo || !mapa) throw Error('Carta ou facção inválida.');
     const next = {...regiao, units:{...regiao.units}, buildings:{...regiao.buildings}};
@@ -68,7 +82,7 @@
       next.units.piratas += regiao.bar ? 2 : 1;
     } else if (nome === 'Taverna Pirata') {
       if (dominio(regiao) !== 'piratas' || regiao.bar) throw Error('Exige região controlada sem Bar.');
-      if (Object.values(mapa).filter(item => item.bar).length >= 1) throw Error('Limite de um Bar Pirata no mapa.');
+      if (Object.values(mapa).filter(item => item.bar).length >= limiteBares) throw Error(limiteBares === 1 ? 'Limite de um Bar Pirata no mapa.' : 'Limite de Bares Piratas no mapa.');
       next.bar = true;
     } else if (nome === 'Projeto de Poder Maligno') {
       if (regiao.units.necromante < 1 || recurso === 'Sem recurso' || regiao.extractor) throw Error('Precisa de zumbi, recurso e região sem extrator.');
@@ -416,7 +430,7 @@
     for (const i of [...escolhidas].sort((a, b) => b - a)) descarte.push(mao.splice(i, 1)[0]);
     return { vencedor, quantidade: escolhidas.length, ordem: ordem.slice(indice).concat(ordem.slice(0, indice)), baralhos: { ...baralhos, [vencedor]: { ...original, hand: mao, discard: descarte } } };
   }
-  const api = Object.freeze({ faccoes, cenarioInicial, recursosIniciais, fluxoInicial, construcoes, dominio, devastada, pontosFlorestas, pontosDevastacao, registrarPontos, vizinhos, pagar, receber, calcularMovimento, cartaLocal, coletaDeCartas, movimentoDeCarta, filhosDaFloresta, milagreDaFloresta, mercenariosPiratas, monumentoMorte, construirTecnologia, coletaImperial, magiaDasTrevas, pagarImposto, substituirImposto, opcoesPenalidadeImposto, validarHarmonia, tropasHarmonia, transportePirata, validarAlianca, validarCorsario, validarAtaque, validarFuria, efeitosCombate, saquear, opcoesAlistamento, aplicarAlistamento, recuperarTorre, reforcarTorre, opcoesIlhaAVista, aplicarIlhaAVista, proximaFacção, comprarAte, consumirCarta, reacaoDisponivel, calcularDano, rolarDados, aplicarBaixas, decidirReacao, iniciarLeilao, passarLeilao, proximoLance, registrarLance, encerrarLeilao });
+  const api = Object.freeze({ faccoes, cenarioInicial, recursosIniciais, fluxoInicial, construcoes, dominio, devastada, pontosFlorestas, pontosDevastacao, condicaoEvento, registrarPontos, vizinhos, pagar, receber, calcularMovimento, cartaLocal, coletaDeCartas, movimentoDeCarta, filhosDaFloresta, milagreDaFloresta, mercenariosPiratas, monumentoMorte, construirTecnologia, coletaImperial, magiaDasTrevas, pagarImposto, substituirImposto, opcoesPenalidadeImposto, validarHarmonia, tropasHarmonia, transportePirata, validarAlianca, validarCorsario, validarAtaque, validarFuria, efeitosCombate, saquear, opcoesAlistamento, aplicarAlistamento, recuperarTorre, reforcarTorre, opcoesIlhaAVista, aplicarIlhaAVista, proximaFacção, comprarAte, consumirCarta, reacaoDisponivel, calcularDano, rolarDados, aplicarBaixas, decidirReacao, iniciarLeilao, passarLeilao, proximoLance, registrarLance, encerrarLeilao });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.ConflictIslandBase = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

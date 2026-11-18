@@ -14,6 +14,7 @@ function isAttackCard(f, n) {
 }
 let battle = null;
 let minimizedDialog = null;
+let suspendedDialogs = [];
 let selectionBeforeMinimize = null;
 const resumeModalButton = document.createElement("button");
 resumeModalButton.type = "button";
@@ -24,9 +25,16 @@ function minimizeDialog(dialog, label) {
   if (!dialog.open) return;
   selectionBeforeMinimize = selected;
   minimizedDialog = dialog;
+  suspendedDialogs = Array.from(
+    document.querySelectorAll("dialog[open]"),
+    (item) => ({
+      dialog: item,
+      modal: item.matches(":modal"),
+    }),
+  );
   resumeModalButton.textContent = "Retomar " + label;
   resumeModalButton.hidden = false;
-  dialog.close();
+  for (const item of [...suspendedDialogs].reverse()) item.dialog.close();
   resumeModalButton.focus();
 }
 resumeModalButton.onclick = () => {
@@ -34,7 +42,11 @@ resumeModalButton.onclick = () => {
   const dialog = minimizedDialog;
   selected = selectionBeforeMinimize;
   render();
-  dialog.showModal();
+  for (const item of suspendedDialogs) {
+    if (item.modal) item.dialog.showModal();
+    else item.dialog.show();
+  }
+  suspendedDialogs = [];
   minimizedDialog = null;
   resumeModalButton.hidden = true;
   dialog.focus();
@@ -62,7 +74,9 @@ function ensureMinimizeButton(dialog, label) {
     button = document.createElement("button");
     button.type = "button";
     button.className = "minimize-modal";
-    button.textContent = "Minimizar";
+    button.textContent = "−";
+    button.setAttribute("aria-label", "Minimizar janela");
+    button.title = "Minimizar janela";
     dialog.prepend(button);
   }
   button.onclick = () => minimizeDialog(dialog, label);
@@ -91,12 +105,16 @@ function openActionDialog(required, nonModal = false) {
   if (dialog.open && dialog.classList.contains("nonmodal") !== nonModal)
     dialog.close();
   dialog.classList.toggle("nonmodal", nonModal);
-  if (!required) dialog.querySelector(".minimize-modal")?.remove();
+  ensureMinimizeButton(dialog, battle ? "combate" : "ação");
   dialog.oncancel = (event) => {
     if (required) event.preventDefault();
   };
   dialog.onclose = () => {
-    if (!dialog.open && minimizedDialog !== dialog) {
+    if (
+      !dialog.open &&
+      minimizedDialog !== dialog &&
+      !suspendedDialogs.some((item) => item.dialog === dialog)
+    ) {
       $("dialogContent").innerHTML = "";
       if (!battle) {
         if (dialog.classList.contains("nonmodal")) render();
@@ -604,6 +622,7 @@ function renderBattle() {
       $("battleError").textContent = e.message;
       return;
     }
+    if (region.bar && !resolved.bar) penalidadeBar();
     Object.assign(region, resolved);
     const success = result.attackDamage > 0 && region.units[b.f] > 0;
     let loot = [];

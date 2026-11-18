@@ -9,9 +9,11 @@ const scenario = String.raw`
 check("definitions.length===10&&edges.length===16&&factionIds.length===4&&cardDefs.elfos.reduce((n,c)=>n+c[1],0)===12");
 check("state.R6.units.elfos===2&&state.R10.units.elfos===2&&state.R3.tower&&resources.elfos.ouro===0&&resources.elfos.madeira===0");
 run("scoreRound()");check("game.score.elfos===1");run("scoreRound()");check("game.score.elfos===1");
+run("state.R2.units.elfos=1;state.R4.units.elfos=1");check("elfForestPoints(definitions,state).owned===2&&elfForestPoints(definitions,state).points===2");
+run("state.R4.units.elfos=0");check("elfForestPoints(definitions,state).points===1");
 run("flow.round=2;state.R2.units.imperio=0;state.R2.units.elfos=1;state.R4.units.necromante=0;state.R4.units.elfos=1;scoreRound()");check("game.score.elfos===3");
 run("state=initial();resources=initialResources();game=newGame();state.R1.units.elfos=1;state.R8.units.elfos=1;executeCard('elfos','Frutos da Mata','R6',0)");check("resources.elfos.madeira===2&&resources.elfos.ouro===1");
-run("game=newGame();resources=initialResources();resources.elfos.ouro=3;transfer('elfos','piratas','ouro',1);transfer('elfos','piratas','ouro',1);transfer('elfos','imperio','ouro',1)");check("game.score.elfos===2");
+run("game=newGame();resources=initialResources();resources.elfos.ouro=3;transfer('elfos','piratas','ouro',1);transfer('elfos','piratas','ouro',1);transfer('elfos','imperio','ouro',1)");check("game.score.elfos===0");
 run("state=initial();resources=initialResources();resources.elfos.ouro=3");set('miracleGive','ouro');set('miracleTake','madeira');
 for(let i=1;i<=11;i++){set('miracleFrom-R'+i,'0');set('miracleTo-R'+i,'0')}
 run("executeCard('elfos','Milagre da Floresta','R6',0)");check("resources.elfos.ouro===0&&resources.elfos.madeira===2");

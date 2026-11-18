@@ -44,7 +44,7 @@ const experimentalConditions = Object.freeze({
   'Extratores da Torre': 'Construir exige zumbi, recurso impresso e região sem extrator. Colher exige extrator no mapa e rende 1 recurso impresso por extrator no mapa.',
   'Magia das Trevas / Monumento à Morte': 'Magia exige custos e alvos da magia escolhida. Monumento exige região devastada sem monumento, 1 Madeira e domínio de algum oponente; pontue 2 por monumento e reponha a mão.',
   'Remanejando Mortos': 'Mova quantos zumbis quiser, inclusive zero movimentos, entre regiões inicialmente devastadas ligadas diretamente. Ao concluir, descarte a mão e compre até cinco.',
-  'Fúria da Ilha / Harmônia': 'Atacar exige defensor presente e permite atacar no local ou mover 1 a 3 elfos para região adjacente e atacar. Trocar exige outra facção e aceite; primeira troca efetiva por facção rende 1 ponto na rodada.',
+  'Fúria da Ilha / Harmônia': 'Atacar exige defensor presente e permite atacar no local ou mover 1 a 3 elfos para região adjacente e atacar. Trocar exige outra facção e aceite; primeira troca de recursos nos dois sentidos por facção rende 1 ponto na rodada.',
   'Trilhas na Mata / Defesa Global': 'Mover leva quantidade positiva de elfos de uma origem adjacente. Defesa Global: após reação defensiva e antes dos dados, gaste carta para proteger um lado com tropas, inclusive em combate de terceiros.',
   'Frutos da Mata / Filhos da Floresta': 'Colher exige tropas élficas no mapa e rende um recurso impresso por região com elfos. Recrutar exige floresta não devastada e 1 Ouro, Madeira ou tropa élfica; depois reponha a mão.',
   'Milagre da Floresta': 'Converta 3 unidades de um tipo em 2 de outro: Ouro, Madeira ou tropas élficas. Tropas recebidas vão a regiões dominadas pelos Elfos.',

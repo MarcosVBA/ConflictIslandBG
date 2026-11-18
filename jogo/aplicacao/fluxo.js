@@ -31,8 +31,7 @@ function syncPhaseDialog(phase) {
   if (typeof dialog.showModal !== "function") return;
   const inDialog = ["preparação", "leilão", "pontuação"].includes(phase);
   if (inDialog) {
-    if (phase === "pontuação") ensureMinimizeButton(dialog, "pontuação");
-    else dialog.querySelector(".minimize-modal")?.remove();
+    ensureMinimizeButton(dialog, phase === "leilão" ? "liderança" : phase);
     $("phaseDialogPanel").appendChild(flowPanel);
     if (phase === "leilão") $("phaseDialogCards").appendChild($("handArea"));
     else if (handHome) handHome.appendChild($("handArea"));
@@ -45,7 +44,7 @@ function syncPhaseDialog(phase) {
           : "Preparação da rodada",
     );
     dialog.oncancel = (event) => event.preventDefault();
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open && minimizedDialog !== dialog) dialog.showModal();
   } else {
     if (dialog.open) dialog.close();
     $("flowSlot").appendChild(flowPanel);
@@ -130,7 +129,7 @@ function factionInfo(f) {
   }
   if (f === "piratas") {
     const bars = Object.values(state).filter((s) => s.bar).length;
-    details = `<p><strong>${bars}/1</strong> Bar Pirata construído</p><small>O Ouro restante gera pontos na pontuação da rodada.</small>`;
+    details = `<p><strong>${bars}/${game.eventFlags.pirateWealth ? 3 : 1}</strong> Bar Pirata construído</p><small>O Ouro restante gera pontos na pontuação da rodada.</small>`;
   }
   if (f === "elfos") {
     const forest = elfForestPoints(definitions, state);
@@ -139,8 +138,8 @@ function factionInfo(f) {
   const rules = {
     imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
     necromante: `<p><strong>Devastação:</strong> uma região é devastada quando há peças do Necromante e nenhuma peça adversária. No fim da rodada, 2–3 regiões rendem 1 ponto; 4 rendem 2; 5 rendem 3; 6 ou mais rendem 4.</p><p><strong>Magia da Torre:</strong> ao perder seu domínio, remova as peças indicadas pela magia; a Torre permanece e recebe 2 zumbis. Se for sua única região dominada, após comprar cartas adicione 1 zumbi nela, até 5.</p>`,
-    piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
-    elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; todas rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
+    piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa. Se o Bar for destruído, perca todo o Ouro e 1 ponto.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
+    elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; com pelo menos 2 dominadas e tropas em todas, rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca de recursos nos dois sentidos com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
   };
   if (revisedModes)
     rules.elfos = rules.elfos.replace(
@@ -154,6 +153,7 @@ function showFactionInfo(f) {
   if (!factionIds.includes(f)) return;
   $("factionInfoContent").innerHTML = factionInfo(f);
   const dialog = $("factionDialog");
+  ensureMinimizeButton(dialog, "informações da facção");
   if (typeof dialog.showModal === "function" && !dialog.open)
     dialog.showModal();
 }
@@ -208,6 +208,7 @@ function rescueRegions() {
 function restoreTowerIfLost() {
   const result = ConflictIslandBase.recuperarTorre(state);
   if (!result.ativada) return false;
+  if (state.R3.bar && !result.mapa.R3.bar) penalidadeBar();
   for (const id of Object.keys(state))
     Object.assign(state[id], result.mapa[id]);
   flowLog("Magia da Torre: peças removidas e 2 zumbis retornam à Torre.");
@@ -347,6 +348,7 @@ function renderFlow() {
   const target = $("flow"),
     phase = flow.phase;
   syncPhaseDialog(phase);
+  iniciarEventoPendente();
   renderRoundPhases(phase);
   $("gameTools").innerHTML =
     gameSummary() +

@@ -78,7 +78,6 @@ function transfer(from, to, type, n) {
   fail(resources[from][type] >= n, "Recursos insuficientes para a troca.");
   resources[from][type] -= n;
   addResource(to, type, n, "acordo");
-  if (n > 0 && !game.winner) awardElfTrade(from, to);
 }
 function move(from, to, f, n) {
   fail(from !== to && state[from] && state[to], "Movimento inválido.");
@@ -838,7 +837,7 @@ function executeCard(f, name, id, ci) {
       transfer(o, "elfos", "madeira", tw);
       if (game.winner) break;
       state = ConflictIslandBase.tropasHarmonia(state, o, moves);
-      if (g || t) awardElfTrade("elfos", o);
+      if (gg + gw + g > 0 && tg + tw + t > 0) awardElfTrade("elfos", o);
       break;
     }
     case "Trilhas na Mata": {
@@ -861,7 +860,7 @@ function executeCard(f, name, id, ci) {
     case "Trabalhadores Zumbificado": {
       const resultado = ConflictIslandBase.coletaDeCartas(
         name,
-        definitions,
+        regioesComRecursos(),
         state,
         id,
         resources[f],
@@ -879,7 +878,8 @@ function executeCard(f, name, id, ci) {
         s,
         resources[f],
         state,
-        r.resource,
+        recursoEvento(r),
+        game.eventFlags.pirateWealth ? 3 : 1,
       );
       Object.assign(s, result.regiao);
       Object.assign(resources[f], result.saldo);
@@ -956,7 +956,7 @@ function executeCard(f, name, id, ci) {
         state,
         edges,
         id,
-        r.resource,
+        recursoEvento(r),
         resources[f],
         $("spell").value,
         other(),
@@ -983,7 +983,7 @@ function executeCard(f, name, id, ci) {
       const deck = flow.decks[f],
         result = ConflictIslandBase.coletaImperial(
           s,
-          r.resource,
+          recursoEvento(r),
           resources[f],
           deck,
           ci,
@@ -1009,6 +1009,7 @@ function executeCard(f, name, id, ci) {
       transfer(f, o, gt, g);
       if (game.winner) break;
       transfer(o, f, tt, t);
+      if (g > 0 && t > 0) awardElfTrade(f, o);
       break;
     }
     case "Pagamento de Impostos": {
@@ -1572,4 +1573,5 @@ if (document.addEventListener) {
   );
 }
 updateFullscreenLabel();
+instalarEventos();
 renderFlow();

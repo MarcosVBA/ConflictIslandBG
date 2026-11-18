@@ -189,6 +189,9 @@ function buildingIcons(s) {
     )
     .join("");
 }
+function recursoVisivel(r) {
+  return typeof recursoEvento === "function" ? recursoEvento(r) : r.resource;
+}
 function resourceIcon(resource) {
   if (resource === "Ouro")
     return '<span class="resource-token gold" title="Ouro" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 1 18 9.5 10 19 2 9.5z"/></svg></span>';
@@ -292,9 +295,9 @@ function render() {
     b.setAttribute("aria-pressed", r.id === selected);
     b.setAttribute(
       "aria-label",
-      `${r.id}, ${r.name}, ${terrains[r.terrain]}, ${r.coast ? "costeira, " : ""}${r.resource}, ${domainLabel(s)}, tropas: ${sides.map((f) => names[f] + " " + s.units[f]).join(", ")}, construções: ${buildingDescription(s)}`,
+      `${r.id}, ${r.name}, ${terrains[r.terrain]}, ${r.coast ? "costeira, " : ""}${recursoVisivel(r)}, ${domainLabel(s)}, tropas: ${sides.map((f) => names[f] + " " + s.units[f]).join(", ")}, construções: ${buildingDescription(s)}`,
     );
-    b.innerHTML = `<span class="region-id">${r.id}${r.coast ? " · ⚓" : ""}</span><span class="region-top"><strong>${r.name}</strong></span><span class="region-meta">${terrains[r.terrain]} · ${domainLabel(s)}</span><span class="region-pieces"><span class="troops">${troopDots(s)}</span><span class="region-buildings">${buildingIcons(s)}${devastated(s) || mapDevastationOverride?.has(r.id) ? '<span class="devastated-icon" title="Região devastada">☠</span>' : ""}</span>${resourceIcon(r.resource)}</span>`;
+    b.innerHTML = `<span class="region-id">${r.id}${r.coast ? " · ⚓" : ""}</span><span class="region-top"><strong>${r.name}</strong></span><span class="region-meta">${terrains[r.terrain]} · ${domainLabel(s)}</span><span class="region-pieces"><span class="troops">${troopDots(s)}</span><span class="region-buildings">${buildingIcons(s)}${devastated(s) || mapDevastationOverride?.has(r.id) ? '<span class="devastated-icon" title="Região devastada">☠</span>' : ""}</span>${resourceIcon(recursoVisivel(r))}</span>`;
     b.onclick = () => {
       const returnFocus = document.activeElement === b;
       if (!minimizedDialog && mapChoice && chooseMapRegion(r.id, returnFocus))
@@ -321,7 +324,7 @@ function render() {
     s = state[selected];
   $("details").innerHTML =
     r && s
-      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${domainLabel(s)}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
+      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${recursoVisivel(r)}</dd><dt>Controle</dt><dd>${domainLabel(s)}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
       : "<p>Selecione uma região para ver suas informações.</p>";
   $("apply").disabled = !s;
   $("clear").disabled = !s;

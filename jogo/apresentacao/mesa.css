@@ -220,4 +220,11 @@ body>header small{display:block;line-height:1.1}
 .action-dialog,.phase-dialog{outline:1px solid #bbaa7260;outline-offset:-7px}
 
 .hand-area .hand-card.bid-selected{outline:3px solid #f45b5b;outline-offset:-3px;background:#a52f35;box-shadow:0 0 0 2px #f45b5b}
-.minimize-modal{float:right;margin:0 0 .5rem .75rem}#resumeModal{position:fixed;z-index:100;top:1rem;right:1rem;background:#e1c078;color:#10221d;font-weight:700;padding:.7rem 1rem}#resumeModal[hidden]{display:none}
+.minimize-modal,.action-dialog .minimize-modal{float:right;display:grid;place-items:center;width:2.25rem;height:2.25rem;padding:0;margin:0 0 .5rem .75rem;border:1px solid #718574;border-radius:.4rem;background:#1b302b;color:#e5e6cf;font-size:1.35rem;line-height:1}
+.minimize-modal:hover{background:#304a3c;border-color:#dfc77f;color:#fff2d1}
+.round-score .row{gap:.65rem;margin-top:1rem}
+.round-score #nextRound,.round-score #abrirEventosPontuacao{min-height:2.6rem;border:1px solid #ad995f;border-radius:.4rem;font-weight:700;letter-spacing:.02em}
+.round-score #nextRound{background:#dcb974;color:#18291f}
+.round-score #abrirEventosPontuacao{background:#1b302b;color:#e8dfc7;border-color:#718574}
+.round-score #nextRound:hover{background:#ead095}.round-score #abrirEventosPontuacao:hover{background:#304a3c;border-color:#dfc77f}
+#resumeModal{position:fixed;z-index:100;bottom:1rem;right:1rem;background:#e1c078;color:#10221d;font-weight:700;padding:.7rem 1rem}#resumeModal[hidden]{display:none}

@@ -264,13 +264,21 @@ body>header small{display:block;line-height:1.1}
 .action-dialog,.phase-dialog{outline:1px solid #bbaa7260;outline-offset:-7px}
 
 .hand-area .hand-card.bid-selected{outline:3px solid #f45b5b;outline-offset:-3px;background:#a52f35;box-shadow:0 0 0 2px #f45b5b}
-.minimize-modal{float:right;margin:0 0 .5rem .75rem}#resumeModal{position:fixed;z-index:100;top:1rem;right:1rem;background:#e1c078;color:#10221d;font-weight:700;padding:.7rem 1rem}#resumeModal[hidden]{display:none}
+.minimize-modal,.action-dialog .minimize-modal{float:right;display:grid;place-items:center;width:2.25rem;height:2.25rem;padding:0;margin:0 0 .5rem .75rem;border:1px solid #718574;border-radius:.4rem;background:#1b302b;color:#e5e6cf;font-size:1.35rem;line-height:1}
+.minimize-modal:hover{background:#304a3c;border-color:#dfc77f;color:#fff2d1}
+.round-score .row{gap:.65rem;margin-top:1rem}
+.round-score #nextRound,.round-score #abrirEventosPontuacao{min-height:2.6rem;border:1px solid #ad995f;border-radius:.4rem;font-weight:700;letter-spacing:.02em}
+.round-score #nextRound{background:#dcb974;color:#18291f}
+.round-score #abrirEventosPontuacao{background:#1b302b;color:#e8dfc7;border-color:#718574}
+.round-score #nextRound:hover{background:#ead095}.round-score #abrirEventosPontuacao:hover{background:#304a3c;border-color:#dfc77f}
+#resumeModal{position:fixed;z-index:100;bottom:1rem;right:1rem;background:#e1c078;color:#10221d;font-weight:700;padding:.7rem 1rem}#resumeModal[hidden]{display:none}
 /* FIM ESTILO MESA */
 </style></head><body>
 <header><div><h1>Conflict Island</h1><small>A ILHA DE CÂLEPOO</small></div><div class="row"><button id="fullscreen" type="button" aria-label="Entrar em tela cheia">⛶ Tela cheia</button><button id="reset">Restaurar cenário inicial</button><details id="toolsDrawer" class="debug-drawer"><summary>Ferramentas</summary><footer><section id="gameTools" class="panel utility" aria-label="Informações da partida"></section><details class="panel utility"><summary>Ajustar recursos manualmente</summary><p class="muted">Saldos atualizados pelas ações; ajustes manuais ficam disponíveis para depuração.</p><div id="resources"></div><button id="applyResources">Aplicar recursos</button><p id="resourceMessage" role="status"></p></details><details class="panel utility"><summary>Histórico e desfazer</summary><div class="row"><h2>Histórico</h2><button id="undo">Desfazer última alteração</button></div><ol id="history" class="list"></ol></details><details class="panel utility"><summary>Diagnóstico do cenário inicial</summary><ul id="diagnostics" class="list"></ul><p class="muted">Nomes, distribuição das regiões livres e demais regras permanecem em teste. As conexões foram aprovadas.</p></details><details class="tools"><summary>Ferramentas de teste e ajustes manuais</summary><p class="notice">Ajustes manuais mudam peças; o domínio é recalculado. O extrator começa provisoriamente na floresta do Necromante; sua posição ainda não foi aprovada.</p><p>O domínio é calculado automaticamente a partir das peças.</p><label>Soldados imperiais <input id="imperio" type="number" min="0" max="9007199254740991" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))" value="0"></label><label>Zumbis <input id="necromante" type="number" min="0" max="9007199254740991" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))" value="0"></label><label>Piratas <input id="piratas" type="number" min="0" max="9007199254740991" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))" value="0"></label><label>Elfos <input id="elfos" type="number" min="0" max="9007199254740991" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))" value="0"></label><label><input id="tower" type="checkbox"> Torre do Necromante</label><label><input id="extractor" type="checkbox"> Extrator do Necromante</label><label>Outras construções imperiais <input id="build-imperio" type="number" min="0" max="50" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))"></label><label>Outras construções do Necromante <input id="build-necromante" type="number" min="0" max="50" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))"></label><label>Construções piratas <input id="build-piratas" type="number" min="0" max="50" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))"></label><label>Construções élficas <input id="build-elfos" type="number" min="0" max="50" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))"></label><div class="row"><button id="apply">Aplicar alterações</button><button id="clear">Limpar região</button></div><p id="message" role="status"></p></details></footer></details></div></header>
 <dialog id="actionDialog" class="action-dialog" aria-label="Ação em andamento"><div id="dialogContent"></div></dialog>
 <dialog id="factionDialog" class="action-dialog faction-dialog" aria-label="Informações da facção"><div id="factionInfoContent"></div><button id="closeFactionInfo" type="button">Fechar</button></dialog>
 <dialog id="phaseDialog" class="phase-dialog" aria-label="Etapa da rodada"><button id="phaseFullscreen" type="button">⛶ Tela cheia</button><div id="phaseDialogPanel"></div><div id="phaseDialogCards"></div></dialog>
+<dialog id="eventoEscolhaDialog" class="action-dialog" aria-label="Testar evento"><h2>Testar evento</h2><p>Escolha uma carta para executar sem verificar sua condição.</p><label>Evento <select id="eventoEscolha"></select></label><button id="executarEvento" type="button">Escolher</button><button id="fecharEventos" type="button">Fechar</button></dialog><dialog id="eventoDialog" class="action-dialog" aria-label="Evento"><div id="eventoConteudo"></div></dialog>
 <main><div id="statusBar" class="statusbar" aria-label="Placar e recursos"></div><nav id="headerPhases" class="round-phases" aria-label="Fases da rodada"></nav><section class="panel board-panel"><div class="board-head"><div><h2>Ilha de Câlepoo</h2><p class="muted">Selecione uma região para explorar a ilha.</p></div><button id="toggleRegionInfo" type="button" aria-controls="regionInfo" aria-pressed="false">Mostrar informações das regiões</button></div><p id="mapFeedback" class="map-feedback" role="status">Selecione uma região para inspecionar.</p><div class="mapwrap" id="mapArea"><div class="map" id="map"><svg id="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg></div></div><div class="legend"><span><i class="dot" style="background:#e7b44d"></i>Império</span><span><i class="dot" style="background:#8b59bd"></i>Necromante</span><span><i class="dot" style="background:#d65b55"></i>Piratas</span><span><i class="dot" style="background:#38a9a5"></i>Elfos</span><span><i class="dot" style="background:#c7c9be"></i>Livre (sem controle)</span><span>⚓ Costa</span><span>● tropas · ⚑ domínio</span><span>♜ Torre · ⚙ extrator · ✝ monumento · ⚒ tecnologia · ♨ Bar</span><span>Verde: floresta · cinza: montanha · areia: praia · azul: planície</span></div><section id="regionInfo" class="region-info" aria-label="Informações da região selecionada" hidden><div id="details"></div></section><section id="handArea" class="hand-area" aria-label="Mão da facção atual"></section></section>
 <aside class="sidebar"><div id="flowSlot"></div></aside></main>
 
@@ -309,18 +317,32 @@ body>header small{display:block;line-height:1.1}
   function pontosFlorestas(regioes, estado) {
     const florestas = regioes.filter(r => r.terrain === 'floresta');
     const dominadas = florestas.filter(r => dominio(estado[r.id]) === 'elfos').length;
-    return { owned: dominadas, points: florestas.length && dominadas === florestas.length ? 2 : dominadas >= 2 ? 1 : 0 };
+    return { owned: dominadas, points: dominadas >= 2 && florestas.every(r => estado[r.id].units.elfos > 0) ? 2 : dominadas >= 2 ? 1 : 0 };
   }
   function pontosDevastacao(estado) {
     const quantidade = Object.values(estado).filter(devastada).length;
     return { quantidade, pontos: quantidade >= 6 ? 4 : quantidade >= 5 ? 3 : quantidade >= 4 ? 2 : quantidade >= 2 ? 1 : 0 };
   }
+  function condicaoEvento(id, placar, mapa, participantes = faccoes) {
+    if (!Array.isArray(participantes) || !participantes.every(f => faccoes.includes(f))) throw Error('Participantes inválidos.');
+    const presente = f => participantes.includes(f);
+    const maior = Math.max(...participantes.map(f => placar[f]));
+    const atras = f => presente(f) && placar[f] < maior;
+    if (id === 'morte') return atras('necromante');
+    if (id === 'vinganca') return atras('elfos');
+    if (id === 'riqueza') return atras('piratas');
+    if (id === 'colonizacao') return atras('imperio');
+    if (id === 'fome') return !presente('necromante') || Object.values(mapa).reduce((n, r) => n + r.units.necromante, 0) < 5;
+    if (id === 'incendio') return presente('elfos');
+    if (id === 'escassez') return !presente('imperio') || participantes.filter(f => placar[f] > placar.imperio).length < 2;
+    if (id === 'guerra') return true;
+    throw Error('Evento desconhecido.');
+  }
   function registrarPontos(partida, faccao, quantidade) {
-    if (partida.winner) return { partida, marco: false, venceu: false };
+    if (partida.winner) return { partida, venceu: false };
     const pontos = partida.score[faccao] + quantidade;
-    const marco = pontos >= 20 && !partida.endEventsReady;
     const venceu = pontos >= partida.victoryTarget;
-    return { partida:{ ...partida, score:{...partida.score,[faccao]:pontos}, endEventsReady:partida.endEventsReady || marco, winner:venceu ? faccao : null }, marco, venceu };
+    return { partida:{ ...partida, score:{...partida.score,[faccao]:pontos}, winner:venceu ? faccao : null }, venceu };
   }
   function vizinhos(ligacoes, id) {
     return ligacoes.flatMap(([a,b]) => a === id ? [b] : b === id ? [a] : []);
@@ -336,7 +358,7 @@ body>header small{display:block;line-height:1.1}
     if (!Number.isSafeInteger(quantidade) || quantidade < 0 || origem < quantidade) throw Error('Movimento inválido.');
     return { origem: origem - quantidade, destino: destino + quantidade };
   }
-  function cartaLocal(nome, faccao, regiao, saldo, mapa, recurso) {
+  function cartaLocal(nome, faccao, regiao, saldo, mapa, recurso, limiteBares = 1) {
     const expected = {'Pirata Aprendiz':'piratas','Taverna Pirata':'piratas','Projeto de Poder Maligno':'necromante','Alistamento':'imperio'};
     if (expected[nome] !== faccao || !regiao || !saldo || !mapa) throw Error('Carta ou facção inválida.');
     const next = {...regiao, units:{...regiao.units}, buildings:{...regiao.buildings}};
@@ -346,7 +368,7 @@ body>header small{display:block;line-height:1.1}
       next.units.piratas += regiao.bar ? 2 : 1;
     } else if (nome === 'Taverna Pirata') {
       if (dominio(regiao) !== 'piratas' || regiao.bar) throw Error('Exige região controlada sem Bar.');
-      if (Object.values(mapa).filter(item => item.bar).length >= 1) throw Error('Limite de um Bar Pirata no mapa.');
+      if (Object.values(mapa).filter(item => item.bar).length >= limiteBares) throw Error(limiteBares === 1 ? 'Limite de um Bar Pirata no mapa.' : 'Limite de Bares Piratas no mapa.');
       next.bar = true;
     } else if (nome === 'Projeto de Poder Maligno') {
       if (regiao.units.necromante < 1 || recurso === 'Sem recurso' || regiao.extractor) throw Error('Precisa de zumbi, recurso e região sem extrator.');
@@ -694,7 +716,7 @@ body>header small{display:block;line-height:1.1}
     for (const i of [...escolhidas].sort((a, b) => b - a)) descarte.push(mao.splice(i, 1)[0]);
     return { vencedor, quantidade: escolhidas.length, ordem: ordem.slice(indice).concat(ordem.slice(0, indice)), baralhos: { ...baralhos, [vencedor]: { ...original, hand: mao, discard: descarte } } };
   }
-  const api = Object.freeze({ faccoes, cenarioInicial, recursosIniciais, fluxoInicial, construcoes, dominio, devastada, pontosFlorestas, pontosDevastacao, registrarPontos, vizinhos, pagar, receber, calcularMovimento, cartaLocal, coletaDeCartas, movimentoDeCarta, filhosDaFloresta, milagreDaFloresta, mercenariosPiratas, monumentoMorte, construirTecnologia, coletaImperial, magiaDasTrevas, pagarImposto, substituirImposto, opcoesPenalidadeImposto, validarHarmonia, tropasHarmonia, transportePirata, validarAlianca, validarCorsario, validarAtaque, validarFuria, efeitosCombate, saquear, opcoesAlistamento, aplicarAlistamento, recuperarTorre, reforcarTorre, opcoesIlhaAVista, aplicarIlhaAVista, proximaFacção, comprarAte, consumirCarta, reacaoDisponivel, calcularDano, rolarDados, aplicarBaixas, decidirReacao, iniciarLeilao, passarLeilao, proximoLance, registrarLance, encerrarLeilao });
+  const api = Object.freeze({ faccoes, cenarioInicial, recursosIniciais, fluxoInicial, construcoes, dominio, devastada, pontosFlorestas, pontosDevastacao, condicaoEvento, registrarPontos, vizinhos, pagar, receber, calcularMovimento, cartaLocal, coletaDeCartas, movimentoDeCarta, filhosDaFloresta, milagreDaFloresta, mercenariosPiratas, monumentoMorte, construirTecnologia, coletaImperial, magiaDasTrevas, pagarImposto, substituirImposto, opcoesPenalidadeImposto, validarHarmonia, tropasHarmonia, transportePirata, validarAlianca, validarCorsario, validarAtaque, validarFuria, efeitosCombate, saquear, opcoesAlistamento, aplicarAlistamento, recuperarTorre, reforcarTorre, opcoesIlhaAVista, aplicarIlhaAVista, proximaFacção, comprarAte, consumirCarta, reacaoDisponivel, calcularDano, rolarDados, aplicarBaixas, decidirReacao, iniciarLeilao, passarLeilao, proximoLance, registrarLance, encerrarLeilao });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.ConflictIslandBase = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
@@ -915,6 +937,9 @@ function buildingIcons(s) {
     )
     .join("");
 }
+function recursoVisivel(r) {
+  return typeof recursoEvento === "function" ? recursoEvento(r) : r.resource;
+}
 function resourceIcon(resource) {
   if (resource === "Ouro")
     return '<span class="resource-token gold" title="Ouro" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 1 18 9.5 10 19 2 9.5z"/></svg></span>';
@@ -1018,9 +1043,9 @@ function render() {
     b.setAttribute("aria-pressed", r.id === selected);
     b.setAttribute(
       "aria-label",
-      `${r.id}, ${r.name}, ${terrains[r.terrain]}, ${r.coast ? "costeira, " : ""}${r.resource}, ${domainLabel(s)}, tropas: ${sides.map((f) => names[f] + " " + s.units[f]).join(", ")}, construções: ${buildingDescription(s)}`,
+      `${r.id}, ${r.name}, ${terrains[r.terrain]}, ${r.coast ? "costeira, " : ""}${recursoVisivel(r)}, ${domainLabel(s)}, tropas: ${sides.map((f) => names[f] + " " + s.units[f]).join(", ")}, construções: ${buildingDescription(s)}`,
     );
-    b.innerHTML = `<span class="region-id">${r.id}${r.coast ? " · ⚓" : ""}</span><span class="region-top"><strong>${r.name}</strong></span><span class="region-meta">${terrains[r.terrain]} · ${domainLabel(s)}</span><span class="region-pieces"><span class="troops">${troopDots(s)}</span><span class="region-buildings">${buildingIcons(s)}${devastated(s) || mapDevastationOverride?.has(r.id) ? '<span class="devastated-icon" title="Região devastada">☠</span>' : ""}</span>${resourceIcon(r.resource)}</span>`;
+    b.innerHTML = `<span class="region-id">${r.id}${r.coast ? " · ⚓" : ""}</span><span class="region-top"><strong>${r.name}</strong></span><span class="region-meta">${terrains[r.terrain]} · ${domainLabel(s)}</span><span class="region-pieces"><span class="troops">${troopDots(s)}</span><span class="region-buildings">${buildingIcons(s)}${devastated(s) || mapDevastationOverride?.has(r.id) ? '<span class="devastated-icon" title="Região devastada">☠</span>' : ""}</span>${resourceIcon(recursoVisivel(r))}</span>`;
     b.onclick = () => {
       const returnFocus = document.activeElement === b;
       if (!minimizedDialog && mapChoice && chooseMapRegion(r.id, returnFocus))
@@ -1047,7 +1072,7 @@ function render() {
     s = state[selected];
   $("details").innerHTML =
     r && s
-      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${domainLabel(s)}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
+      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${recursoVisivel(r)}</dd><dt>Controle</dt><dd>${domainLabel(s)}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
       : "<p>Selecione uma região para ver suas informações.</p>";
   $("apply").disabled = !s;
   $("clear").disabled = !s;
@@ -1380,7 +1405,7 @@ const experimentalConditions = Object.freeze({
   'Extratores da Torre': 'Construir exige zumbi, recurso impresso e região sem extrator. Colher exige extrator no mapa e rende 1 recurso impresso por extrator no mapa.',
   'Magia das Trevas / Monumento à Morte': 'Magia exige custos e alvos da magia escolhida. Monumento exige região devastada sem monumento, 1 Madeira e domínio de algum oponente; pontue 2 por monumento e reponha a mão.',
   'Remanejando Mortos': 'Mova quantos zumbis quiser, inclusive zero movimentos, entre regiões inicialmente devastadas ligadas diretamente. Ao concluir, descarte a mão e compre até cinco.',
-  'Fúria da Ilha / Harmônia': 'Atacar exige defensor presente e permite atacar no local ou mover 1 a 3 elfos para região adjacente e atacar. Trocar exige outra facção e aceite; primeira troca efetiva por facção rende 1 ponto na rodada.',
+  'Fúria da Ilha / Harmônia': 'Atacar exige defensor presente e permite atacar no local ou mover 1 a 3 elfos para região adjacente e atacar. Trocar exige outra facção e aceite; primeira troca de recursos nos dois sentidos por facção rende 1 ponto na rodada.',
   'Trilhas na Mata / Defesa Global': 'Mover leva quantidade positiva de elfos de uma origem adjacente. Defesa Global: após reação defensiva e antes dos dados, gaste carta para proteger um lado com tropas, inclusive em combate de terceiros.',
   'Frutos da Mata / Filhos da Floresta': 'Colher exige tropas élficas no mapa e rende um recurso impresso por região com elfos. Recrutar exige floresta não devastada e 1 Ouro, Madeira ou tropa élfica; depois reponha a mão.',
   'Milagre da Floresta': 'Converta 3 unidades de um tipo em 2 de outro: Ouro, Madeira ou tropas élficas. Tropas recebidas vão a regiões dominadas pelos Elfos.',
@@ -1435,8 +1460,7 @@ function syncPhaseDialog(phase) {
   if (typeof dialog.showModal !== "function") return;
   const inDialog = ["preparação", "leilão", "pontuação"].includes(phase);
   if (inDialog) {
-    if (phase === "pontuação") ensureMinimizeButton(dialog, "pontuação");
-    else dialog.querySelector(".minimize-modal")?.remove();
+    ensureMinimizeButton(dialog, phase === "leilão" ? "liderança" : phase);
     $("phaseDialogPanel").appendChild(flowPanel);
     if (phase === "leilão") $("phaseDialogCards").appendChild($("handArea"));
     else if (handHome) handHome.appendChild($("handArea"));
@@ -1449,7 +1473,7 @@ function syncPhaseDialog(phase) {
           : "Preparação da rodada",
     );
     dialog.oncancel = (event) => event.preventDefault();
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open && minimizedDialog !== dialog) dialog.showModal();
   } else {
     if (dialog.open) dialog.close();
     $("flowSlot").appendChild(flowPanel);
@@ -1534,7 +1558,7 @@ function factionInfo(f) {
   }
   if (f === "piratas") {
     const bars = Object.values(state).filter((s) => s.bar).length;
-    details = `<p><strong>${bars}/1</strong> Bar Pirata construído</p><small>O Ouro restante gera pontos na pontuação da rodada.</small>`;
+    details = `<p><strong>${bars}/${game.eventFlags.pirateWealth ? 3 : 1}</strong> Bar Pirata construído</p><small>O Ouro restante gera pontos na pontuação da rodada.</small>`;
   }
   if (f === "elfos") {
     const forest = elfForestPoints(definitions, state);
@@ -1543,8 +1567,8 @@ function factionInfo(f) {
   const rules = {
     imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
     necromante: `<p><strong>Devastação:</strong> uma região é devastada quando há peças do Necromante e nenhuma peça adversária. No fim da rodada, 2–3 regiões rendem 1 ponto; 4 rendem 2; 5 rendem 3; 6 ou mais rendem 4.</p><p><strong>Magia da Torre:</strong> ao perder seu domínio, remova as peças indicadas pela magia; a Torre permanece e recebe 2 zumbis. Se for sua única região dominada, após comprar cartas adicione 1 zumbi nela, até 5.</p>`,
-    piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
-    elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; todas rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
+    piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa. Se o Bar for destruído, perca todo o Ouro e 1 ponto.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
+    elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; com pelo menos 2 dominadas e tropas em todas, rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca de recursos nos dois sentidos com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
   };
   if (revisedModes)
     rules.elfos = rules.elfos.replace(
@@ -1558,6 +1582,7 @@ function showFactionInfo(f) {
   if (!factionIds.includes(f)) return;
   $("factionInfoContent").innerHTML = factionInfo(f);
   const dialog = $("factionDialog");
+  ensureMinimizeButton(dialog, "informações da facção");
   if (typeof dialog.showModal === "function" && !dialog.open)
     dialog.showModal();
 }
@@ -1612,6 +1637,7 @@ function rescueRegions() {
 function restoreTowerIfLost() {
   const result = ConflictIslandBase.recuperarTorre(state);
   if (!result.ativada) return false;
+  if (state.R3.bar && !result.mapa.R3.bar) penalidadeBar();
   for (const id of Object.keys(state))
     Object.assign(state[id], result.mapa[id]);
   flowLog("Magia da Torre: peças removidas e 2 zumbis retornam à Torre.");
@@ -1751,6 +1777,7 @@ function renderFlow() {
   const target = $("flow"),
     phase = flow.phase;
   syncPhaseDialog(phase);
+  iniciarEventoPendente();
   renderRoundPhases(phase);
   $("gameTools").innerHTML =
     gameSummary() +
@@ -2170,6 +2197,7 @@ function isAttackCard(f, n) {
 }
 let battle = null;
 let minimizedDialog = null;
+let suspendedDialogs = [];
 let selectionBeforeMinimize = null;
 const resumeModalButton = document.createElement("button");
 resumeModalButton.type = "button";
@@ -2180,9 +2208,16 @@ function minimizeDialog(dialog, label) {
   if (!dialog.open) return;
   selectionBeforeMinimize = selected;
   minimizedDialog = dialog;
+  suspendedDialogs = Array.from(
+    document.querySelectorAll("dialog[open]"),
+    (item) => ({
+      dialog: item,
+      modal: item.matches(":modal"),
+    }),
+  );
   resumeModalButton.textContent = "Retomar " + label;
   resumeModalButton.hidden = false;
-  dialog.close();
+  for (const item of [...suspendedDialogs].reverse()) item.dialog.close();
   resumeModalButton.focus();
 }
 resumeModalButton.onclick = () => {
@@ -2190,7 +2225,11 @@ resumeModalButton.onclick = () => {
   const dialog = minimizedDialog;
   selected = selectionBeforeMinimize;
   render();
-  dialog.showModal();
+  for (const item of suspendedDialogs) {
+    if (item.modal) item.dialog.showModal();
+    else item.dialog.show();
+  }
+  suspendedDialogs = [];
   minimizedDialog = null;
   resumeModalButton.hidden = true;
   dialog.focus();
@@ -2218,7 +2257,9 @@ function ensureMinimizeButton(dialog, label) {
     button = document.createElement("button");
     button.type = "button";
     button.className = "minimize-modal";
-    button.textContent = "Minimizar";
+    button.textContent = "−";
+    button.setAttribute("aria-label", "Minimizar janela");
+    button.title = "Minimizar janela";
     dialog.prepend(button);
   }
   button.onclick = () => minimizeDialog(dialog, label);
@@ -2247,12 +2288,16 @@ function openActionDialog(required, nonModal = false) {
   if (dialog.open && dialog.classList.contains("nonmodal") !== nonModal)
     dialog.close();
   dialog.classList.toggle("nonmodal", nonModal);
-  if (!required) dialog.querySelector(".minimize-modal")?.remove();
+  ensureMinimizeButton(dialog, battle ? "combate" : "ação");
   dialog.oncancel = (event) => {
     if (required) event.preventDefault();
   };
   dialog.onclose = () => {
-    if (!dialog.open && minimizedDialog !== dialog) {
+    if (
+      !dialog.open &&
+      minimizedDialog !== dialog &&
+      !suspendedDialogs.some((item) => item.dialog === dialog)
+    ) {
       $("dialogContent").innerHTML = "";
       if (!battle) {
         if (dialog.classList.contains("nonmodal")) render();
@@ -2760,6 +2805,7 @@ function renderBattle() {
       $("battleError").textContent = e.message;
       return;
     }
+    if (region.bar && !resolved.bar) penalidadeBar();
     Object.assign(region, resolved);
     const success = result.attackDamage > 0 && region.units[b.f] > 0;
     let loot = [];
@@ -2803,6 +2849,10 @@ function newGame() {
     score: { imperio: 0, necromante: 0, piratas: 0, elfos: 0 },
     victoryTarget: 30,
     endEventsReady: false,
+    eventPending: false,
+    eventDeck: [],
+    eventDiscard: [],
+    eventFlags: { pirateWealth: false, goldScarce: false, noWood: [] },
     winner: null,
     taxes: shuffle(imperialTaxes.map((t) => ({ ...t }))),
     tax: null,
@@ -2822,13 +2872,18 @@ function addPoints(f, n, reason) {
   if (game.winner) return;
   const result = ConflictIslandBase.registrarPontos(game, f, n);
   Object.assign(game, result.partida);
-  game.scoreLog.push(`Rodada ${flow.round}: ${names[f]} +${n} — ${reason}`);
-  if (result.marco)
-    flowLog("Marco de 20 pontos alcançado; eventos de fim aguardam definição.");
+  game.scoreLog.push(
+    `Rodada ${flow.round}: ${names[f]} ${n >= 0 ? "+" : ""}${n} — ${reason}`,
+  );
   if (result.venceu) {
     flow.phase = "fim";
     flowLog(names[f] + " alcançou " + game.victoryTarget + " pontos e venceu.");
   }
+}
+function penalidadeBar() {
+  if (game.eventFlags.pirateWealth) return;
+  resources.piratas.ouro = 0;
+  addPoints("piratas", -1, "Bar destruído");
 }
 function addResource(f, type, n, reason) {
   Object.assign(
@@ -2860,7 +2915,7 @@ function taxCard() {
   return `<div class="tax-card" aria-label="Imposto imperial proposto"><strong>Imposto imperial · proposta</strong><span>${game.tax ? taxText(game.tax) : flow.phase === "preparação" && game.taxes.length ? "Revelado ao preparar a rodada" : game.taxPaid ? "Pago nesta rodada" : "Nenhum imposto ativo"}</span><small>Atraso: ${game.delay} de 3 rodadas</small>${flow.phase === "resolução" && activeFaction() === "imperio" && hasTech("Salão Imperial") && game.tax && !game.taxPaid && (game.taxes.length || game.taxDiscard.length) && game.hallUsedRound !== flow.round ? '<label>Recurso a descartar <select id="hallResource"><option value="ouro">Ouro</option><option value="madeira">Madeira</option></select></label><button id="hallChange">Alterar imposto</button><small id="hallMessage" role="status"></small>' : ""}</div>`;
 }
 function gameSummary() {
-  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste. Eventos de fim de jogo ainda não foram definidos.</p></details>`;
+  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details><p>Eventos ativos: ${[game.eventFlags.pirateWealth ? "Riqueza Pirata" : "", game.eventFlags.goldScarce ? "Escassez de Ouro" : "", ...game.eventFlags.noWood.map((r) => "Sem Madeira em " + r)].filter(Boolean).join(" · ") || "nenhum"}</p></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império, eventos e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste.</p></details>`;
 }
 // Cálculo separado da interface para facilitar testes e futuras automações.
 function elfForestPoints(regions, position) {
@@ -2944,6 +2999,17 @@ function beginScoring() {
   const finish = (id, type) => {
     const before = { ...game.score };
     scoreRound(id, type);
+    if (
+      !game.winner &&
+      !game.endEventsReady &&
+      factionIds.some((f) => game.score[f] >= 20)
+    ) {
+      game.endEventsReady = true;
+      game.eventPending = true;
+      flowLog(
+        "Marco de 20 pontos verificado na pontuação; um evento será revelado.",
+      );
+    }
     game.roundScoreDelta = Object.fromEntries(
       factionIds.map((f) => [f, game.score[f] - before[f]]),
     );
@@ -2965,7 +3031,7 @@ function beginScoring() {
   } else finish(candidates[0]?.id || null, null);
 }
 function scoreView() {
-  return `<section class="round-score"><small>FIM DA RODADA ${flow.round}</small><h3>Pontuação da rodada</h3><div class="round-score-list">${factionIds.map((f) => `<div class="round-score-row ${f}"><strong>${names[f]}</strong><span>+${game.roundScoreDelta?.[f] ?? 0} nesta pontuação</span><b>${game.score[f]} pontos</b></div>`).join("")}</div><p>Cada facção pode descartar toda a mão antes da próxima rodada.</p>${factionIds.map((f) => `<label><input type="checkbox" id="discardRemaining-${f}"> ${names[f]} · descartar ${flow.decks[f].hand.length} carta(s)</label>`).join("")}<button id="nextRound">Próxima rodada</button></section>`;
+  return `<section class="round-score"><small>FIM DA RODADA ${flow.round}</small><h3>Pontuação da rodada</h3><div class="round-score-list">${factionIds.map((f) => `<div class="round-score-row ${f}"><strong>${names[f]}</strong><span>+${game.roundScoreDelta?.[f] ?? 0} nesta pontuação</span><b>${game.score[f]} pontos</b></div>`).join("")}</div><p>Cada facção pode descartar toda a mão antes da próxima rodada.</p>${factionIds.map((f) => `<label><input type="checkbox" id="discardRemaining-${f}"> ${names[f]} · descartar ${flow.decks[f].hand.length} carta(s)</label>`).join("")}<div class="row"><button id="nextRound">Próxima rodada</button><button id="abrirEventosPontuacao" type="button" onclick="abrirSeletorEventos()">Testar evento</button></div></section>`;
 }
 function endView() {
   const max = game.winner
@@ -2993,6 +3059,272 @@ function afterBattle(b, region, result, loot, skipInfestationRecruit = false) {
   }
 }
 // FIM PONTUAÇÃO
+// INÍCIO EVENTOS
+/* Cartas propostas para testes; as condições não limitam o acionamento manual. */
+const eventos = Object.freeze([
+  { id: 'morte', nome: 'Espalhar a Morte', condicao: 'Necromante não possui a maior pontuação.', efeito: 'Adicione um zumbi em cada região sem zumbis e mais dois zumbis livremente.' },
+  { id: 'vinganca', nome: 'Vingança da Mata', condicao: 'Elfos não possuem a maior pontuação.', efeito: 'Remova peças de outras facções das florestas e adicione um elfo em cada floresta.' },
+  { id: 'riqueza', nome: 'Riqueza Pirata', condicao: 'Piratas não possuem a maior pontuação.', efeito: 'Adicione dois Bares; eles geram pontos, não causam penalidade ao serem destruídos e o limite passa a três.' },
+  { id: 'colonizacao', nome: 'Colonização', condicao: 'Império não possui a maior pontuação.', efeito: 'Construa tecnologias e adicione uma tecnologia ainda não construída gratuitamente em região controlada.' },
+  { id: 'fome', nome: 'A Grande Fome', condicao: 'Necromante ausente ou com menos de cinco tropas.', efeito: 'Elimine todas as tropas exceto zumbis.' },
+  { id: 'incendio', nome: 'Incêndio na Floresta', condicao: 'Elfos presentes na partida.', efeito: 'Cada jogador remove uma peça de uma floresta; escolha uma região que deixa de produzir Madeira.' },
+  { id: 'escassez', nome: 'Escassez de Ouro', condicao: 'Império ausente ou em primeiro ou segundo lugar.', efeito: 'Somente R11 continua produzindo Ouro.' },
+  { id: 'guerra', nome: 'O Mal da Guerra', condicao: 'Sempre.', efeito: 'Remova todas as peças das regiões com peças de mais de uma facção.' },
+].map(Object.freeze));
+// Eventos são hipóteses de teste; as escolhas são aplicadas de uma só vez.
+let eventoAtual = null;
+function recursoEvento(r) {
+  if (game.eventFlags.goldScarce && r.resource === "Ouro" && r.id !== "R11")
+    return "Sem recurso";
+  if (game.eventFlags.noWood.includes(r.id) && r.resource === "Madeira")
+    return "Sem recurso";
+  return r.resource;
+}
+function regioesComRecursos() {
+  return definitions.map((r) => ({ ...r, resource: recursoEvento(r) }));
+}
+function opcoesRegiao(lista = definitions, vazio = false) {
+  return (
+    (vazio ? '<option value="">Nenhuma</option>' : "") +
+    lista
+      .map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`)
+      .join("")
+  );
+}
+function abrirEvento(id, manual = true) {
+  const carta = eventos.find((e) => e.id === id);
+  if (!carta) throw Error("Evento desconhecido.");
+  if (battle || $("actionDialog").open) {
+    game.queuedEvent = { id, manual };
+    flowLog("Evento " + carta.nome + " aguardará a conclusão da ação.");
+    return;
+  }
+  eventoAtual = { id, manual };
+  const florestas = definitions.filter((r) => r.terrain === "floresta");
+  const areas = definitions.filter(
+    (r) =>
+      calcOwner(state[r.id]) === "imperio" &&
+      !state[r.id].tech &&
+      !state[r.id].buildings.imperio,
+  );
+  let campos = "";
+  if (id === "morte")
+    campos = [1, 2]
+      .map(
+        (i) =>
+          `<label>Zumbi extra ${i} <select id="evento-zumbi-${i}">${opcoesRegiao()}</select></label>`,
+      )
+      .join("");
+  if (id === "riqueza")
+    campos = [1, 2]
+      .map(
+        (i) =>
+          `<label>Bar ${i} <select id="evento-bar-${i}">${opcoesRegiao(
+            definitions.filter((r) => !state[r.id].bar),
+            true,
+          )}</select></label>`,
+      )
+      .join("");
+  if (id === "colonizacao")
+    campos = Object.keys(technologies)
+      .filter((t) => !hasTech(t))
+      .map(
+        (t, i) =>
+          `<label>${t} <select id="evento-tech-${i}" data-tech="${t}">${opcoesRegiao(areas, true)}</select></label>`,
+      )
+      .join("");
+  if (id === "incendio") {
+    campos =
+      factionIds
+        .map((f) => {
+          const escolhas = [];
+          for (const r of florestas) {
+            const s = state[r.id];
+            if (s.units[f]) escolhas.push([r.id + ":unit", r.id + " · tropa"]);
+            if (s.buildings[f])
+              escolhas.push([r.id + ":generic", r.id + " · construção"]);
+            for (const [dono, chave, label] of [
+              ["necromante", "tower", "Torre"],
+              ["necromante", "extractor", "Extrator"],
+              ["necromante", "monument", "Monumento"],
+              ["piratas", "bar", "Bar"],
+              ["imperio", "tech", "Tecnologia"],
+            ])
+              if (f === dono && s[chave])
+                escolhas.push([r.id + ":" + chave, r.id + " · " + label]);
+          }
+          return `<label>${names[f]} <select id="evento-peca-${f}">${escolhas.length ? escolhas.map(([v, l]) => `<option value="${v}">${l}</option>`).join("") : '<option value="">Sem peça na floresta</option>'}</select></label>`;
+        })
+        .join("") +
+      `<label>Região sem produção de Madeira <select id="evento-madeira">${opcoesRegiao(definitions.filter((r) => r.resource === "Madeira"))}</select></label>`;
+  }
+  $("eventoConteudo").innerHTML =
+    `<h2>${carta.nome}</h2><p><strong>Condição:</strong> ${carta.condicao}</p><p>${carta.efeito}</p>${manual ? "<p>Execução manual: a condição foi ignorada.</p>" : ""}${campos}<p id="eventoErro" role="status"></p><button id="aplicarEvento" type="button">Aplicar evento</button>${manual ? '<button id="cancelarEvento" type="button">Cancelar</button>' : ""}`;
+  $("aplicarEvento").onclick = aplicarEventoAtual;
+  if (manual)
+    $("cancelarEvento").onclick = () => {
+      eventoAtual = null;
+      $("eventoDialog").close();
+    };
+  ensureMinimizeButton($("eventoDialog"), "evento");
+  if (
+    typeof $("eventoDialog").showModal === "function" &&
+    !$("eventoDialog").open
+  )
+    $("eventoDialog").showModal();
+}
+function removerPecaEvento(s, f, key) {
+  if (key === "unit") s.units[f]--;
+  else if (key === "generic") s.buildings[f]--;
+  else {
+    if (key === "bar") penalidadeBar();
+    s[key] = key === "tech" ? null : false;
+  }
+}
+function limparFaccaoEvento(s, f) {
+  s.units[f] = 0;
+  s.buildings[f] = 0;
+  if (f === "imperio") s.tech = null;
+  if (f === "piratas" && s.bar) {
+    penalidadeBar();
+    s.bar = false;
+  }
+  if (f === "necromante") {
+    s.tower = false;
+    s.extractor = false;
+    s.monument = false;
+  }
+}
+function aplicarEventoAtual() {
+  if (!eventoAtual) return;
+  const { id, manual } = eventoAtual;
+  const get = (id) => $(id).value;
+  if (id === "riqueza") {
+    const ids = [get("evento-bar-1"), get("evento-bar-2")].filter(Boolean);
+    const existentes = Object.values(state).filter((s) => s.bar).length;
+    const necessarios = Math.min(
+      2,
+      3 - existentes,
+      definitions.length - existentes,
+    );
+    if (
+      ids.length !== necessarios ||
+      new Set(ids).size !== ids.length ||
+      ids.some((x) => !state[x] || state[x].bar)
+    ) {
+      $("eventoErro").textContent =
+        `Escolha ${necessarios} região(ões) distintas sem Bar, respeitando o limite de três.`;
+      return;
+    }
+    game.eventFlags.pirateWealth = true;
+    for (const x of ids) state[x].bar = true;
+  }
+  if (id === "colonizacao") {
+    const techs = Object.keys(technologies).filter((t) => !hasTech(t));
+    const escolhas = techs
+      .map((t, i) => [t, get("evento-tech-" + i)])
+      .filter(([, r]) => r);
+    if (
+      new Set(escolhas.map((x) => x[1])).size !== escolhas.length ||
+      escolhas.some(
+        ([, r]) =>
+          !state[r] ||
+          calcOwner(state[r]) !== "imperio" ||
+          state[r].tech ||
+          state[r].buildings.imperio,
+      )
+    ) {
+      $("eventoErro").textContent =
+        "Escolha regiões dominadas distintas e sem construção imperial.";
+      return;
+    }
+    for (const [t, r] of escolhas) state[r].tech = t;
+  }
+  if (id === "morte") {
+    for (const s of Object.values(state))
+      if (!s.units.necromante) s.units.necromante++;
+    for (const i of [1, 2]) state[get("evento-zumbi-" + i)].units.necromante++;
+  }
+  if (id === "vinganca")
+    for (const r of definitions.filter((r) => r.terrain === "floresta")) {
+      for (const f of factionIds.filter((f) => f !== "elfos"))
+        limparFaccaoEvento(state[r.id], f);
+      state[r.id].units.elfos++;
+    }
+  if (id === "fome")
+    for (const s of Object.values(state))
+      for (const f of factionIds.filter((f) => f !== "necromante"))
+        s.units[f] = 0;
+  if (id === "incendio") {
+    for (const f of factionIds) {
+      const valor = get("evento-peca-" + f);
+      if (valor) {
+        const [r, key] = valor.split(":");
+        removerPecaEvento(state[r], f, key);
+      }
+    }
+    const r = get("evento-madeira");
+    if (!game.eventFlags.noWood.includes(r)) game.eventFlags.noWood.push(r);
+  }
+  if (id === "escassez") game.eventFlags.goldScarce = true;
+  if (id === "guerra")
+    for (const s of Object.values(state))
+      if (
+        factionIds.filter((f) => s.units[f] || buildingCount(s, f)).length > 1
+      )
+        for (const f of factionIds) limparFaccaoEvento(s, f);
+  flowLog(
+    "Evento " +
+      eventos.find((e) => e.id === id).nome +
+      (manual ? " aplicado manualmente." : " aplicado."),
+  );
+  eventoAtual = null;
+  if ($("eventoDialog").open) $("eventoDialog").close();
+  restoreTowerIfLost();
+  refreshOwners();
+  render();
+  renderFlow();
+}
+function iniciarEventoPendente() {
+  if (eventoAtual || battle || $("actionDialog").open || game.winner) return;
+  if (game.queuedEvent) {
+    const item = game.queuedEvent;
+    game.queuedEvent = null;
+    abrirEvento(item.id, item.manual);
+    return;
+  }
+  if (flow.phase !== "pontuação" || !game.eventPending) return;
+  game.eventPending = false;
+  if (!game.eventDeck.length)
+    game.eventDeck = shuffle(eventos.map((e) => e.id));
+  while (game.eventDeck.length) {
+    const id = game.eventDeck.shift();
+    game.eventDiscard.push(id);
+    const carta = eventos.find((e) => e.id === id);
+    flowLog("Evento revelado: " + carta.nome + ".");
+    if (ConflictIslandBase.condicaoEvento(id, game.score, state, factionIds)) {
+      abrirEvento(id, false);
+      return;
+    }
+  }
+}
+function abrirSeletorEventos() {
+  ensureMinimizeButton($("eventoEscolhaDialog"), "seleção de evento");
+  $("eventoEscolhaDialog").showModal();
+}
+function instalarEventos() {
+  $("executarEvento").onclick = () => {
+    const id = $("eventoEscolha").value;
+    $("eventoEscolhaDialog").close();
+    abrirEvento(id, true);
+  };
+  $("fecharEventos").onclick = () => $("eventoEscolhaDialog").close();
+  $("eventoEscolha").innerHTML = eventos
+    .map((e) => `<option value="${e.id}">${e.nome}</option>`)
+    .join("");
+  $("eventoDialog").oncancel = (e) => e.preventDefault();
+}
+// FIM EVENTOS
 function optRegions(filter = () => true) {
   return definitions
     .filter(filter)
@@ -3072,7 +3404,6 @@ function transfer(from, to, type, n) {
   fail(resources[from][type] >= n, "Recursos insuficientes para a troca.");
   resources[from][type] -= n;
   addResource(to, type, n, "acordo");
-  if (n > 0 && !game.winner) awardElfTrade(from, to);
 }
 function move(from, to, f, n) {
   fail(from !== to && state[from] && state[to], "Movimento inválido.");
@@ -3832,7 +4163,7 @@ function executeCard(f, name, id, ci) {
       transfer(o, "elfos", "madeira", tw);
       if (game.winner) break;
       state = ConflictIslandBase.tropasHarmonia(state, o, moves);
-      if (g || t) awardElfTrade("elfos", o);
+      if (gg + gw + g > 0 && tg + tw + t > 0) awardElfTrade("elfos", o);
       break;
     }
     case "Trilhas na Mata": {
@@ -3855,7 +4186,7 @@ function executeCard(f, name, id, ci) {
     case "Trabalhadores Zumbificado": {
       const resultado = ConflictIslandBase.coletaDeCartas(
         name,
-        definitions,
+        regioesComRecursos(),
         state,
         id,
         resources[f],
@@ -3873,7 +4204,8 @@ function executeCard(f, name, id, ci) {
         s,
         resources[f],
         state,
-        r.resource,
+        recursoEvento(r),
+        game.eventFlags.pirateWealth ? 3 : 1,
       );
       Object.assign(s, result.regiao);
       Object.assign(resources[f], result.saldo);
@@ -3950,7 +4282,7 @@ function executeCard(f, name, id, ci) {
         state,
         edges,
         id,
-        r.resource,
+        recursoEvento(r),
         resources[f],
         $("spell").value,
         other(),
@@ -3977,7 +4309,7 @@ function executeCard(f, name, id, ci) {
       const deck = flow.decks[f],
         result = ConflictIslandBase.coletaImperial(
           s,
-          r.resource,
+          recursoEvento(r),
           resources[f],
           deck,
           ci,
@@ -4003,6 +4335,7 @@ function executeCard(f, name, id, ci) {
       transfer(f, o, gt, g);
       if (game.winner) break;
       transfer(o, f, tt, t);
+      if (g > 0 && t > 0) awardElfTrade(f, o);
       break;
     }
     case "Pagamento de Impostos": {
@@ -4566,6 +4899,7 @@ if (document.addEventListener) {
   );
 }
 updateFullscreenLabel();
+instalarEventos();
 renderFlow();
 </script>
 <!-- FIM APLICAÇÃO ACOES --></body></html>

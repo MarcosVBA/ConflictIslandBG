@@ -26,7 +26,7 @@ for(let round=1;round<=6;round++){
   click('toScore');check("flow.phase==='pontuação'");click('nextRound');
 }
 check("flow.phase==='preparação'&&flow.round===7&&game.imperialRecruitRound===6");
-run("game.score.elfos=19;addPoints('elfos',1,'teste')");check("game.endEventsReady&&!game.winner");
+run("game.score.elfos=19;addPoints('elfos',1,'teste')");check("!game.endEventsReady&&!game.eventPending&&!game.winner");
 run("game.score.elfos=29;addPoints('elfos',1,'teste')");check("game.winner==='elfos'&&flow.phase==='fim'");
 // O pagamento do Corsário permanece disponível até a pontuação e não encerra a ação.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['piratas','elfos','imperio','necromante'];flow.markers=[{f:'piratas',region:'R5',used:false}];flow.decks.piratas.hand=[{name:'Carta de Corsário / Serviço de Transporte Pirata'}];state.R5.units.imperio=1;game.score.piratas=29;showCorsair('piratas',0,0)");
