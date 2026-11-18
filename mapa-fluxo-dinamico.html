@@ -476,7 +476,7 @@ body>header small{display:block;line-height:1.1}
       recursos=pagar(saldo,1,2);for(const f of faccoes)if(f!=='necromante')alvo.units[f]=0;alvo.units.necromante--;
     } else if (magia==='Trabalhadores incansáveis') {
       if (recurso==='Sem recurso' || local.extractor) throw Error('Exige recurso e ausência de extrator.');
-      recursos=pagar(saldo,3,0);alvo.extractor=true;recursos=receber(recursos,recurso==='Ouro'?'ouro':'madeira',1);
+      recursos=pagar(saldo,1,0);alvo.extractor=true;recursos=receber(recursos,recurso==='Ouro'?'ouro':'madeira',1);
     } else throw Error('Magia inválida.');
     return {mapa:next,saldo:recursos};
   }
@@ -543,15 +543,14 @@ body>header small{display:block;line-height:1.1}
     if (!cartas[faccao]?.includes(nome) || !local || !regiao || nome==='Furia da Ilha') throw Error('Carta ou região inválida.');
     const inimigos=faccoes.filter(f=>f!==faccao && (local.units[f]>0 || construcoes(local,f)>0));
     if (!(nome==='Infestação' && !inimigos.length) && (!(costeiro || nome==='Marcha Imperial') || inimigos.length) && !inimigos.includes(defensor)) throw Error('Escolha defensor com tropas ou construções no local.');
-    if (costeiro && operacao !== 'move' && !regiao.coast) throw Error('Invasão Costeira exige destino costeiro.');
+    if (costeiro && operacao === 'both' && !regiao.coast) throw Error('Invasão Costeira exige destino costeiro.');
     if (nome==='Ataque a Linha de Suprimentos' && (!recursos[defensor] || recursos[defensor].ouro<1)) throw Error('O inimigo precisa ter Ouro.');
     if (!Array.isArray(movimentos) || new Set(movimentos.map(m=>m.id)).size!==movimentos.length || movimentos.some(m=>!mapa[m.id] || m.id===alvo || !Number.isSafeInteger(m.n) || m.n<0 || m.n>mapa[m.id].units[faccao] || localOnly || (costeiro ? !(operacao === 'move' && vizinhos(ligacoes,alvo).includes(m.id)) && !(regiao.coast && regioes.find(r=>r.id===m.id)?.coast) : !vizinhos(ligacoes,alvo).includes(m.id)))) throw Error('Escolha origens e tropas disponíveis.');
-    const total=movimentos.reduce((sum,m)=>sum+m.n,0),max=costeiro && operacao==='move'?Number.MAX_SAFE_INTEGER:['Infestação','Tambores de Guerra'].includes(nome)?2:['Invasão Costeira','Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem','Marcha Imperial'].includes(nome)?3:Number.MAX_SAFE_INTEGER;
+    const total=movimentos.reduce((sum,m)=>sum+m.n,0),max=costeiro && operacao==='move'?Number.MAX_SAFE_INTEGER:nome==='Infestação'?(inimigos.length?3:2):nome==='Tambores de Guerra'?2:['Invasão Costeira','Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem','Marcha Imperial'].includes(nome)?3:Number.MAX_SAFE_INTEGER;
     if(total>max) throw Error('O total de tropas movidas excede o limite da carta.');
     if(local.units[faccao]+total<1) throw Error('Envie ao menos uma tropa ou tenha tropas no local.');
     if (nome==='Infestação' && !inimigos.length && total===0) throw Error('Mova ao menos um zumbi para uma região sem defensor.');
     if((costeiro||nome==='Marcha Imperial') && movimentos.filter(m=>m.n>0).length>1) throw Error('Esta carta move de apenas uma região.');
-    if(nome==='Marcha Imperial' && !vizinhos(ligacoes,alvo).some(x=>mapa[x]&&dominio(mapa[x])==='imperio')) throw Error('Marcha Imperial exige região adjacente a uma região dominada pelo Império.');
     return {hasEnemy:inimigos.length>0,total};
   }
   function validarFuria(mapa, ligacoes, origem, destino, quantidade, defensor) {
@@ -1362,27 +1361,27 @@ const factionIds = ["imperio", "necromante", "piratas", "elfos"];
 /* Catálogo experimental: cada tupla representa uma carta física. */
 const cardDefs = {
   imperio: [
-    ['Marcha Imperial', 3, 'Mova e/ou ataque em região adjacente ao seu domínio.'],
+    ['Marcha Imperial', 3, 'Mova soldados adjacentes e/ou ataque onde houver soldados.'],
     ['Assegurar Recursos para o Rei', 4, 'Colete recurso impresso e descarte cópias adicionais para coletar mais.'],
     ['Ordens da Coroa', 3, 'Construa uma tecnologia ou pague o imposto ativo.'],
     ['Guarda Imperial', 2, 'Reação defensiva: ignore dano às tropas.'],
   ],
   piratas: [
-    ['Invasão Costeira', 4, 'Mova tropas pela ilha ou saqueie na costa.'],
+    ['Invasão Costeira', 4, 'Mova tropas pela ilha ou saqueie onde houver piratas.'],
     ['Taverna Pirata / Pirata Aprendiz', 3, 'Construa um Bar ou recrute um pirata.'],
     ['Carta de Corsário / Serviço de Transporte Pirata', 3, 'Proponha um acordo de Corsário ou Transporte.'],
     ['Vento a Favor', 2, 'Reação em saque: suprima dados de defesa ou receba Ouro extra em caso de sucesso.'],
   ],
   necromante: [
-    ['Infestação', 3, 'Ataque com zumbis presentes e/ou até dois de regiões adjacentes; depois recrute um.'],
+    ['Infestação', 4, 'Ataque com zumbis presentes e/ou até três de regiões adjacentes; depois recrute um.'],
     ['Extratores da Torre', 4, 'Construa um extrator ou colha recursos dos extratores.'],
-    ['Magia das Trevas / Monumento à Morte', 2, 'Use uma magia ou construa um monumento e reponha a mão.'],
-    ['Remanejando Mortos', 3, 'Mova zumbis entre regiões devastadas adjacentes e reponha a mão.'],
+    ['Magia das Trevas / Monumento à Morte', 2, 'Use uma magia ou construa um monumento.'],
+    ['Remanejando Mortos', 2, 'Mova um zumbi para região adjacente.'],
   ],
   elfos: [
     ['Fúria da Ilha / Harmônia', 3, 'Mova e ataque ou proponha uma troca.'],
     ['Trilhas na Mata / Defesa Global', 2, 'Mova tropas ou proteja um dos lados de uma batalha.'],
-    ['Frutos da Mata / Filhos da Floresta', 5, 'Colha recursos ou recrute um elfo e reponha a mão.'],
+    ['Frutos da Mata / Filhos da Floresta', 5, 'Colha recursos ou recrute um elfo.'],
     ['Milagre da Floresta', 2, 'Converta três recursos de um tipo em dois de outro.'],
   ],
 };
@@ -1393,21 +1392,21 @@ const leadershipValues = Object.freeze({
   'Fúria da Ilha / Harmônia': 1, 'Trilhas na Mata / Defesa Global': 3, 'Frutos da Mata / Filhos da Floresta': 1, 'Milagre da Floresta': 0,
 });
 const experimentalConditions = Object.freeze({
-  'Marcha Imperial': 'Destino adjacente a domínio imperial; mova 1 a 3 soldados de uma origem adjacente. Ataque exige soldados e defensor presente; Fortaleza permite rerrolar um dado.',
+  'Marcha Imperial': 'Mova 1 a 3 soldados de uma origem adjacente. Ataque exige soldados e defensor presente; Fortaleza permite rerrolar um dado.',
   'Assegurar Recursos para o Rei': 'Região com recurso e tropa ou construção imperial. Cada cópia extra descartada rende mais um recurso, até três; Serraria ou Mercado Local dá bônus uma vez.',
   'Ordens da Coroa': 'Construir exige soldados, região sem construção imperial, custo e pré-requisito; rende 1 ponto. Imposto exige região dominada, imposto ativo e pagamento; escolha a origem do soldado quando exigido.',
   'Guarda Imperial': 'Ao defender, antes dos dados, gaste carta para ignorar 1 dano às tropas, ou 2 com Quartel.',
-  'Invasão Costeira': 'Saquear exige costa e permite mover 1 a 3 piratas de outra costa. Só mover permite qualquer quantidade de uma origem adjacente ou de outra costa para costa. Para saquear, tenha piratas e escolha defensor com tropas ou construções.',
+  'Invasão Costeira': 'Mover e saquear exige costa e permite mover 1 a 3 piratas de outra costa. Saquear sem mover também é permitido no interior. Só mover permite qualquer quantidade de uma origem adjacente ou de outra costa para costa. Para saquear, tenha piratas e escolha defensor com tropas ou construções.',
   'Taverna Pirata / Pirata Aprendiz': 'Construir Bar exige região dominada e não pode haver outro Bar. Recrutar exige região dominada pelos Piratas ou sem domínio e adiciona dois piratas em região com Bar.',
   'Carta de Corsário / Serviço de Transporte Pirata': 'Outra facção aceita ou recusa preço de 0 a 3 Ouros. Corsário move piratas para região adjacente e pode saquear; Transporte move tropas do contratante para costa ou região adjacente à origem.',
   'Vento a Favor': 'Piratas atacantes em saque: após declaração e antes da reação defensiva, gaste carta. Suprima dados de defesa existentes ou ganhe 1 Ouro extra em saque bem-sucedido. Uma cópia por combate.',
-  'Infestação': 'Ataque defensor presente e/ou mova até 2 zumbis adjacentes. Sem defensor, o movimento termina sem combate ou recrutamento. Recrute 1 após combate, salvo interrupção ou recuperação da Torre.',
+  'Infestação': 'Ataque defensor presente e/ou mova até 3 zumbis adjacentes. Sem defensor, mova até 2 sem combate ou recrutamento. Recrute 1 após combate, salvo interrupção ou recuperação da Torre.',
   'Extratores da Torre': 'Construir exige zumbi, recurso impresso e região sem extrator. Colher exige extrator no mapa e rende 1 recurso impresso por extrator no mapa.',
-  'Magia das Trevas / Monumento à Morte': 'Magia exige custos e alvos da magia escolhida. Monumento exige região devastada sem monumento, 1 Madeira e domínio de algum oponente; pontue 2 por monumento e reponha a mão.',
-  'Remanejando Mortos': 'Mova quantos zumbis quiser, inclusive zero movimentos, entre regiões inicialmente devastadas ligadas diretamente. Ao concluir, descarte a mão e compre até cinco.',
+  'Magia das Trevas / Monumento à Morte': 'Magia exige custos e alvos da magia escolhida. Monumento exige região devastada sem monumento, 1 Madeira e domínio de algum oponente; pontue 2 por monumento.',
+  'Remanejando Mortos': 'Mova 1 zumbi para qualquer região adjacente, sem iniciar combate.',
   'Fúria da Ilha / Harmônia': 'Atacar exige defensor presente e permite atacar no local ou mover 1 a 3 elfos para região adjacente e atacar. Trocar exige outra facção e aceite; primeira troca de recursos nos dois sentidos por facção rende 1 ponto na rodada.',
   'Trilhas na Mata / Defesa Global': 'Mover leva quantidade positiva de elfos de uma origem adjacente. Defesa Global: após reação defensiva e antes dos dados, gaste carta para proteger um lado com tropas, inclusive em combate de terceiros.',
-  'Frutos da Mata / Filhos da Floresta': 'Colher exige tropas élficas no mapa e rende um recurso impresso por região com elfos. Recrutar exige floresta não devastada e 1 Ouro, Madeira ou tropa élfica; depois reponha a mão.',
+  'Frutos da Mata / Filhos da Floresta': 'Colher exige tropas élficas no mapa e rende um recurso impresso por região com elfos. Recrutar exige floresta não devastada e 1 Ouro, Madeira ou tropa élfica.',
   'Milagre da Floresta': 'Converta 3 unidades de um tipo em 2 de outro: Ouro, Madeira ou tropas élficas. Tropas recebidas vão a regiões dominadas pelos Elfos.',
 });
 // janela: mapa, modal ou reação; o efeito identifica a regra utilizada.
@@ -1423,7 +1422,7 @@ const experimentalModes = Object.freeze({
   'Infestação': [{label:'Atacar', effect:'Infestação', window:'mapa'}],
   'Extratores da Torre': [{label:'Construir', effect:'Projeto de Poder Maligno', window:'mapa'}, {label:'Colher', effect:'Trabalhadores Zumbificado', window:'mapa'}],
   'Magia das Trevas / Monumento à Morte': [{label:'Magia', effect:'Magia das Trevas', window:'mapa'}, {label:'Monumento', effect:'Monumento a Morte', window:'mapa'}],
-  'Remanejando Mortos': [{label:'Remanejar', effect:'Remanejando Mortos', window:'mapa'}],
+  'Remanejando Mortos': [{label:'Mover zumbi', effect:'Remanejando Mortos', window:'mapa'}],
   'Fúria da Ilha / Harmônia': [{label:'Atacar', effect:'Furia da Ilha', window:'mapa'}, {label:'Trocar', effect:'Harmônia', window:'mapa'}],
   'Trilhas na Mata / Defesa Global': [{label:'Mover', effect:'Trilhas na Mata', window:'mapa'}, {label:'Defesa Global', effect:'Defesa Global', window:'reação'}],
   'Frutos da Mata / Filhos da Floresta': [{label:'Colher', effect:'Frutos da Mata', window:'mapa'}, {label:'Recrutar', effect:'Filhos da Floresta', window:'mapa'}],
@@ -1567,7 +1566,7 @@ function factionInfo(f) {
   const rules = {
     imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
     necromante: `<p><strong>Devastação:</strong> uma região é devastada quando há peças do Necromante e nenhuma peça adversária. No fim da rodada, 2–3 regiões rendem 1 ponto; 4 rendem 2; 5 rendem 3; 6 ou mais rendem 4.</p><p><strong>Magia da Torre:</strong> ao perder seu domínio, remova as peças indicadas pela magia; a Torre permanece e recebe 2 zumbis. Se for sua única região dominada, após comprar cartas adicione 1 zumbi nela, até 5.</p>`,
-    piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa. Se o Bar for destruído, perca todo o Ouro e 1 ponto.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
+    piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar gera 1 Ouro por rodada; há limite de 1 Bar no mapa. Se o Bar for destruído, perca todo o Ouro e 1 ponto.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
     elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; com pelo menos 2 dominadas e tropas em todas, rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca de recursos nos dois sentidos com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
   };
   if (revisedModes)
@@ -2847,7 +2846,7 @@ const imperialTaxes=Object.freeze([{g:1,w:0,s:0,p:2},{g:1,w:1,s:0,p:2},{g:1,w:1,
 function newGame() {
   return {
     score: { imperio: 0, necromante: 0, piratas: 0, elfos: 0 },
-    victoryTarget: 30,
+    victoryTarget: 20,
     endEventsReady: false,
     eventPending: false,
     eventDeck: [],
@@ -2915,7 +2914,7 @@ function taxCard() {
   return `<div class="tax-card" aria-label="Imposto imperial proposto"><strong>Imposto imperial · proposta</strong><span>${game.tax ? taxText(game.tax) : flow.phase === "preparação" && game.taxes.length ? "Revelado ao preparar a rodada" : game.taxPaid ? "Pago nesta rodada" : "Nenhum imposto ativo"}</span><small>Atraso: ${game.delay} de 3 rodadas</small>${flow.phase === "resolução" && activeFaction() === "imperio" && hasTech("Salão Imperial") && game.tax && !game.taxPaid && (game.taxes.length || game.taxDiscard.length) && game.hallUsedRound !== flow.round ? '<label>Recurso a descartar <select id="hallResource"><option value="ouro">Ouro</option><option value="madeira">Madeira</option></select></label><button id="hallChange">Alterar imposto</button><small id="hallMessage" role="status"></small>' : ""}</div>`;
 }
 function gameSummary() {
-  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details><p>Eventos ativos: ${[game.eventFlags.pirateWealth ? "Riqueza Pirata" : "", game.eventFlags.goldScarce ? "Escassez de Ouro" : "", ...game.eventFlags.noWood.map((r) => "Sem Madeira em " + r)].filter(Boolean).join(" · ") || "nenhum"}</p></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império, eventos e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste.</p></details>`;
+  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details><p>Eventos ativos: ${[game.eventFlags.pirateWealth ? "Riqueza Pirata" : "", game.eventFlags.goldScarce ? "Escassez de Ouro" : "", ...game.eventFlags.noWood.map((r) => "Sem Madeira em " + r)].filter(Boolean).join(" · ") || "nenhum"}</p></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste.</p></details>`;
 }
 // Cálculo separado da interface para facilitar testes e futuras automações.
 function elfForestPoints(regions, position) {
@@ -2923,9 +2922,7 @@ function elfForestPoints(regions, position) {
 }
 function scoreRound(penaltyRegion = null, penaltyResource = null) {
   if (game.scored === flow.round) return;
-  const bars = Object.values(state).filter(
-    (s) => s.bar && calcOwner(s) === "piratas",
-  ).length;
+  const bars = Object.values(state).filter((s) => s.bar).length;
   if (bars) addResource("piratas", "ouro", bars, "renda dos bares");
   const pirateGold = resources.piratas.ouro;
   resources.piratas.ouro = 0;
@@ -3002,12 +2999,12 @@ function beginScoring() {
     if (
       !game.winner &&
       !game.endEventsReady &&
-      factionIds.some((f) => game.score[f] >= 20)
+      factionIds.some((f) => game.score[f] >= 10)
     ) {
       game.endEventsReady = true;
       game.eventPending = true;
       flowLog(
-        "Marco de 20 pontos verificado na pontuação; um evento será revelado.",
+        "Marco de 10 pontos verificado na pontuação; um evento será revelado.",
       );
     }
     game.roundScoreDelta = Object.fromEntries(
@@ -3071,7 +3068,7 @@ const eventos = Object.freeze([
   { id: 'escassez', nome: 'Escassez de Ouro', condicao: 'Império ausente ou em primeiro ou segundo lugar.', efeito: 'Somente R11 continua produzindo Ouro.' },
   { id: 'guerra', nome: 'O Mal da Guerra', condicao: 'Sempre.', efeito: 'Remova todas as peças das regiões com peças de mais de uma facção.' },
 ].map(Object.freeze));
-// Eventos são hipóteses de teste; as escolhas são aplicadas de uma só vez.
+// As escolhas dos eventos são aplicadas de uma só vez.
 let eventoAtual = null;
 function recursoEvento(r) {
   if (game.eventFlags.goldScarce && r.resource === "Ouro" && r.id !== "R11")
@@ -3452,11 +3449,7 @@ function configureActionMap(name, id) {
           (x.coast || neighbors(from).includes(x.id)),
       )
       .map((x) => x.id);
-  } else if (name === "Remanejando Mortos")
-    valid = definitions
-      .filter((x) => x.id !== id && devastated(state[x.id]))
-      .map((x) => x.id);
-  else {
+  } else {
     setMapChoice(null);
     return;
   }
@@ -3486,98 +3479,45 @@ function configureActionMap(name, id) {
     };
 }
 function showRemanejamento(f, ci, mi) {
-  const before = clone(state),
-    draft = clone(state),
-    moves = [],
-    eligible = new Set(
-      definitions.filter((r) => devastated(draft[r.id])).map((r) => r.id),
+  const origins = definitions.filter(
+    (r) => state[r.id].units.necromante > 0 && neighbors(r.id).length,
+  );
+  $("dialogContent").innerHTML =
+    `<h3>Remanejando Mortos</h3><p>Mova 1 zumbi para uma região adjacente.</p>${field("remOrigin", "Origem", origins.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join(""))}${field("remDestination", "Destino", "")}<button id="remFinish">Mover zumbi e concluir</button> <button id="remCancel">Cancelar</button><p id="actionError" role="status"></p>`;
+  const update = () => {
+    const origin = $("remOrigin").value;
+    $("remDestination").innerHTML = optRegions((r) =>
+      neighbors(origin).includes(r.id),
     );
-  const preview = () => {
-    const actual = state;
-    try {
-      state = draft;
-      mapDevastationOverride = eligible;
-      render();
-    } finally {
-      state = actual;
-      mapDevastationOverride = null;
-    }
   };
-  function panel() {
-    const origins = definitions.filter(
-      (r) =>
-        eligible.has(r.id) &&
-        draft[r.id].units.necromante > 0 &&
-        neighbors(r.id).some((x) => eligible.has(x)),
-    );
-    $("dialogContent").innerHTML =
-      `<h3>Remanejando Mortos</h3><p>Distribua zumbis entre regiões devastadas adjacentes, quantas vezes desejar. Ao terminar, descarte a mão e compre até cinco cartas.</p>${field("remOrigin", "Origem", origins.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join(""))}${field("remDestination", "Destino", "")}${amount("remQuantity", "Zumbis a mover", Number.MAX_SAFE_INTEGER)}<button id="remMove">Mover zumbis</button> <button id="remFinish">Concluir ação</button> <button id="remCancel">Cancelar</button><p>Movimentos preparados: ${moves.length}</p><p id="actionError" role="status"></p>`;
-    const update = () => {
-      const origin = $("remOrigin").value;
-      $("remDestination").innerHTML = optRegions(
-        (r) => neighbors(origin).includes(r.id) && eligible.has(r.id),
+  $("remOrigin").onchange = update;
+  update();
+  $("remCancel").onclick = () => {
+    render();
+    renderFlow();
+  };
+  $("remFinish").onclick = () => {
+    try {
+      const origin = $("remOrigin").value,
+        destination = $("remDestination").value;
+      fail(
+        state[origin]?.units.necromante > 0 &&
+          state[destination] &&
+          neighbors(origin).includes(destination),
+        "Escolha um zumbi e uma região adjacente.",
       );
-      const available = draft[origin]?.units.necromante || 0;
-      $("remQuantity").max = available;
-      $("remQuantity").min = available ? 1 : 0;
-      $("remQuantity").disabled = !available;
-      $("remQuantity").value = available
-        ? Math.min(available, Math.max(1, Number($("remQuantity").value) || 1))
-        : 0;
-    };
-    $("remOrigin").onchange = update;
-    update();
-    $("remMove").onclick = () => {
-      try {
-        const origin = $("remOrigin").value,
-          destination = $("remDestination").value,
-          n = countValue("remQuantity");
-        fail(
-          draft[origin] &&
-            draft[destination] &&
-            eligible.has(origin) &&
-            eligible.has(destination) &&
-            neighbors(origin).includes(destination) &&
-            n > 0 &&
-            draft[origin].units.necromante >= n,
-          "Escolha regiões devastadas adjacentes e tropas disponíveis.",
-        );
-        const result = ConflictIslandBase.calcularMovimento(
-          draft[origin].units.necromante,
-          draft[destination].units.necromante,
-          n,
-        );
-        draft[origin].units.necromante = result.origem;
-        draft[destination].units.necromante = result.destino;
-        moves.push({ origin, destination, n });
-        selected = destination;
-        preview();
-        panel();
-      } catch (e) {
-        $("actionError").textContent = e.message;
-      }
-    };
-    $("remCancel").onclick = () => {
-      render();
-      renderFlow();
-    };
-    $("remFinish").onclick = () => {
-      if (JSON.stringify(state) !== JSON.stringify(before)) {
-        $("actionError").textContent =
-          "O mapa mudou durante a preparação. Cancele e prepare a ação novamente.";
-        return;
-      }
-      state = draft;
+      move(origin, destination, f, 1);
       finishAction(
         f,
         ci,
         mi,
-        true,
-        "Remanejando Mortos: " + moves.length + " movimento(s).",
+        false,
+        "Um zumbi movido de " + origin + " para " + destination + ".",
       );
-    };
-  }
-  panel();
+    } catch (e) {
+      $("actionError").textContent = e.message;
+    }
+  };
   openActionDialog(false, true);
 }
 function showPlayableAction(f, ci, mi, mode = null) {
@@ -4069,12 +4009,7 @@ function showPlayableAction(f, ci, mi, mode = null) {
         f,
         activeIndex,
         mi,
-        [
-          "Novas Comandante a Bordo",
-          "Remanejando Mortos",
-          "Monumento a Morte",
-          "Filhos da Floresta",
-        ].includes(name),
+        name === "Novas Comandante a Bordo",
         (semMapa ? name : name + " em " + id) +
           (refused ? ": acordo recusado" : ""),
       );
@@ -4685,16 +4620,22 @@ function showAttackMovement(f, ci, mi, mode = null) {
   const max =
     coastal && mode?.operation === "move"
       ? Number.MAX_SAFE_INTEGER
-      : name === "Infestação" || name === "Tambores de Guerra"
-        ? 2
-        : [
-              "Invasão Costeira",
-              "Ataque a Linha de Suprimentos",
-              "Trabalhe enquanto eles dormem",
-              "Marcha Imperial",
-            ].includes(name)
+      : name === "Infestação"
+        ? factionIds.some(
+            (x) => x !== f && (s.units[x] > 0 || buildingCount(s, x) > 0),
+          )
           ? 3
-          : Number.MAX_SAFE_INTEGER;
+          : 2
+        : name === "Tambores de Guerra"
+          ? 2
+          : [
+                "Invasão Costeira",
+                "Ataque a Linha de Suprimentos",
+                "Trabalhe enquanto eles dormem",
+                "Marcha Imperial",
+              ].includes(name)
+            ? 3
+            : Number.MAX_SAFE_INTEGER;
   const moving = mode?.operation !== "attack",
     attacking = mode?.operation !== "move",
     chooseDefender =

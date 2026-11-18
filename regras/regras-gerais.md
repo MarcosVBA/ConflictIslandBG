@@ -8,7 +8,7 @@ Este módulo reúne regras comuns fora de combate, dados, mapa e pontuação. Pa
 
 Depois da compra normal, resolvem-se as habilidades de preparação, incluindo o [Alistamento Obrigatório](../faccoes/imperio.md), e o leilão. O líder inicia as ações, que seguem em sentido anti-horário: Império → Necromante → Piratas → Elfos → Império. O primeiro jogador da partida é escolhido manualmente; nas rodadas seguintes, o líder anterior inicia o leilão.
 
-A mão tem cinco cartas por padrão, ajustável de 1 a 10 no protótipo. No início da rodada, completa-se a mão, reembaralhando o descarte quando necessário. Cartas que exigem descartar toda a mão compram imediatamente até cinco cartas durante a resolução. Descartar uma carta usando uma ação não gera compra imediata. Antes de confirmar o uso da carta, o jogador pode alterar suas escolhas. Depois da confirmação, a ação não pode ser cancelada; no protótipo, confirmar o ataque inicia a resolução sem opção de cancelamento.
+A mão tem cinco cartas por padrão, ajustável de 1 a 10 no protótipo. No início da rodada, completa-se a mão, reembaralhando o descarte quando necessário. Descartar uma carta usando uma ação não gera compra imediata. Antes de confirmar o uso da carta, o jogador pode alterar suas escolhas. Depois da confirmação, a ação não pode ser cancelada; no protótipo, confirmar o ataque inicia a resolução sem opção de cancelamento.
 
 O sistema anterior de alocação está preservado como [histórico](../historico/prototipos/alocacao-de-marcadores.md).
 

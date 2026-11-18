@@ -190,7 +190,7 @@
       recursos=pagar(saldo,1,2);for(const f of faccoes)if(f!=='necromante')alvo.units[f]=0;alvo.units.necromante--;
     } else if (magia==='Trabalhadores incansáveis') {
       if (recurso==='Sem recurso' || local.extractor) throw Error('Exige recurso e ausência de extrator.');
-      recursos=pagar(saldo,3,0);alvo.extractor=true;recursos=receber(recursos,recurso==='Ouro'?'ouro':'madeira',1);
+      recursos=pagar(saldo,1,0);alvo.extractor=true;recursos=receber(recursos,recurso==='Ouro'?'ouro':'madeira',1);
     } else throw Error('Magia inválida.');
     return {mapa:next,saldo:recursos};
   }
@@ -257,15 +257,14 @@
     if (!cartas[faccao]?.includes(nome) || !local || !regiao || nome==='Furia da Ilha') throw Error('Carta ou região inválida.');
     const inimigos=faccoes.filter(f=>f!==faccao && (local.units[f]>0 || construcoes(local,f)>0));
     if (!(nome==='Infestação' && !inimigos.length) && (!(costeiro || nome==='Marcha Imperial') || inimigos.length) && !inimigos.includes(defensor)) throw Error('Escolha defensor com tropas ou construções no local.');
-    if (costeiro && operacao !== 'move' && !regiao.coast) throw Error('Invasão Costeira exige destino costeiro.');
+    if (costeiro && operacao === 'both' && !regiao.coast) throw Error('Invasão Costeira exige destino costeiro.');
     if (nome==='Ataque a Linha de Suprimentos' && (!recursos[defensor] || recursos[defensor].ouro<1)) throw Error('O inimigo precisa ter Ouro.');
     if (!Array.isArray(movimentos) || new Set(movimentos.map(m=>m.id)).size!==movimentos.length || movimentos.some(m=>!mapa[m.id] || m.id===alvo || !Number.isSafeInteger(m.n) || m.n<0 || m.n>mapa[m.id].units[faccao] || localOnly || (costeiro ? !(operacao === 'move' && vizinhos(ligacoes,alvo).includes(m.id)) && !(regiao.coast && regioes.find(r=>r.id===m.id)?.coast) : !vizinhos(ligacoes,alvo).includes(m.id)))) throw Error('Escolha origens e tropas disponíveis.');
-    const total=movimentos.reduce((sum,m)=>sum+m.n,0),max=costeiro && operacao==='move'?Number.MAX_SAFE_INTEGER:['Infestação','Tambores de Guerra'].includes(nome)?2:['Invasão Costeira','Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem','Marcha Imperial'].includes(nome)?3:Number.MAX_SAFE_INTEGER;
+    const total=movimentos.reduce((sum,m)=>sum+m.n,0),max=costeiro && operacao==='move'?Number.MAX_SAFE_INTEGER:nome==='Infestação'?(inimigos.length?3:2):nome==='Tambores de Guerra'?2:['Invasão Costeira','Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem','Marcha Imperial'].includes(nome)?3:Number.MAX_SAFE_INTEGER;
     if(total>max) throw Error('O total de tropas movidas excede o limite da carta.');
     if(local.units[faccao]+total<1) throw Error('Envie ao menos uma tropa ou tenha tropas no local.');
     if (nome==='Infestação' && !inimigos.length && total===0) throw Error('Mova ao menos um zumbi para uma região sem defensor.');
     if((costeiro||nome==='Marcha Imperial') && movimentos.filter(m=>m.n>0).length>1) throw Error('Esta carta move de apenas uma região.');
-    if(nome==='Marcha Imperial' && !vizinhos(ligacoes,alvo).some(x=>mapa[x]&&dominio(mapa[x])==='imperio')) throw Error('Marcha Imperial exige região adjacente a uma região dominada pelo Império.');
     return {hasEnemy:inimigos.length>0,total};
   }
   function validarFuria(mapa, ligacoes, origem, destino, quantidade, defensor) {

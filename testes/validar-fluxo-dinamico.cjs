@@ -26,13 +26,13 @@ for(let round=1;round<=6;round++){
   click('toScore');check("flow.phase==='pontuação'");click('nextRound');
 }
 check("flow.phase==='preparação'&&flow.round===7&&game.imperialRecruitRound===6");
-run("game.score.elfos=19;addPoints('elfos',1,'teste')");check("!game.endEventsReady&&!game.eventPending&&!game.winner");
-run("game.score.elfos=29;addPoints('elfos',1,'teste')");check("game.winner==='elfos'&&flow.phase==='fim'");
+run("game.score.elfos=9;addPoints('elfos',1,'teste')");check("!game.endEventsReady&&!game.eventPending&&!game.winner");
+run("game.score.elfos=19;addPoints('elfos',1,'teste')");check("game.winner==='elfos'&&flow.phase==='fim'");
 // O pagamento do Corsário permanece disponível até a pontuação e não encerra a ação.
-run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['piratas','elfos','imperio','necromante'];flow.markers=[{f:'piratas',region:'R5',used:false}];flow.decks.piratas.hand=[{name:'Carta de Corsário / Serviço de Transporte Pirata'}];state.R5.units.imperio=1;game.score.piratas=29;showCorsair('piratas',0,0)");
-set('corsairAlly','imperio');set('corsairOrigin','R5');set('decision','yes');set('price',1);set('destination','R6');set('quantity',1);set('corsairMode','move');set('attackDefender','necromante');click('corsairGo');check("game.winner===null&&game.score.piratas===29&&resources.piratas.ouro===1&&state.R5.units.piratas===0&&state.R6.units.piratas===1&&flow.markers[0].used&&battle===null");
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['piratas','elfos','imperio','necromante'];flow.markers=[{f:'piratas',region:'R5',used:false}];flow.decks.piratas.hand=[{name:'Carta de Corsário / Serviço de Transporte Pirata'}];state.R5.units.imperio=1;game.score.piratas=19;showCorsair('piratas',0,0)");
+set('corsairAlly','imperio');set('corsairOrigin','R5');set('decision','yes');set('price',1);set('destination','R6');set('quantity',1);set('corsairMode','move');set('attackDefender','necromante');click('corsairGo');check("game.winner===null&&game.score.piratas===19&&resources.piratas.ouro===1&&state.R5.units.piratas===0&&state.R6.units.piratas===1&&flow.markers[0].used&&battle===null");
 // O transporte inválido é recusado antes do pagamento.
-run("state=initial();resources=initialResources();game=newGame();flow=newFlow();state.R5.units.imperio=1;game.score.piratas=29");
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();state.R5.units.imperio=1;game.score.piratas=19");
 set('other','imperio');set('decision','yes');set('price',1);set('transportOrigin','R1');set('destination','R1');set('quantity',1);
 check("(()=>{try{executeCard('piratas','Serviço de Transporte Pirata','R5',0);return false}catch(e){return true}})()&&game.winner===null&&resources.imperio.ouro===1&&resources.piratas.ouro===0");
 // Ouro de saque e acordo permanece negociável; só o saldo com a renda do Bar pontua.
@@ -41,7 +41,7 @@ check("resources.piratas.ouro===3&&game.score.piratas===0");
 run("transfer('piratas','necromante','ouro',2)");check("resources.piratas.ouro===1&&resources.necromante.ouro===2&&game.score.piratas===0");
 run("scoreRound()");check("resources.piratas.ouro===0&&game.score.piratas===2");
 run("scoreRound()");check("resources.piratas.ouro===0&&game.score.piratas===2");
-run("state=initial();resources=initialResources();game=newGame();flow=newFlow();game.score.piratas=29;resources.piratas.ouro=1;scoreRound()");check("game.winner==='piratas'&&resources.piratas.ouro===0&&game.score.piratas===30");
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();game.score.piratas=19;resources.piratas.ouro=1;scoreRound()");check("game.winner==='piratas'&&resources.piratas.ouro===0&&game.score.piratas===20");
 click('reset');check("flow.round===1&&flow.phase==='preparação'&&flow.markers.length===0&&state.R1.units.imperio===2");
 assert(!/<(?:script|link|img)\b[^>]*(?:src|href)\s*=/i.test(html.replace(/<script>[\s\S]*?<\/script>/g,'')),'O protótipo deve funcionar sem dependências externas obrigatórias.');
 console.log('Seis rodadas e reinício OK');

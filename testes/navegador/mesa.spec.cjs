@@ -225,7 +225,7 @@ test('vitória interrompe a partida e o cenário pode ser reiniciado', async ({ 
   const erros=await abrir(page);
   await preparar(page);
   // Coloca os Elfos a um ponto da vitória para exercitar o encerramento pela pontuação real.
-  await page.evaluate(() => { game.score.elfos=29; });
+  await page.evaluate(() => { game.score.elfos=19; });
   for(let i=0;i<8;i++) { await page.locator('#handArea [data-card-index="0"]').click(); await page.locator('#discardAction').click(); }
   await page.locator('#toScore').click();
   await expect(page.locator('#flow')).toContainText('Vencedor: Elfos');

@@ -12,13 +12,14 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Ataque, reação e resolução da batalha | [Combate](regras/combate.md) |
 | Faces e significado dos dados | [Dados](regras/dados.md) |
 | Princípios globais de pontuação e encerramento | [Pontuação](regras/pontuacao.md) |
+| Cartas de evento e marco de pontuação | [Eventos](regras/eventos.md) |
 | Regiões, conexões e cenário inicial | [Mapa](regras/mapa.md) |
 | Facção e baralho dos Piratas | [Piratas](faccoes/piratas.md) |
 | Facção, baralho e magias do Necromante | [Necromante](faccoes/necromante.md) |
 | Facção, tecnologias, baralhos e impostos do Império | [Império — proposta](faccoes/imperio.md) |
 | Facção e baralho dos Elfos | [Elfos](faccoes/elfos.md) |
 | Ideias para facções futuras | [Dragões](faccoes/dragoes.md) |
-| Ideias gerais em exploração ou adiadas | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) · [IA para facções](ideias/ia-para-faccoes.md) |
+| Ideias gerais em exploração ou adiadas | [Pontuação](ideias/pontuacao.md) · [Tensão pela madeira](ideias/tensao-madeira.md) · [IA para facções](ideias/ia-para-faccoes.md) |
 | Referência para ilustrações | [Direção artística](arte/direcao-artistica.md) |
 
 [Abrir o protótipo principal](mapa-fluxo-dinamico.html): quatro facções, controle manual e fluxo sem alocação prévia. Cada facção usa um baralho de 12 cartas. O jogo funciona em um único HTML local, sem servidor ou IA. Versões e decisões antigas permanecem arquivadas em `historico/`.
@@ -71,7 +72,7 @@ Com Node.js e dependências instaladas, use `npm run check:rapido` para sincroni
 - A partida não é salva ao fechar ou recarregar; não há semente reproduzível, relatório ou métricas automáticas de equilíbrio. Ajustes manuais de depuração podem criar estados intermediários e não simulam automaticamente a perda da Torre. O estoque de peças físicas não é simulado.
 - No teste de navegador a reação de combate parte de um estado preparado, sem percorrer toda a declaração pela interface. A proteção do atacante por Defesa Global e o saque sem movimento da Invasão não têm cenário automatizado específico. Outras cartas defensivas e detalhes de alvos que se tornam inválidos ainda precisam de definição; Guarda Imperial é uma adaptação de teste.
 - O motor foi parcialmente extraído: apresentação, orquestração do combate, algumas escolhas e transições ainda ficam na aplicação. A disponibilidade de ações ainda usa dois registros virtuais por facção.
-- Os testes usam DOM substituto e Chromium com dados controlados; não interpretam toda a prosa nem comprovam todas as combinações, a instalação em dispositivos físicos ou uma partida real. Os eventos após o marco de 20 pontos são hipóteses em teste; IA permanece adiada; reposição, limites de componentes e casos sem opções legais dependem de definição onde não documentados.
+- Os testes usam DOM substituto e Chromium com dados controlados; não interpretam toda a prosa nem comprovam todas as combinações, a instalação em dispositivos físicos ou uma partida real. IA permanece adiada; reposição, limites de componentes e casos sem opções legais dependem de definição onde não documentados.
 
 ### Testes em navegador
 

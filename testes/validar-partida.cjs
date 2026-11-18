@@ -31,7 +31,7 @@ while(!run('Boolean(game.winner)') && rounds<40){
   click('toScore');
   if(!run('Boolean(game.winner)'))click('nextRound');
 }
-check("game.winner!==null&&game.score[game.winner]>=30&&flow.phase==='fim'&&game.endEventsReady");
+check("game.winner!==null&&game.score[game.winner]>=20&&flow.phase==='fim'&&game.endEventsReady");
 assert(rounds>1&&rounds<=40,'A partida deve atingir a vitória em rodadas sucessivas.');
 click('reset');check("flow.phase==='preparação'&&flow.round===1&&game.winner===null");
 // O jogador escolhe entre tecnologias de maior nível e recursos empatados.

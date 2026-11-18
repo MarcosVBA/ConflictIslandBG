@@ -3,7 +3,7 @@
 function newGame() {
   return {
     score: { imperio: 0, necromante: 0, piratas: 0, elfos: 0 },
-    victoryTarget: 30,
+    victoryTarget: 20,
     endEventsReady: false,
     eventPending: false,
     eventDeck: [],
@@ -71,7 +71,7 @@ function taxCard() {
   return `<div class="tax-card" aria-label="Imposto imperial proposto"><strong>Imposto imperial · proposta</strong><span>${game.tax ? taxText(game.tax) : flow.phase === "preparação" && game.taxes.length ? "Revelado ao preparar a rodada" : game.taxPaid ? "Pago nesta rodada" : "Nenhum imposto ativo"}</span><small>Atraso: ${game.delay} de 3 rodadas</small>${flow.phase === "resolução" && activeFaction() === "imperio" && hasTech("Salão Imperial") && game.tax && !game.taxPaid && (game.taxes.length || game.taxDiscard.length) && game.hallUsedRound !== flow.round ? '<label>Recurso a descartar <select id="hallResource"><option value="ouro">Ouro</option><option value="madeira">Madeira</option></select></label><button id="hallChange">Alterar imposto</button><small id="hallMessage" role="status"></small>' : ""}</div>`;
 }
 function gameSummary() {
-  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details><p>Eventos ativos: ${[game.eventFlags.pirateWealth ? "Riqueza Pirata" : "", game.eventFlags.goldScarce ? "Escassez de Ouro" : "", ...game.eventFlags.noWood.map((r) => "Sem Madeira em " + r)].filter(Boolean).join(" · ") || "nenhum"}</p></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império, eventos e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste.</p></details>`;
+  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details><p>Eventos ativos: ${[game.eventFlags.pirateWealth ? "Riqueza Pirata" : "", game.eventFlags.goldScarce ? "Escassez de Ouro" : "", ...game.eventFlags.noWood.map((r) => "Sem Madeira em " + r)].filter(Boolean).join(" · ") || "nenhum"}</p></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste.</p></details>`;
 }
 // Cálculo separado da interface para facilitar testes e futuras automações.
 function elfForestPoints(regions, position) {
@@ -79,9 +79,7 @@ function elfForestPoints(regions, position) {
 }
 function scoreRound(penaltyRegion = null, penaltyResource = null) {
   if (game.scored === flow.round) return;
-  const bars = Object.values(state).filter(
-    (s) => s.bar && calcOwner(s) === "piratas",
-  ).length;
+  const bars = Object.values(state).filter((s) => s.bar).length;
   if (bars) addResource("piratas", "ouro", bars, "renda dos bares");
   const pirateGold = resources.piratas.ouro;
   resources.piratas.ouro = 0;
@@ -158,12 +156,12 @@ function beginScoring() {
     if (
       !game.winner &&
       !game.endEventsReady &&
-      factionIds.some((f) => game.score[f] >= 20)
+      factionIds.some((f) => game.score[f] >= 10)
     ) {
       game.endEventsReady = true;
       game.eventPending = true;
       flowLog(
-        "Marco de 20 pontos verificado na pontuação; um evento será revelado.",
+        "Marco de 10 pontos verificado na pontuação; um evento será revelado.",
       );
     }
     game.roundScoreDelta = Object.fromEntries(

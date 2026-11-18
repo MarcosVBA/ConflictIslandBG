@@ -106,3 +106,17 @@ const regioesMovimento = [{id:'a',coast:false},{id:'b',coast:false}];
 assert.equal(motor.validarAtaque(mapaMovimento, regioesMovimento, [['a','b']], {}, 'piratas', 'Invasão Costeira', 'b', 'elfos', [{id:'a',n:5}], 'move').total, 5);
 mapaMovimento.a.units.necromante = 2;
 assert.equal(motor.validarAtaque(mapaMovimento, regioesMovimento, [['a','b']], {}, 'necromante', 'Infestação', 'b', 'elfos', [{id:'a',n:2}]).hasEnemy, false);
+
+// Alterações de facções: custo, marcha sem domínio adjacente e saque no interior.
+const trabalhadores = motor.magiaDasTrevas({a:regiao()}, [], 'a', 'Ouro', {madeira:1,ouro:0}, 'Trabalhadores incansáveis');
+assert.equal(trabalhadores.saldo.madeira, 0); assert.equal(trabalhadores.saldo.ouro, 1); assert.equal(trabalhadores.mapa.a.extractor, true);
+assert.throws(() => motor.magiaDasTrevas({a:regiao()}, [], 'a', 'Ouro', {madeira:0,ouro:0}, 'Trabalhadores incansáveis'), /Recursos insuficientes/);
+const interior = {a:regiao(),b:regiao()}; interior.a.units.imperio=1; interior.a.units.elfos=2; interior.b.units.elfos=1;
+assert.equal(motor.validarAtaque(interior, [{id:'a',coast:false},{id:'b',coast:false}], [['a','b']], {}, 'imperio', 'Marcha Imperial', 'b', 'elfos', [{id:'a',n:1}], 'both').total, 1);
+interior.b.units.piratas=1; assert.equal(motor.validarAtaque(interior, [{id:'a',coast:false},{id:'b',coast:false}], [['a','b']], {}, 'piratas', 'Invasão Costeira', 'b', 'elfos', [], 'attack').hasEnemy, true);
+assert.throws(() => motor.validarAtaque(interior, [{id:'a',coast:false},{id:'b',coast:false}], [['a','b']], {}, 'piratas', 'Invasão Costeira', 'b', 'elfos', [], 'both'), /costeiro/);
+
+// Infestação admite três zumbis contra defensor, mas apenas dois sem defensor.
+const infestacao={a:regiao(),b:regiao()}; infestacao.a.units.necromante=3; infestacao.b.units.elfos=1;
+assert.equal(motor.validarAtaque(infestacao, [{id:'a',coast:false},{id:'b',coast:false}], [['a','b']], {}, 'necromante', 'Infestação', 'b', 'elfos', [{id:'a',n:3}]).total, 3);
+infestacao.b.units.elfos=0; assert.throws(()=>motor.validarAtaque(infestacao, [{id:'a',coast:false},{id:'b',coast:false}], [['a','b']], {}, 'necromante', 'Infestação', 'b', 'elfos', [{id:'a',n:3}]), /limite/);

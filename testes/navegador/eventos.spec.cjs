@@ -22,7 +22,7 @@ test('evento manual ignora condição e mantém efeitos até reiniciar', async (
 
 test('marco revela evento somente na pontuação', async ({ page }) => {
   await page.goto(url);
-  await page.evaluate(() => { flow.phase = 'resolução'; game.score.elfos = 19; game.eventDeck = ['fome', 'guerra']; addPoints('elfos', 1, 'teste'); renderFlow(); });
+  await page.evaluate(() => { flow.phase = 'resolução'; game.score.elfos = 9; game.eventDeck = ['fome', 'guerra']; addPoints('elfos', 1, 'teste'); renderFlow(); });
   await expect(page.locator('#eventoDialog')).toBeHidden();
   await page.evaluate(() => beginScoring());
   await expect(page.locator('#eventoDialog')).toBeVisible();

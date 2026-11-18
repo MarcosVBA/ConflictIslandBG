@@ -66,8 +66,6 @@ test('trocar carta cancela remanejamento e Milagre pode ser cancelado', async ({
   });
   await page.locator('#remOrigin').selectOption('R3');
   await page.locator('#remDestination').selectOption('R4');
-  await page.locator('#remQuantity').fill('1');
-  await page.locator('#remMove').click();
   await page.locator('#handArea [data-card-index="1"]').click();
   expect(await page.evaluate(() => ({a:state.R3.units.necromante,b:state.R4.units.necromante,used:flow.markers[0].used}))).toEqual({a:2,b:1,used:false});
   await page.evaluate(() => {

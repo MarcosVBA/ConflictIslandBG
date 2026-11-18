@@ -1,4 +1,4 @@
-// Eventos são hipóteses de teste; as escolhas são aplicadas de uma só vez.
+// As escolhas dos eventos são aplicadas de uma só vez.
 let eventoAtual = null;
 function recursoEvento(r) {
   if (game.eventFlags.goldScarce && r.resource === "Ouro" && r.id !== "R11")

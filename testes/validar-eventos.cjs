@@ -21,10 +21,11 @@ run("state=initial();game=newGame();flow=newFlow();state.R6.units.imperio=1;abri
 run("state=initial();game=newGame();flow=newFlow();state.R5.units.imperio=1;abrirEvento('guerra',true);aplicarEventoAtual()");check("state.R5.units.imperio===0&&state.R5.units.piratas===0");
 run("state=initial();game=newGame();flow=newFlow();abrirEvento('colonizacao',true)");for(let i=0;i<5;i++)set('evento-tech-'+i,'');set('evento-tech-0','R1');run("aplicarEventoAtual()");check("state.R1.tech==='Serraria'");
 run("state=initial();game=newGame();flow=newFlow();abrirEvento('incendio',true)");for(const f of ['imperio','necromante','piratas','elfos'])set('evento-peca-'+f,'');set('evento-peca-imperio','R2:unit');set('evento-madeira','R2');run("aplicarEventoAtual()");check("state.R2.units.imperio===0&&recursoEvento(byId('R2'))==='Sem recurso'");
-run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';game.score.elfos=19;game.eventDeck=['fome'];addPoints('elfos',1,'teste');renderFlow()");check("!game.eventPending&&!game.endEventsReady&&game.eventDiscard.length===0");
-run("addPoints('elfos',-2,'teste');beginScoring()");check("game.score.elfos===19&&!game.endEventsReady&&game.eventDiscard.length===0");
-run("flow.round++;flow.phase='resolução';beginScoring()");check("game.score.elfos===20&&game.endEventsReady&&game.eventDiscard.join(',')==='fome'");
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';game.score.elfos=9;game.eventDeck=['fome'];addPoints('elfos',1,'teste');renderFlow()");check("!game.eventPending&&!game.endEventsReady&&game.eventDiscard.length===0");
+run("addPoints('elfos',-2,'teste');beginScoring()");check("game.score.elfos===9&&!game.endEventsReady&&game.eventDiscard.length===0");
+run("flow.round++;flow.phase='resolução';beginScoring()");check("game.score.elfos===10&&game.endEventsReady&&game.eventDiscard.join(',')==='fome'");
 run("game=newGame()");check("!game.eventFlags.goldScarce&&!game.eventFlags.pirateWealth&&game.eventFlags.noWood.length===0");
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();state.R5.bar=true;state.R5.units.piratas=0;state.R5.units.imperio=2;resources.piratas.ouro=0;scoreRound()");check("game.score.piratas===1");
 console.log('Eventos: condições, efeitos, escolhas e reinício verificados.');
 `;
 vm.runInNewContext(harness + scenario, { require, console, process, __dirname });

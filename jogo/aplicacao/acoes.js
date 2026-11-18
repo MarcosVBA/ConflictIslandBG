@@ -126,11 +126,7 @@ function configureActionMap(name, id) {
           (x.coast || neighbors(from).includes(x.id)),
       )
       .map((x) => x.id);
-  } else if (name === "Remanejando Mortos")
-    valid = definitions
-      .filter((x) => x.id !== id && devastated(state[x.id]))
-      .map((x) => x.id);
-  else {
+  } else {
     setMapChoice(null);
     return;
   }
@@ -160,98 +156,45 @@ function configureActionMap(name, id) {
     };
 }
 function showRemanejamento(f, ci, mi) {
-  const before = clone(state),
-    draft = clone(state),
-    moves = [],
-    eligible = new Set(
-      definitions.filter((r) => devastated(draft[r.id])).map((r) => r.id),
+  const origins = definitions.filter(
+    (r) => state[r.id].units.necromante > 0 && neighbors(r.id).length,
+  );
+  $("dialogContent").innerHTML =
+    `<h3>Remanejando Mortos</h3><p>Mova 1 zumbi para uma região adjacente.</p>${field("remOrigin", "Origem", origins.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join(""))}${field("remDestination", "Destino", "")}<button id="remFinish">Mover zumbi e concluir</button> <button id="remCancel">Cancelar</button><p id="actionError" role="status"></p>`;
+  const update = () => {
+    const origin = $("remOrigin").value;
+    $("remDestination").innerHTML = optRegions((r) =>
+      neighbors(origin).includes(r.id),
     );
-  const preview = () => {
-    const actual = state;
-    try {
-      state = draft;
-      mapDevastationOverride = eligible;
-      render();
-    } finally {
-      state = actual;
-      mapDevastationOverride = null;
-    }
   };
-  function panel() {
-    const origins = definitions.filter(
-      (r) =>
-        eligible.has(r.id) &&
-        draft[r.id].units.necromante > 0 &&
-        neighbors(r.id).some((x) => eligible.has(x)),
-    );
-    $("dialogContent").innerHTML =
-      `<h3>Remanejando Mortos</h3><p>Distribua zumbis entre regiões devastadas adjacentes, quantas vezes desejar. Ao terminar, descarte a mão e compre até cinco cartas.</p>${field("remOrigin", "Origem", origins.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join(""))}${field("remDestination", "Destino", "")}${amount("remQuantity", "Zumbis a mover", Number.MAX_SAFE_INTEGER)}<button id="remMove">Mover zumbis</button> <button id="remFinish">Concluir ação</button> <button id="remCancel">Cancelar</button><p>Movimentos preparados: ${moves.length}</p><p id="actionError" role="status"></p>`;
-    const update = () => {
-      const origin = $("remOrigin").value;
-      $("remDestination").innerHTML = optRegions(
-        (r) => neighbors(origin).includes(r.id) && eligible.has(r.id),
+  $("remOrigin").onchange = update;
+  update();
+  $("remCancel").onclick = () => {
+    render();
+    renderFlow();
+  };
+  $("remFinish").onclick = () => {
+    try {
+      const origin = $("remOrigin").value,
+        destination = $("remDestination").value;
+      fail(
+        state[origin]?.units.necromante > 0 &&
+          state[destination] &&
+          neighbors(origin).includes(destination),
+        "Escolha um zumbi e uma região adjacente.",
       );
-      const available = draft[origin]?.units.necromante || 0;
-      $("remQuantity").max = available;
-      $("remQuantity").min = available ? 1 : 0;
-      $("remQuantity").disabled = !available;
-      $("remQuantity").value = available
-        ? Math.min(available, Math.max(1, Number($("remQuantity").value) || 1))
-        : 0;
-    };
-    $("remOrigin").onchange = update;
-    update();
-    $("remMove").onclick = () => {
-      try {
-        const origin = $("remOrigin").value,
-          destination = $("remDestination").value,
-          n = countValue("remQuantity");
-        fail(
-          draft[origin] &&
-            draft[destination] &&
-            eligible.has(origin) &&
-            eligible.has(destination) &&
-            neighbors(origin).includes(destination) &&
-            n > 0 &&
-            draft[origin].units.necromante >= n,
-          "Escolha regiões devastadas adjacentes e tropas disponíveis.",
-        );
-        const result = ConflictIslandBase.calcularMovimento(
-          draft[origin].units.necromante,
-          draft[destination].units.necromante,
-          n,
-        );
-        draft[origin].units.necromante = result.origem;
-        draft[destination].units.necromante = result.destino;
-        moves.push({ origin, destination, n });
-        selected = destination;
-        preview();
-        panel();
-      } catch (e) {
-        $("actionError").textContent = e.message;
-      }
-    };
-    $("remCancel").onclick = () => {
-      render();
-      renderFlow();
-    };
-    $("remFinish").onclick = () => {
-      if (JSON.stringify(state) !== JSON.stringify(before)) {
-        $("actionError").textContent =
-          "O mapa mudou durante a preparação. Cancele e prepare a ação novamente.";
-        return;
-      }
-      state = draft;
+      move(origin, destination, f, 1);
       finishAction(
         f,
         ci,
         mi,
-        true,
-        "Remanejando Mortos: " + moves.length + " movimento(s).",
+        false,
+        "Um zumbi movido de " + origin + " para " + destination + ".",
       );
-    };
-  }
-  panel();
+    } catch (e) {
+      $("actionError").textContent = e.message;
+    }
+  };
   openActionDialog(false, true);
 }
 function showPlayableAction(f, ci, mi, mode = null) {
@@ -743,12 +686,7 @@ function showPlayableAction(f, ci, mi, mode = null) {
         f,
         activeIndex,
         mi,
-        [
-          "Novas Comandante a Bordo",
-          "Remanejando Mortos",
-          "Monumento a Morte",
-          "Filhos da Floresta",
-        ].includes(name),
+        name === "Novas Comandante a Bordo",
         (semMapa ? name : name + " em " + id) +
           (refused ? ": acordo recusado" : ""),
       );
@@ -1359,16 +1297,22 @@ function showAttackMovement(f, ci, mi, mode = null) {
   const max =
     coastal && mode?.operation === "move"
       ? Number.MAX_SAFE_INTEGER
-      : name === "Infestação" || name === "Tambores de Guerra"
-        ? 2
-        : [
-              "Invasão Costeira",
-              "Ataque a Linha de Suprimentos",
-              "Trabalhe enquanto eles dormem",
-              "Marcha Imperial",
-            ].includes(name)
+      : name === "Infestação"
+        ? factionIds.some(
+            (x) => x !== f && (s.units[x] > 0 || buildingCount(s, x) > 0),
+          )
           ? 3
-          : Number.MAX_SAFE_INTEGER;
+          : 2
+        : name === "Tambores de Guerra"
+          ? 2
+          : [
+                "Invasão Costeira",
+                "Ataque a Linha de Suprimentos",
+                "Trabalhe enquanto eles dormem",
+                "Marcha Imperial",
+              ].includes(name)
+            ? 3
+            : Number.MAX_SAFE_INTEGER;
   const moving = mode?.operation !== "attack",
     attacking = mode?.operation !== "move",
     chooseDefender =

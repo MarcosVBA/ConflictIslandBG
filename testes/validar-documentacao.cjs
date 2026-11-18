@@ -68,7 +68,7 @@ run("visualAssets.cartas['Marcha Imperial']='artes/marcha.webp';visualAssets.reg
 assert(run("handCard('imperio',{name:'Marcha Imperial',text:'',leadership:1},0,1).includes('src=\"artes/marcha.webp\"')"),'Arte opcional da carta não foi aplicada.');
 assert(regions.find(r=>r.attributes['data-region']==='R1').style.backgroundImage.includes('artes/praia.webp'),'Arte opcional da região não foi aplicada.');
 run("delete visualAssets.cartas['Marcha Imperial'];delete visualAssets.regioes.R1;render()");
-const modules = ['README.md','regras/regras-gerais.md','regras/combate.md','regras/dados.md','regras/mapa.md','regras/pontuacao.md','faccoes/piratas.md','faccoes/necromante.md','faccoes/imperio.md','faccoes/elfos.md','faccoes/dragoes.md','ideias/eventos.md','ideias/pontuacao.md','ideias/tensao-madeira.md'];
+const modules = ['README.md','regras/regras-gerais.md','regras/combate.md','regras/dados.md','regras/mapa.md','regras/pontuacao.md','faccoes/piratas.md','faccoes/necromante.md','faccoes/imperio.md','faccoes/elfos.md','faccoes/dragoes.md','regras/eventos.md','ideias/pontuacao.md','ideias/tensao-madeira.md'];
 for (const file of modules) for (const match of read(file).matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
   const href = match[1].split('#')[0];
   if (href && !/^[a-z]+:/i.test(href)) {

@@ -31,10 +31,10 @@ O baralho tem 12 cartas. A barra indica escolha de modo e cada modo consome a ca
 
 | Carta | Cópias | Liderança | Efeito |
 | --- | ---: | ---: | --- |
-| **Infestação** | 3 | 1 | Escolha um defensor com tropas ou construções e ataque com os zumbis presentes e/ou mova até 2 zumbis de regiões adjacentes. Em região sem defensor, mova até 2 zumbis sem combate nem recrutamento. Após aplicar o combate, adicione 1 zumbi na região, inclusive com resultado natural de 0 a 0 ou sem sobreviventes. Se a Magia da Torre impedir a batalha antes da rolagem ou recuperar a Torre após as baixas, omita o recrutamento. |
+| **Infestação** | 4 | 1 | Escolha um defensor com tropas ou construções e ataque com os zumbis presentes e/ou mova até 3 zumbis de regiões adjacentes. Em região sem defensor, mova até 2 zumbis sem combate nem recrutamento. Após aplicar o combate, adicione 1 zumbi na região, inclusive com resultado natural de 0 a 0 ou sem sobreviventes. Se a Magia da Torre impedir a batalha antes da rolagem ou recuperar a Torre após as baixas, omita o recrutamento. |
 | **Extratores da Torre** | 4 | 1 | **Construir:** construa um extrator em região com zumbi, recurso impresso e sem extrator. **Colher:** havendo extrator no mapa, receba 1 recurso impresso de cada região do mapa com extrator. |
-| **Magia das Trevas / Monumento à Morte** | 2 | 2 | **Magia:** escolha uma das quatro magias atuais, com seus custos e alvos. **Monumento:** gaste 1 Madeira em região devastada sem monumento, desde que algum oponente domine uma região no mapa. Pontue 2 por região com monumento, incluindo o novo. Depois, descarte a mão restante e compre até cinco cartas, salvo se a partida tiver terminado. A reposição pertence ao modo Monumento. |
-| **Remanejando Mortos** | 3 | 0 | Reutilize o remanejamento atual. As regiões elegíveis são as devastadas ao começar a ação e continuam elegíveis até concluir. Permita mover quantos zumbis quiser, quantas vezes quiser, entre regiões elegíveis ligadas diretamente. Preserve a possibilidade de concluir com zero deslocamentos. Ao concluir, descarte a mão restante e compre até cinco. Cancelar desfaz a prévia inteira. |
+| **Magia das Trevas / Monumento à Morte** | 2 | 2 | **Magia:** escolha uma das quatro magias atuais, com seus custos e alvos. **Monumento:** gaste 1 Madeira em região devastada sem monumento, desde que algum oponente domine uma região no mapa. Pontue 2 por região com monumento, incluindo o novo. |
+| **Remanejando Mortos** | 2 | 0 | Mova 1 zumbi para qualquer região adjacente, sem iniciar combate. |
 
 ## Magias das Trevas
 
@@ -43,10 +43,10 @@ O baralho tem 12 cartas. A barra indica escolha de modo e cada modo consome a ca
 | Despertar para a Morte | 1 Madeira | Converta 1 unidade inimiga em uma região adjacente a uma região devastada. |
 | Levantar dos Mortos | 1 Madeira e 1 Ouro | Adicione 3 unidades em qualquer região devastada. |
 | Devastar | 1 Madeira e 2 Ouros | Elimine todas as tropas inimigas em uma região com pelo menos uma unidade aliada e remova 1 zumbi da região. |
-| Trabalhadores incansáveis | 3 Madeiras | Adicione 1 extrator em uma região com recursos e colete 1 recurso imediatamente. |
+| Trabalhadores incansáveis | 1 Madeira | Adicione 1 extrator em uma região com recursos e colete 1 recurso imediatamente. |
 
 Despertar para a Morte continua disponível como magia escolhida pela carta Magia das Trevas; não integra o baralho como carta independente.
 
 **Praga Resistente implementada:** ao receber um ataque, o Necromante pode usar a carta antes dos dados, consumindo um de seus marcadores ainda disponíveis; a proteção vale para esse combate.
 
-**Definido; implementado para teste:** Remanejando Mortos permite distribuir qualquer quantidade de zumbis entre regiões devastadas adjacentes, com quantos movimentos desejar. As regiões elegíveis são as devastadas ao iniciar o efeito; mesmo que uma delas fique vazia durante os movimentos, permanece elegível até a resolução terminar. Cada movimento usa uma ligação direta entre regiões elegíveis. Permanecem em revisão as demais interações das cartas.
+**Definido; implementado:** Remanejando Mortos move um único zumbi a uma região adjacente, mesmo sem estar devastada. A perda do domínio da Torre aciona sua magia normalmente. Permanecem em revisão as demais interações das cartas.
