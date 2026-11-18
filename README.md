@@ -19,15 +19,8 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Facção e baralho dos Elfos | [Elfos](faccoes/elfos.md) |
 | Ideias para facções futuras | [Dragões](faccoes/dragoes.md) |
 | Ideias gerais em exploração ou adiadas | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) · [IA para facções](ideias/ia-para-faccoes.md) |
-| Histórico da revisão dos baralhos | [Baralhos revisados](prototipo/baralhos-revisados.md) |
-| Estado, hipóteses, divergências e testes do jogo | [Estado do protótipo](prototipo/estado-e-testes.md) |
-| Índice de decisões, implementação e testes | [Matriz de rastreabilidade](prototipo/rastreabilidade.md) |
-| Planejamento do protótipo para quatro facções | [Plano de quatro facções](prototipo/plano-quatro-faccoes.md) |
-| Evolução para o jogo completo | [Plano de evolução](prototipo/plano-evolucao-jogo.md) |
-| Conceito de mesa e telas | [Plano de interface](prototipo/plano-interface.md) · [Abrir demonstração visual](prototipo/mesa-conceito.html) |
-| Partidas e revisão de interface | [Roteiro de validação humana](prototipo/roteiro-validacao.md) |
 
-[Abrir o protótipo principal](mapa-fluxo-dinamico.html): quatro facções, controle manual e fluxo sem alocação prévia. Cada facção usa um baralho de 12 cartas. O jogo funciona em um único HTML local, sem servidor ou IA. As versões com alocação prévia estão preservadas como [legado](historico/prototipos/alocacao-de-marcadores.md), sem atualizações futuras.
+[Abrir o protótipo principal](mapa-fluxo-dinamico.html): quatro facções, controle manual e fluxo sem alocação prévia. Cada facção usa um baralho de 12 cartas. O jogo funciona em um único HTML local, sem servidor ou IA. Versões e decisões antigas permanecem arquivadas em `historico/`.
 
 ## Site e instalação no celular
 
@@ -43,11 +36,11 @@ Para preparar uma cópia pública contendo apenas o jogo, execute `node scripts/
 - **Direção para teste:** caminho escolhido para experimentar, ainda sujeito a revisão.
 - **Proposta:** hipótese que não foi aprovada como regra definitiva, ainda que o protótipo a utilize.
 - **Pendente:** questão sem decisão. **Adiado:** conteúdo reservado para depois.
-- O estado de implementação é informado no módulo pertinente e, quando exige explicação do protótipo, no [estado do protótipo](prototipo/estado-e-testes.md). Validar o protótipo não aprova automaticamente todas as hipóteses.
+- O estado de implementação é informado no módulo pertinente ou na seção de limitações abaixo. Validar o protótipo não aprova automaticamente todas as hipóteses.
 
-Antes de perguntar se uma regra existe, consulte estes módulos e, quando necessário, a documentação histórica. Para cada mudança de mecânica: atualize o módulo responsável, identifique o impacto nas outras facções e no protótipo, implemente o que for aplicável no HTML, execute os testes pertinentes e registre diferenças ou limitações. Uma edição do Markdown não altera o HTML automaticamente; o código é uma implementação que precisa ser mantida em sincronia.
+Antes de perguntar se uma regra existe, consulte estes módulos. Para cada mudança de mecânica: atualize o módulo responsável, identifique o impacto nas outras facções e no protótipo, implemente o que for aplicável no HTML, execute os testes pertinentes e registre diferenças ou limitações. Uma edição do Markdown não altera o HTML automaticamente; o código é uma implementação que precisa ser mantida em sincronia.
 
-Os documentos anteriores foram preservados em [histórico](historico/README.md). Eles ajudam a recuperar o contexto, mas não são fontes concorrentes para regras atuais. Não há precedência automática para contradições sem decisão identificável: registre-as como pendentes.
+Os documentos anteriores foram preservados em `historico/`, fora das consultas e checagens de rotina. São registros, não fontes concorrentes para regras atuais. Não há precedência automática para contradições sem decisão identificável: registre-as como pendentes.
 
 ## Verificação local
 
@@ -55,14 +48,32 @@ O motor extraído fica em `jogo/motor/base.js`; dados de mapa e cartas ficam em 
 
 Em `jogo/apresentacao/artes.js`, associe caminhos opcionais aos nomes de cartas ou IDs de regiões. Os caminhos locais são relativos ao HTML aberto; depois, sincronize o HTML. Sem imagem, ou se uma imagem de carta não carregar, o desenho provisório continua disponível. O preparo do site copia a pasta opcional `artes/` para a distribuição; outros caminhos locais devem ser incluídos manualmente.
 
-Com Node.js e dependências de desenvolvimento instaladas, `npm run check:rapido` verifica a sincronização, a matriz, a formatação, a documentação e o motor; `npm run check:completo` acrescenta as demais suítes e o navegador. Ambos mostram o tempo de cada etapa. Para mudanças localizadas, use também `npm run test:combate`, `npm run test:elfos` ou `npm run test:mapa`. `npm run format:verificar` confere a formatação dos arquivos de aplicação; `npm run format:aplicacao` a aplica, após o que é necessário sincronizar o HTML. A coordenação da pontuação e dos impostos fica em `jogo/aplicacao/pontuacao.js`, incorporado junto das ações ao gerar o HTML.
+### Referências de implementação e testes
 
-A [matriz](prototipo/rastreabilidade.md) é gerada a partir de `prototipo/rastreabilidade.json` por `node scripts/validar-rastreabilidade.cjs --atualizar`. Seu verificador confere estrutura, referências e sincronização da tabela, mas não interpreta prosa nem garante a cobertura de cada regra. A fonte de cada decisão continua sendo seu módulo de regras ou facção.
+O módulo de regra ou facção na tabela acima é a fonte das decisões. A implementação usa `jogo/dados/`, `jogo/motor/base.js` e `jogo/aplicacao/`; a apresentação usa `jogo/apresentacao/`. Para localizar testes por assunto:
 
-Com Node.js instalado, execute `node testes/validar-motor-base.cjs`, `node testes/validar-documentacao.cjs`, `node testes/validar-lideranca.cjs`, `node testes/validar-fluxo-dinamico.cjs`, `node testes/validar-partida.cjs`, `node testes/validar-elfos.cjs`, `node testes/validar-necromante.cjs`, `node testes/validar-novas-habilidades.cjs`, `node testes/validar-publicacao.cjs` e `node testes/validar-mesa-conceito.cjs`. Os testes verificam dados e cenários centrais do protótipo principal; não substituem uma partida real nem inspeção visual.
+| Área | Testes principais |
+| --- | --- |
+| Mapa, dados e baralhos | `testes/validar-documentacao.cjs`, `testes/validar-baralhos-revisados.cjs` |
+| Liderança, ações e partida | `testes/validar-lideranca.cjs`, `testes/validar-fluxo-dinamico.cjs`, `testes/validar-partida.cjs` |
+| Combate e reações | `testes/validar-fluxo-dinamico.cjs`, `testes/navegador/mesa.spec.cjs` |
+| Facções e habilidades | `testes/validar-elfos.cjs`, `testes/validar-necromante.cjs`, `testes/validar-novas-habilidades.cjs` |
+| Interface e distribuição | `testes/navegador/mesa.spec.cjs`, `testes/validar-publicacao.cjs`, `testes/navegador/distribuicao.spec.cjs` |
+
+Com Node.js e dependências instaladas, use `npm run check:rapido` para sincronização, formatação, documentação e motor; `npm run check:completo` inclui as demais suítes e navegador. Para mudanças localizadas, escolha `npm run test:combate`, `npm run test:elfos` ou `npm run test:mapa` conforme o impacto. Cada comando mostra um resumo e, em caso de falha, os detalhes; `CHECK_VERBOSE=1` mostra toda a saída. Agrupe mudanças e faça testes e revisão ao final do lote. `npm run format:verificar` confere a formatação e `npm run format:aplicacao` a aplica; depois sincronize o HTML.
+
+### Limitações e pendências
+
+- **Direção visual:** identidade rústica, fantástica, divertida e aventureira, com clima leve e arte mais abstrata em aquarela, formas geométricas e linhas esporádicas. A tentativa de paleta quente foi rejeitada; o HUD deve mudar de cor com a facção ativa preservando a paleta-base da mesa. O acabamento continua aberto à evolução.
+- O fluxo principal foi validado pelo usuário, mas equilíbrio, acessibilidade e aparência em desktop e celular aguardam mais partidas e avaliação humana. A posição do extrator inicial e o equilíbrio do mapa, facções, custos e liderança permanecem em teste.
+- As melhorias de 18 de novembro foram verificadas; a avaliação visual de domínio, ícones, campos e modais permanece pendente. Os cliques nos botões de quantidade e todos os modos sem região não têm cobertura específica.
+- A partida não é salva ao fechar ou recarregar; não há semente reproduzível, relatório ou métricas automáticas de equilíbrio. Ajustes manuais de depuração podem criar estados intermediários e não simulam automaticamente a perda da Torre. O estoque de peças físicas não é simulado.
+- No teste de navegador a reação de combate parte de um estado preparado, sem percorrer toda a declaração pela interface. A proteção do atacante por Defesa Global e o saque sem movimento da Invasão não têm cenário automatizado específico. Outras cartas defensivas e detalhes de alvos que se tornam inválidos ainda precisam de definição; Guarda Imperial é uma adaptação de teste.
+- O motor foi parcialmente extraído: apresentação, orquestração do combate, algumas escolhas e transições ainda ficam na aplicação. A disponibilidade de ações ainda usa dois registros virtuais por facção.
+- Os testes usam DOM substituto e Chromium com dados controlados; não interpretam toda a prosa nem comprovam todas as combinações, a instalação em dispositivos físicos ou uma partida real. Conteúdo dos eventos após o marco de 20 pontos e IA permanecem adiados; reposição, limites de componentes e casos sem opções legais dependem de definição onde não documentados.
 
 ### Testes em navegador
 
 Para preparar a ferramenta de desenvolvimento, execute `npm ci` e `npx playwright install chromium --only-shell` (em Linux, podem ser necessárias dependências do sistema, instaláveis com `npx playwright install-deps chromium`). Depois execute `npm run test:navegador`. Os testes da mesa abrem o HTML por `file://`, bloqueiam requisições HTTP e exercitam o jogo em Chromium nas configurações de desktop e celular. Um teste separado usa um servidor local temporário apenas para conferir a instalação e o cache offline da distribuição em `dist/`; esse servidor não é necessário para jogar. A aleatoriedade é fixada apenas no navegador de teste; cenários reutilizáveis ajustam a mão ou pontuação para alcançar o trecho a verificar.
 
-As capturas ficam em `test-results/`; falhas também incluem captura e rastreamento. Na integração contínua, esses arquivos e o relatório HTML são anexados à execução. As capturas são evidências, não uma aprovação visual. Para criar referências candidatas, execute `VISUAL_CHECK=1 npx playwright test --update-snapshots`, compare-as com o conceito aprovado e revise-as antes de adicioná-las ao projeto. Após aprovar referências para o mesmo ambiente, `npm run test:visual` compara as imagens sem gerar referências ausentes. Diferenças entre sistemas, fontes e versões de navegador podem exigir revisão; comparação automática não substitui validação humana nem comprova a aparência em todos os dispositivos.
+Falhas incluem captura e rastreamento em `test-results/`. Para capturas adicionais de sucesso, use `CAPTURAS=1 npm run test:navegador`. Na integração contínua, esses arquivos e o relatório HTML são anexados à execução. As capturas são evidências, não uma aprovação visual. Para criar referências candidatas, execute `VISUAL_CHECK=1 npx playwright test --update-snapshots`, revise-as com o usuário antes de adicioná-las ao projeto. Após aprovar referências para o mesmo ambiente, `npm run test:visual` compara as imagens sem gerar referências ausentes. Diferenças entre sistemas, fontes e versões de navegador podem exigir revisão; comparação automática não substitui validação humana nem comprova a aparência em todos os dispositivos.

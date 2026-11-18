@@ -16,6 +16,7 @@ async function abrir(page) {
   return erros;
 }
 async function evidencia(page, info, nome) {
+  if (process.env.VISUAL_CHECK !== '1' && process.env.CAPTURAS !== '1') return;
   const imagem = info.outputPath(`${nome}.png`);
   await page.screenshot({ path: imagem, fullPage: true, animations: 'disabled' });
   await info.attach(nome, { path: imagem, contentType: 'image/png' });
@@ -306,14 +307,6 @@ test('ação inválida informa o problema sem gastar recursos, carta ou ação',
   await page.locator('#executeAction').click();
   await expect(page.locator('#actionError')).not.toBeEmpty();
   expect(await page.evaluate(() => ({ouro:resources.imperio.ouro,tropas:state.R10.units.imperio,mao:flow.decks.imperio.hand.length,acoes:flow.markers.filter(m=>m.f==='imperio'&&!m.used).length}))).toEqual(antes);
-  expect(erros).toEqual([]);
-});
-
-test('registra o conceito aprovado para comparação humana', async ({ page }, info) => {
-  const erros=[];page.on('pageerror',e=>erros.push(e.message));
-  await page.goto(pathToFileURL(path.resolve(__dirname,'../../prototipo/mesa-conceito.html')).href);
-  await expect(page.locator('.region')).toHaveCount(10);
-  await evidencia(page,info,'conceito-mesa');
   expect(erros).toEqual([]);
 });
 

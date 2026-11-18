@@ -8,14 +8,13 @@ const applicationFiles = fs.readdirSync(path.join(root, 'jogo/aplicacao')).filte
 const suites = {
   rapido: [
     ['Sincronização do HTML', 'scripts/sincronizar-motor.cjs', '--verificar'],
-    ['Rastreabilidade', 'scripts/validar-rastreabilidade.cjs'],
     ['Formatação da aplicação', 'node_modules/prettier/bin/prettier.cjs', '--check', ...applicationFiles],
     ['Documentação', 'testes/validar-documentacao.cjs'],
     ['Motor', 'testes/validar-motor-base.cjs'],
   ],
   combate: [['Combate e fluxo', 'testes/validar-fluxo-dinamico.cjs']],
   elfos: [['Elfos', 'testes/validar-elfos.cjs']],
-  mapa: [['Mapa e documentação', 'testes/validar-documentacao.cjs'], ['Conceito de mesa', 'testes/validar-mesa-conceito.cjs']],
+  mapa: [['Mapa e documentação', 'testes/validar-documentacao.cjs']],
   restante: [
     ['Liderança', 'testes/validar-lideranca.cjs'],
     ['Fluxo e combate', 'testes/validar-fluxo-dinamico.cjs'],
@@ -25,7 +24,6 @@ const suites = {
     ['Habilidades', 'testes/validar-novas-habilidades.cjs'],
     ['Baralhos revisados', 'testes/validar-baralhos-revisados.cjs'],
     ['Publicação', 'testes/validar-publicacao.cjs'],
-    ['Conceito de mesa', 'testes/validar-mesa-conceito.cjs'],
     ['Navegador', 'node_modules/@playwright/test/cli.js', 'test'],
   ],
 };
@@ -36,12 +34,19 @@ if (!['rapido', 'completo', 'combate', 'elfos', 'mapa'].includes(selection)) {
 }
 const checks = selection === 'completo' ? [...suites.rapido, ...suites.restante] : suites[selection];
 const start = performance.now();
+const verbose = process.env.CHECK_VERBOSE === '1';
 for (const [name, file, ...args] of checks) {
   const before = performance.now();
-  console.log(`\n▶ ${name}`);
-  const result = spawnSync(node, [path.join(root, file), ...args], { cwd: root, stdio: 'inherit', env: process.env });
-  console.log(`${name}: ${((performance.now() - before) / 1000).toFixed(2)} s`);
+  const result = spawnSync(node, [path.join(root, file), ...args], { cwd: root, stdio: verbose ? 'inherit' : 'pipe', encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, env: process.env });
+  const summary = name === 'Navegador' && !verbose && result.status === 0
+    ? [...(result.stdout || '').replace(/\x1b\[[0-9;]*m/g, '').matchAll(/\b\d+\s+(?:passed|skipped|flaky|did not run|interrupted)\b/g)].map(match => match[0]).join(', ')
+    : '';
+  console.log(`${result.status === 0 && !result.error ? 'OK' : 'FALHOU'} ${name}: ${((performance.now() - before) / 1000).toFixed(2)} s${summary ? ` (${summary})` : ''}`);
   if (result.error || result.status !== 0) {
+    if (!verbose) {
+      if (result.stdout) process.stdout.write(result.stdout);
+      if (result.stderr) process.stderr.write(result.stderr);
+    }
     if (result.error) console.error(result.error.message);
     console.error(`Verificação interrompida em ${name}.`);
     process.exit(result.status || 1);
