@@ -1,10 +1,10 @@
 # Plano do protótipo para quatro facções
 
-**Implementado e validado pelo usuário para continuar o desenvolvimento.** O [protótipo principal](../mapa-fluxo-dinamico.html) é um único HTML local, com Império, Necromante, Piratas e Elfos controlados manualmente, sem IA, em um mapa de 11 regiões. O usuário aprovou o fluxo sem alocação prévia; os protótipos anteriores estão no [histórico](../historico/prototipos/alocacao-de-marcadores.md). A validação do fluxo não aprova automaticamente o equilíbrio de todas as regras.
+**Implementado e validado pelo usuário para continuar o desenvolvimento.** O [protótipo principal](../mapa-fluxo-dinamico.html) é um único HTML local, com Império, Necromante, Piratas e Elfos controlados manualmente, sem IA, em um mapa de 10 regiões. O usuário aprovou o fluxo sem alocação prévia; os protótipos anteriores estão no [histórico](../historico/prototipos/alocacao-de-marcadores.md). A validação do fluxo não aprova automaticamente o equilíbrio de todas as regras.
 
 ## Base de design
 
-- O [mapa](../regras/mapa.md) registra o cenário implementado com as nove regiões anteriores, uma nova floresta e uma nova costa; as ligações R5–R8 e R9–R2 foram removidas, e R2–R6 foi substituída por R2–R10. Os Elfos começam com duas unidades em R6 e duas em R10, sem recursos. A disposição e o equilíbrio aguardam validação.
+- O [mapa](../regras/mapa.md) registra o cenário de dez regiões; R9 foi removida, R4 tornou-se costeira e R5–R8 estão conectadas. Os Elfos começam com duas unidades em R6 e duas em R10, sem recursos. A disposição e o equilíbrio aguardam validação.
 - Preservar as regras existentes e o conteúdo élfico registrado em seus módulos. O protótipo principal incorpora para teste o [Império](../faccoes/imperio.md) com duas cartas de Alistamento e a habilidade de alistamento obrigatório. Propostas não se tornam regras finais por estarem implementadas.
 - As definições recebidas para os [Elfos](../faccoes/elfos.md), comércio, tropas como recurso, coleta, reações e condições iniciais estão registradas no módulo.
 - A coexistência de quatro facções não altera, por si, a regra de dois combatentes. Defesa Global pode proteger um lado antes dos dados, inclusive como intervenção de um terceiro; seus custos e consequências estão definidos nos módulos de [Elfos](../faccoes/elfos.md) e [Combate](../regras/combate.md), implementados no protótipo principal.
@@ -22,4 +22,4 @@ As etapas de construção abaixo foram executadas para teste. Permanecem a avali
 
 ## Critérios para validação pelo usuário
 
-O novo arquivo abre localmente e permite concluir e reiniciar uma partida manual com quatro facções e 11 regiões; regras pendentes usadas no teste estão explicitadas; mapa, documentação e código concordam; verificações automáticas passam e limitações de partidas e apresentação são registradas. A preparação do site usa o protótipo principal; instalação e cache precisam de validação em dispositivos reais.
+O novo arquivo abre localmente e permite concluir e reiniciar uma partida manual com quatro facções e 10 regiões; regras pendentes usadas no teste estão explicitadas; mapa, documentação e código concordam; verificações automáticas passam e limitações de partidas e apresentação são registradas. A preparação do site usa o protótipo principal; instalação e cache precisam de validação em dispositivos reais.

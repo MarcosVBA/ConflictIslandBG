@@ -43,12 +43,13 @@ function element(id) {
       return [];
     },
     appendChild(x) { if (this.id === 'map') regions.push(x); },
+    prepend() {},
     remove() { regions = regions.filter(x => x !== this); },
   };
   elements.set(id, e);
   return e;
 }
-const context = { document: { getElementById: element, createElement: () => element(Math.random()) }, window: { matchMedia: () => ({ matches: true }) } };
+const context = { document: { body: element("body"), addEventListener() {}, getElementById: element, createElement: () => element(Math.random()) }, window: { matchMedia: () => ({ matches: true }) } };
 vm.createContext(context);
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
 if (!scripts.length) throw new Error('Nenhum script encontrado no HTML.');
@@ -61,7 +62,7 @@ const click = id => { const e = element(id); assert(typeof e.onclick === 'functi
 
 // Links dos módulos atuais não dependem dos caminhos históricos antigos.
 assert(element('fullscreen').attributes['aria-label']==='Entrar em tela cheia','Controle de tela cheia ausente.');
-assert((element('lines').innerHTML.match(/<path /g)||[]).length===18,'Todas as conexões devem estar presentes.');
+assert((element('lines').innerHTML.match(/<path /g)||[]).length===16,'Todas as conexões devem estar presentes.');
 assert((element('lines').innerHTML.match(/class="selected-connection"/g)||[]).length===2,'Conexões da região inicial devem estar destacadas.');
 run("visualAssets.cartas['Marcha Imperial']='artes/marcha.webp';visualAssets.regioes.R1='artes/praia.webp';render()");
 assert(run("handCard('imperio',{name:'Marcha Imperial',text:'',leadership:1},0,1).includes('src=\"artes/marcha.webp\"')"),'Arte opcional da carta não foi aplicada.');
@@ -82,7 +83,7 @@ for (const faction of ['piratas','necromante','imperio','elfos']) {
 const mapText=read('regras/mapa.md');
 const rows=[...mapText.matchAll(/^\|\s*(R\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*(Sim|Não)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|/gm)];
 const defs=JSON.parse(run('JSON.stringify(definitions)'));
-assert(rows.length===defs.length && defs.length===11, 'Quantidade de regiões divergente.');
+assert(rows.length===defs.length && defs.length===10, 'Quantidade de regiões divergente.');
 for(const row of rows){
  const [,id,name,terrain,coast,resource,start]=row, r=defs.find(x=>x.id===id);
  assert(r && r.name===name.trim() && r.terrain===terrain.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') && r.coast===(coast==='Sim') && r.resource===(resource.trim()==='Nenhum'?'Sem recurso':resource.trim()), `Região divergente: ${id}`);
@@ -106,5 +107,5 @@ const actualFaces=JSON.parse(run('JSON.stringify([attackFaces,defenseFaces])'));
 for(let i=0;i<2;i++)assert(JSON.stringify(faces[i].sort())===JSON.stringify(actualFaces[i].map(x=>x.join(',')).sort()),'Dados divergentes.');
 assert(!/<(?:script|link|img)\b[^>]*(?:src|href)\s*=/i.test(html.replace(/<script>[\s\S]*?<\/script>/g,'')),'O HTML principal precisa funcionar sem arquivos externos obrigatórios.');
 check("resources.imperio.ouro===1&&resources.necromante.madeira===1&&resources.piratas.ouro===0&&resources.elfos.ouro===0&&resources.elfos.madeira===0");
-console.log('OK: links, quatro baralhos e liderança, 11 regiões, conexões, dados e HTML local.');
+console.log('OK: links, quatro baralhos e liderança, 10 regiões, conexões, dados e HTML local.');
 console.log('Limite: DOM substituto; não verifica apresentação visual nem interpreta toda a prosa.');

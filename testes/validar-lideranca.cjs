@@ -11,7 +11,7 @@ for (const [file, order] of [
   const base = harness.replace("const html = read('mapa-fluxo-dinamico.html');", `const html = read('${file}');`);
   const scenario = `
 const seatOrder = ${JSON.stringify(order)};
-function clearBid(){for(let i=0;i<10;i++) element('bid-'+i).checked=false}
+function chooseBid(...indices){for(const index of indices) cards[index].onclick()}
 const values=JSON.parse(run('JSON.stringify(leadershipValues)'));
 const selector=element('flow').innerHTML.split('<select id="orderChoice"')[1]?.split('</select>')[0];
 assert(selector && (selector.match(/<option /g)||[]).length===seatOrder.split(',').length,'O seletor deve conter um jogador por opção.');
@@ -29,8 +29,8 @@ for(const f of seatOrder.split(',')){
 set('orderChoice','imperio');set('handSize',5);click('startRound');if(run("flow.phase==='alistamento'")){set('imperialRecruit','R1');click('confirmImperialRecruit')}
 check("flow.phase==='leilão'&&factionIds.every(f=>flow.decks[f].hand.every(c=>c.leadership===leadershipValues[c.name]))");
 run("flow.decks.imperio.hand=[{name:'Ordens da Coroa',leadership:1},{name:'Marcha Imperial',leadership:2}];flow.decks.necromante.hand=[{name:'Infestação',leadership:1},{name:'Magia das Trevas / Monumento à Morte',leadership:2}];renderFlow()");
-clearBid();element('bid-0').checked=true;click('submitBid');check("flow.auction.leader==='imperio'&&flow.auction.high===1");
-clearBid();element('bid-0').checked=true;element('bid-1').checked=true;click('submitBid');check("flow.auction.leader==='necromante'&&flow.auction.high===3");
+chooseBid(0);click('submitBid');check("flow.auction.leader==='imperio'&&flow.auction.high===1");
+chooseBid(0,1);click('submitBid');check("flow.auction.leader==='necromante'&&flow.auction.high===3");
 click('passBid');click('passBid');click('passBid');check("flow.phase==='resolução'&&flow.order[0]==='necromante'&&flow.decks.necromante.discard.length===2&&flow.decks.imperio.hand.length===2");
 console.log('Leilão, valores e lances verificados: ${file}');
 `;

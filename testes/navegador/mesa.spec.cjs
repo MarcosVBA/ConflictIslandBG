@@ -41,7 +41,7 @@ async function preparar(page) {
 
 test('abre offline, mostra o mapa e permite selecionar regiões por teclado', async ({ page }, info) => {
   const erros = await abrir(page);
-  await expect(page.locator('.region')).toHaveCount(11);
+  await expect(page.locator('.region')).toHaveCount(10);
   await expect(page.locator('#lines path, #lines line')).not.toHaveCount(0);
   await preparar(page);
   const regiao=page.locator('[data-region="R10"]');
@@ -66,17 +66,17 @@ test('detalhes da região sobre o mapa podem ser ocultados sem afetar as conexõ
   await expect(toggle).toHaveText('Ocultar informações das regiões');
   await expect(infoRegiao).toHaveCSS('pointer-events', 'none');
   await expect(page.locator('#toggle')).toHaveCount(0);
-  await expect(page.locator('#lines path')).toHaveCount(18);
+  await expect(page.locator('#lines path')).toHaveCount(16);
   await evidencia(page, info, 'informacoes-sobre-mapa');
   await toggle.click();
   await expect(infoRegiao).toBeHidden();
   await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-  await page.locator('[data-region="R9"]').click();
-  await expect(page.locator('#lines path')).toHaveCount(18);
+  await page.locator('[data-region="R11"]').click();
+  await expect(page.locator('#lines path')).toHaveCount(16);
   await toggle.click();
   await expect(infoRegiao).toBeVisible();
   await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-  await expect(infoRegiao).toContainText('R9');
+  await expect(infoRegiao).toContainText('R11');
   expect(erros).toEqual([]);
 });
 
@@ -114,9 +114,9 @@ test('regiões mostram meeples, construções e recursos coloridos e identificá
     const size = selector => { const rect=el.querySelector(selector).getBoundingClientRect(); return [rect.width,rect.height] };
     return {meeple:size('.troop-meeple'), construcao:size('.building-icon'), recurso:size('.resource-token')};
   });
-  expect(dimensions.meeple).toEqual([18,21]);
-  expect(dimensions.construcao).toEqual([34,34]);
-  expect(dimensions.recurso).toEqual([18,18]);
+  expect(dimensions.meeple).toEqual([20,20]);
+  expect(dimensions.construcao).toEqual([20,20]);
+  expect(dimensions.recurso).toEqual([20,20]);
   await expect(torre).toHaveAttribute('aria-label', /Necromante 2/);
   expect(erros).toEqual([]);
 });
@@ -129,13 +129,16 @@ test('oferece uma carta no leilão de liderança', async ({ page }) => {
     await page.locator('#imperialRecruit').selectOption('R1');
     await page.locator('#confirmImperialRecruit').click();
   }
-  await page.evaluate(() => { flow.decks.imperio.hand=[{name:'Marcha Imperial',text:'Atacar',leadership:1}];renderFlow(); });
+  await page.evaluate(() => { flow.decks.imperio.hand=[{name:'Marcha Imperial',text:'Atacar',leadership:1},{name:'Guarda Imperial',text:'Reação',leadership:0}];renderFlow(); });
   await page.locator('#handArea [data-card-index="0"]').click();
-  await expect(page.locator('#bid-0')).toBeChecked();
+  await expect(page.locator('#handArea [data-card-index="0"]')).toHaveAttribute('aria-pressed','true');
   await page.locator('#submitBid').click();
   for (let i=0;i<3;i++) await page.locator('#passBid').click();
   await expect(page.locator('#flow')).toContainText('Vez: Império');
   expect(await page.evaluate(() => flow.decks.imperio.discard.some(c=>c.name==='Marcha Imperial'))).toBe(true);
+  await page.locator('#handArea [data-card-index="0"]').click();
+  await page.locator('#discardAction').click();
+  await expect(page.locator('#flow')).not.toContainText('Vez: Império');
   expect(erros).toEqual([]);
 });
 
@@ -151,7 +154,7 @@ test('preparação e liderança usam janelas sobre a mesa', async ({ page }, inf
   await page.locator('#confirmImperialRecruit').click();
   await expect(page.locator('#phaseDialog')).toHaveAttribute('aria-label','Leilão de liderança');
   await page.locator('#phaseDialog #handArea [data-card-index="0"]').click();
-  await expect(page.locator('#bid-0')).toBeChecked();
+  await expect(page.locator('#handArea [data-card-index="0"]')).toHaveAttribute('aria-pressed','true');
   await evidencia(page,info,'lideranca-modal');
   for(let i=0;i<4;i++)await page.locator('#passBid').click();
   await expect(page.locator('#phaseDialog')).toBeHidden();
@@ -168,13 +171,12 @@ test('leilão, ações das quatro facções e próxima rodada', async ({ page },
     await expect(page.locator('#handArea')).toHaveAttribute('data-faction',f);
     await page.locator('#handArea [data-card-index="0"]').click();
     await page.locator(`[data-mode="${mode}"]`).click();
-    await page.locator(`[data-region="${region}"]`).click();
+    if (!["necromante", "elfos"].includes(f)) await page.locator(`[data-region="${region}"]`).click();
     await evidencia(page,info,`mao-${f}`);
     await page.locator('#executeAction').click();
   }
   const resultado=await page.evaluate(() => ({i:resources.imperio.ouro,n:resources.necromante.madeira,p:state.R5.units.piratas,e:resources.elfos.madeira}));
   expect(resultado).toEqual({i:2,n:2,p:2,e:2});
-  for(let i=0;i<4;i++) await page.locator('#passAction').click();
   await page.locator('#toScore').click();
   await expect(page.locator('#nextRound')).toBeVisible();
   await page.locator('#nextRound').click();
@@ -223,7 +225,7 @@ test('vitória interrompe a partida e o cenário pode ser reiniciado', async ({ 
   await preparar(page);
   // Coloca os Elfos a um ponto da vitória para exercitar o encerramento pela pontuação real.
   await page.evaluate(() => { game.score.elfos=29; });
-  for(let i=0;i<8;i++) await page.locator('#passAction').click();
+  for(let i=0;i<8;i++) { await page.locator('#handArea [data-card-index="0"]').click(); await page.locator('#discardAction').click(); }
   await page.locator('#toScore').click();
   await expect(page.locator('#flow')).toContainText('Vencedor: Elfos');
   await evidencia(page,info,'fim-partida');
@@ -310,7 +312,7 @@ test('ação inválida informa o problema sem gastar recursos, carta ou ação',
 test('registra o conceito aprovado para comparação humana', async ({ page }, info) => {
   const erros=[];page.on('pageerror',e=>erros.push(e.message));
   await page.goto(pathToFileURL(path.resolve(__dirname,'../../prototipo/mesa-conceito.html')).href);
-  await expect(page.locator('.region')).toHaveCount(11);
+  await expect(page.locator('.region')).toHaveCount(10);
   await evidencia(page,info,'conceito-mesa');
   expect(erros).toEqual([]);
 });

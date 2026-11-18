@@ -55,11 +55,11 @@ function diagnostics() {
   };
   const ids = definitions.map((r) => r.id);
   check(
-    ids.length === 11 && new Set(ids).size === 11,
-    "Devem existir onze IDs únicos.",
+    ids.length === 10 && new Set(ids).size === 10,
+    "Devem existir dez IDs únicos.",
   );
   for (const [owner, n] of Object.entries({
-    livre: 4,
+    livre: 3,
     imperio: 2,
     necromante: 2,
     piratas: 1,
@@ -76,7 +76,7 @@ function diagnostics() {
     "Florestas e madeira",
   );
   check(
-    [4, 5].includes(definitions.filter((r) => r.coast).length),
+    definitions.filter((r) => r.coast).length === 5,
     "Quantidade de costas",
   );
   check(
@@ -90,10 +90,10 @@ function diagnostics() {
   check(
     !byId("R7").coast &&
       byId("R7").resource === "Sem recurso" &&
-      ["R9", "R11"].every(
-        (id) => byId(id).coast && byId(id).resource === "Ouro",
-      ),
-    "Costa e recursos de R7, R9 e R11",
+      byId("R11").coast &&
+      byId("R11").resource === "Ouro" &&
+      byId("R4").coast,
+    "Costa e recursos de R4, R7 e R11",
   );
   check(
     edges.every(([a, b]) => ids.includes(a) && ids.includes(b) && a !== b),
@@ -105,9 +105,7 @@ function diagnostics() {
   );
   check(
     !neighbors("R3").includes("R7") &&
-      !neighbors("R9").includes("R11") &&
-      !neighbors("R9").includes("R7") &&
-      !neighbors("R9").includes("R1") &&
+      neighbors("R8").includes("R5") &&
       !neighbors("R6").includes("R8") &&
       neighbors("R7").includes("R11"),
     "Conexões aprovadas e removidas",
@@ -121,7 +119,7 @@ function diagnostics() {
         queue.push(n);
       }
   }
-  check(reached.size === 11, "Mapa desconectado");
+  check(reached.size === 10, "Mapa desconectado");
   check(
     !neighbors("R3").some((id) => ["R1", "R2", "R5"].includes(id)),
     "Torre próxima de outro início",
@@ -266,6 +264,12 @@ function chooseMapRegion(id, returnFocus = false) {
     focusMapRegion(id);
   return true;
 }
+function domainLabel(s) {
+  if (s.owner !== "livre") return "Domínio: " + names[s.owner];
+  return sides.some((f) => s.units[f] > 0 || buildingCount(s, f) > 0)
+    ? "Contestada"
+    : "Sem domínio";
+}
 function render() {
   refreshOwners();
   const map = $("map");
@@ -274,7 +278,7 @@ function render() {
   for (const r of definitions) {
     let s = state[r.id],
       b = document.createElement("button");
-    b.className = `region ${r.terrain} ${s.owner} ${r.id === selected ? "selected" : ""} ${adj.includes(r.id) ? "adj" : ""} ${mapChoice ? (mapChoice.valid.includes(r.id) ? "map-valid" : "map-invalid") : ""} ${mapChoice && mapChoice.origin === r.id ? "map-origin" : ""} ${regionPulse === r.id ? "region-pop" : ""}`;
+    b.className = `region ${r.terrain} ${s.owner} ${domainLabel(s) === "Contestada" ? "contested" : ""} ${r.id === selected ? "selected" : ""} ${adj.includes(r.id) ? "adj" : ""} ${mapChoice ? (mapChoice.valid.includes(r.id) ? "map-valid" : "map-invalid") : ""} ${mapChoice && mapChoice.origin === r.id ? "map-origin" : ""} ${regionPulse === r.id ? "region-pop" : ""}`;
     b.style.left = r.x + "%";
     b.style.top = r.y + "%";
     const art = visualAssets.regioes[r.id];
@@ -288,16 +292,17 @@ function render() {
     b.setAttribute("aria-pressed", r.id === selected);
     b.setAttribute(
       "aria-label",
-      `${r.id}, ${r.name}, ${terrains[r.terrain]}, ${r.coast ? "costeira, " : ""}${r.resource}, controle ${names[s.owner]}, tropas: ${sides.map((f) => names[f] + " " + s.units[f]).join(", ")}, construções: ${buildingDescription(s)}`,
+      `${r.id}, ${r.name}, ${terrains[r.terrain]}, ${r.coast ? "costeira, " : ""}${r.resource}, ${domainLabel(s)}, tropas: ${sides.map((f) => names[f] + " " + s.units[f]).join(", ")}, construções: ${buildingDescription(s)}`,
     );
-    b.innerHTML = `<span class="region-id">${r.id}${r.coast ? " · ⚓" : ""}</span><span class="region-top"><strong>${r.name}</strong></span><span class="region-meta">${terrains[r.terrain]}</span><span class="region-pieces"><span class="troops">${troopDots(s)}</span><span class="region-buildings">${buildingIcons(s)}${devastated(s) || mapDevastationOverride?.has(r.id) ? '<span class="devastated-icon" title="Região devastada">☠</span>' : ""}</span>${resourceIcon(r.resource)}</span>`;
+    b.innerHTML = `<span class="region-id">${r.id}${r.coast ? " · ⚓" : ""}</span><span class="region-top"><strong>${r.name}</strong></span><span class="region-meta">${terrains[r.terrain]} · ${domainLabel(s)}</span><span class="region-pieces"><span class="troops">${troopDots(s)}</span><span class="region-buildings">${buildingIcons(s)}${devastated(s) || mapDevastationOverride?.has(r.id) ? '<span class="devastated-icon" title="Região devastada">☠</span>' : ""}</span>${resourceIcon(r.resource)}</span>`;
     b.onclick = () => {
       const returnFocus = document.activeElement === b;
-      if (mapChoice && chooseMapRegion(r.id, returnFocus)) return;
+      if (!minimizedDialog && mapChoice && chooseMapRegion(r.id, returnFocus))
+        return;
       selected = r.id;
       regionPulse = r.id;
       render();
-      const actionRegion = $("actionRegion");
+      const actionRegion = minimizedDialog ? null : $("actionRegion");
       if (
         actionRegion &&
         !actionRegion.disabled &&
@@ -316,7 +321,7 @@ function render() {
     s = state[selected];
   $("details").innerHTML =
     r && s
-      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${names[s.owner]}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
+      ? `<h3>${r.id} · ${r.name}</h3><dl><dt>Terreno</dt><dd>${terrains[r.terrain]}</dd><dt>Costa</dt><dd>${r.coast ? "⚓ Sim" : "Não"}</dd><dt>Recurso</dt><dd>${r.resource}</dd><dt>Controle</dt><dd>${domainLabel(s)}</dd><dt>Ocupantes</dt><dd>Soldados ${s.units.imperio} · Zumbis ${s.units.necromante} · Piratas ${s.units.piratas} · Elfos ${s.units.elfos}</dd><dt>Construções</dt><dd>${[s.tower ? "Torre Esquecida" : "", s.extractor ? "Extrator do Necromante" : "", s.monument ? "Monumento à Morte" : "", s.tech ? "Tecnologia: " + s.tech : "", s.bar ? "Bar Pirata" : "", ...sides.filter((f) => s.buildings[f]).map((f) => names[f] + ": " + s.buildings[f])].filter(Boolean).join(" · ") || "Nenhuma"}</dd><dt>Devastada</dt><dd>${devastated(s) || mapDevastationOverride?.has(r.id) ? "Sim" : "Não"}</dd><dt>Adjacentes</dt><dd>${adj.map((id) => id + " " + byId(id).name).join(", ")}</dd></dl>`
       : "<p>Selecione uma região para ver suas informações.</p>";
   $("apply").disabled = !s;
   $("clear").disabled = !s;
@@ -328,7 +333,7 @@ function render() {
   $("resources").innerHTML = ["imperio", "necromante", "piratas", "elfos"]
     .map(
       (f) =>
-        `<p><strong>${names[f]}</strong> · Ouro <input type="number" min="0" step="1" id="${f}-ouro" value="${resources[f].ouro}" aria-label="Ouro: ${names[f]}" style="width:5rem"> · Madeira <input type="number" min="0" step="1" id="${f}-madeira" value="${resources[f].madeira}" aria-label="Madeira: ${names[f]}" style="width:5rem"></p>`,
+        `<p><strong>${names[f]}</strong> · Ouro <input type="number" min="0" max="9007199254740991" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))" id="${f}-ouro" value="${resources[f].ouro}" aria-label="Ouro: ${names[f]}" style="width:5rem"> · Madeira <input type="number" min="0" max="9007199254740991" step="1" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))" id="${f}-madeira" value="${resources[f].madeira}" aria-label="Madeira: ${names[f]}" style="width:5rem"></p>`,
     )
     .join("");
   $("history").innerHTML = history.length
@@ -372,9 +377,11 @@ function drawMapConnections() {
       dy = to.y - from.y,
       length = Math.hypot(dx, dy) || 1;
     let best = null;
-    for (const bend of [
-      0, 8, -8, 16, -16, 25, -25, 36, -36, 48, -48, 65, -65,
-    ]) {
+    const bends =
+      [a, b].includes("R8") && [a, b].includes("R11")
+        ? [0]
+        : [0, 8, -8, 16, -16, 25, -25, 36, -36, 48, -48, 65, -65];
+    for (const bend of bends) {
       const cx = (from.x + to.x) / 2 - (dy / length) * bend,
         cy = (from.y + to.y) / 2 + (dx / length) * bend,
         points = [];
@@ -580,7 +587,7 @@ $("toggleRegionInfo").onclick = () => {
     : "Mostrar informações das regiões";
 };
 $("mapArea").onclick = (event) => {
-  if (event.target.closest?.(".region") || battle) return;
+  if (event.target.closest?.(".region") || battle || minimizedDialog) return;
   selected = null;
   regionPulse = null;
   if (flow.phase === "resolução") {

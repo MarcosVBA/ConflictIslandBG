@@ -29,14 +29,20 @@ const handHome = $("handArea").parentElement;
 function syncPhaseDialog(phase) {
   const dialog = $("phaseDialog");
   if (typeof dialog.showModal !== "function") return;
-  const inDialog = phase === "preparação" || phase === "leilão";
+  const inDialog = ["preparação", "leilão", "pontuação"].includes(phase);
   if (inDialog) {
+    if (phase === "pontuação") ensureMinimizeButton(dialog, "pontuação");
+    else dialog.querySelector(".minimize-modal")?.remove();
     $("phaseDialogPanel").appendChild(flowPanel);
     if (phase === "leilão") $("phaseDialogCards").appendChild($("handArea"));
     else if (handHome) handHome.appendChild($("handArea"));
     dialog.setAttribute(
       "aria-label",
-      phase === "leilão" ? "Leilão de liderança" : "Preparação da rodada",
+      phase === "leilão"
+        ? "Leilão de liderança"
+        : phase === "pontuação"
+          ? "Pontuação da rodada"
+          : "Preparação da rodada",
     );
     dialog.oncancel = (event) => event.preventDefault();
     if (!dialog.open) dialog.showModal();
@@ -59,14 +65,20 @@ function flowLog(s) {
   flow.log.push("Rodada " + flow.round + ": " + s);
 }
 function activeFaction() {
-  const next = ConflictIslandBase.proximaFacção(
-    flow.order,
-    flow.turn,
-    flow.markers,
-  );
-  if (!next) return null;
-  flow.turn = next.indice;
-  return next.faccao;
+  while (true) {
+    const next = ConflictIslandBase.proximaFacção(
+      flow.order,
+      flow.turn,
+      flow.markers,
+    );
+    if (!next) return null;
+    flow.turn = next.indice;
+    if (flow.decks[next.faccao].hand.length) return next.faccao;
+    for (const marker of flow.markers)
+      if (marker.f === next.faccao && !marker.used) marker.used = true;
+    flowLog(names[next.faccao] + " encerrou a vez por estar sem cartas.");
+    flow.turn = (flow.turn + 1) % flow.order.length;
+  }
 }
 const factionCrests = {
   imperio: "♜",
@@ -133,7 +145,7 @@ function factionInfo(f) {
   if (revisedModes)
     rules.elfos = rules.elfos.replace(
       "<p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>",
-      "<p><strong>Defesa Global:</strong> antes dos dados, gaste a carta e uma ação para proteger um dos lados com tropas.</p>",
+      "<p><strong>Defesa Global:</strong> antes dos dados, gaste a carta para proteger um dos lados com tropas.</p>",
     );
   const deck = flow.decks[f];
   return `<div class="faction-info" aria-label="Informações de ${names[f]}"><h2>${names[f]}</h2><p><strong>${game.score[f]} pontos</strong> · ◆ ${res.ouro} ouro · ♣ ${res.madeira} madeira</p><p>${troops} tropas · ${owned} regiões dominadas</p><p>Baralho: ${deck.draw.length} · mão: ${deck.hand.length} · descarte: ${deck.discard.length}</p>${details}<h3>Regras da facção</h3>${rules[f]}</div>`;
@@ -254,30 +266,34 @@ function renderLeadershipAuction(target) {
   const a = flow.auction,
     f = flow.order[a.turn],
     hand = flow.decks[f].hand,
-    committed = new Set(a.offers[f]);
-  showAuctionHand(f, hand, committed);
+    committed = new Set(a.offers[f]),
+    selected = new Set();
   const offers = flow.order
     .map((side) => {
       const cards = a.offers[side].map((i) => flow.decks[side].hand[i]);
       return `<li><strong>${names[side]}</strong>${a.leader === side ? " · maior lance" : ""}${a.passed[side] ? " · passou" : ""}: ${cards.length ? cards.map((c) => c.name + " (" + c.leadership + ")").join(", ") : "nenhuma carta"} — ${cards.reduce((n, c) => n + c.leadership, 0)} liderança</li>`;
     })
     .join("");
-  target.innerHTML = `<p><span class="phase">Rodada ${flow.round} · Leilão de liderança</span></p><h3>Vez: ${names[f]}</h3><p>Maior lance: <strong>${a.high}</strong>${a.leader ? " · " + names[a.leader] : ""}. O leilão segue no sentido anti-horário. Selecione cartas adicionais para superar esse valor ou passe para sair do leilão.</p><ul>${offers}</ul><fieldset><legend>Cartas de ${names[f]}</legend>${hand.map((c, i) => `<label><input type="checkbox" id="bid-${i}" ${committed.has(i) ? "checked disabled" : ""}> ${c.name} · liderança ${c.leadership}${committed.has(i) ? " · já oferecida" : ""}</label>`).join("") || "<p>Sem cartas na mão.</p>"}</fieldset><button id="submitBid">Dar lance</button> <button id="passBid">Passar</button><p id="auctionError" role="status"></p><p class="muted">Cartas oferecidas ficam abertas até o fim. Somente o vencedor as descarta; os demais as recuperam.</p>`;
-  $("handArea")
-    .querySelectorAll("[data-card-index]")
-    .forEach((button) => {
-      const checkbox = $("bid-" + button.dataset.cardIndex);
-      if (!checkbox.disabled)
-        checkbox.onchange = () => button.syncBid(checkbox.checked);
-    });
+  target.innerHTML = `<p><span class="phase">Rodada ${flow.round} · Leilão de liderança</span></p><h3>Vez: ${names[f]}</h3><p>Maior lance: <strong>${a.high}</strong>${a.leader ? " · " + names[a.leader] : ""}. O leilão segue no sentido anti-horário. Selecione cartas adicionais para superar esse valor ou passe para sair do leilão.</p><ul>${offers}</ul><p>Total do seu lance: <strong id="bidTotal">0</strong> liderança</p><button id="submitBid">Dar lance</button> <button id="passBid">Passar</button> ${!a.leader ? '<button id="skipAuction">Pular leilão</button>' : ""}<p id="auctionError" role="status"></p><p class="muted">Cartas oferecidas ficam abertas até o fim. Somente o vencedor as descarta; os demais as recuperam.</p>`;
+  const updateTotal = () => {
+    $("bidTotal").textContent = [...committed, ...selected].reduce(
+      (sum, i) => sum + hand[i].leadership,
+      0,
+    );
+  };
+  showAuctionHand(f, hand, committed, selected, updateTotal);
+  updateTotal();
+  if ($("skipAuction"))
+    $("skipAuction").onclick = () => {
+      if (flow.auction !== a || a.leader) return;
+      finishLeadershipAuction();
+    };
   $("submitBid").onclick = () => {
     if (flow.auction !== a || flow.order[a.turn] !== f) return;
-    const selected = hand
-      .map((c, i) => i)
-      .filter((i) => !committed.has(i) && $("bid-" + i).checked);
+    const chosen = [...selected];
     let result;
     try {
-      result = ConflictIslandBase.registrarLance(a, f, hand, selected);
+      result = ConflictIslandBase.registrarLance(a, f, hand, chosen);
     } catch (e) {
       $("auctionError").textContent = e.message;
       return;
@@ -446,7 +462,7 @@ function renderFlow() {
   let html = `<p><span class="phase">Rodada ${flow.round} · ${phase}</span></p>`;
   if (phase === "resolução" && activeFaction() === "imperio") html += taxCard();
   if (phase === "preparação") {
-    html += `${flow.round === 1 ? `<label>Primeiro jogador <select id="orderChoice">${factionIds.map((f) => `<option value="${f}" ${f === flow.order[0] ? "selected" : ""}>${names[f]}</option>`).join("")}</select></label>` : `<p>Primeiro no leilão: <strong>${names[flow.order[0]]}</strong> · líder anterior</p>`} <label>Tamanho da mão <input id="handSize" type="number" min="1" max="10" value="${flow.handSize}" style="width:5rem"></label> <button id="startRound">Preparar rodada</button><p class="muted">A mesa segue no sentido anti-horário: ${factionIds.map((f) => names[f]).join(" → ")} → ${names[factionIds[0]]}. Complete a mão e reembaralhe o descarte quando necessário.</p>`;
+    html += `${flow.round === 1 ? `<label>Primeiro jogador <select id="orderChoice">${factionIds.map((f) => `<option value="${f}" ${f === flow.order[0] ? "selected" : ""}>${names[f]}</option>`).join("")}</select></label>` : `<p>Primeiro no leilão: <strong>${names[flow.order[0]]}</strong> · líder anterior</p>`} <label>Tamanho da mão <input id="handSize" type="number" min="1" max="10" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))" value="${flow.handSize}" style="width:5rem"></label> <button id="startRound">Preparar rodada</button><p class="muted">A mesa segue no sentido anti-horário: ${factionIds.map((f) => names[f]).join(" → ")} → ${names[factionIds[0]]}. Complete a mão e reembaralhe o descarte quando necessário.</p>`;
   }
 
   if (phase === "resolução")
@@ -471,11 +487,11 @@ function renderFlow() {
       $("handArea").hidden = false;
       $("handArea").setAttribute("data-faction", f);
       $("handArea").innerHTML =
-        `<div class="hand-content"><div class="hand-heading"><div><strong>Sua mão</strong> <small>· ${d.hand.length} ${d.hand.length === 1 ? "carta" : "cartas"}</small></div></div><select id="actionCard" class="hand-select" hidden aria-label="Carta selecionada">${d.hand.map((c, i) => `<option value="${i}">${c.name}</option>`).join("")}</select><div class="hand-wrap"><div class="hand" id="handViewport" tabindex="0" role="region" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length)).join("") || '<p class="hand-empty">Sua mão está vazia. Você pode passar.</p>'}</div></div><small class="hand-tip">Escolha uma carta para ver o efeito completo e preparar a ação.</small></div>`;
-      html += `<h3>Vez: ${names[f]}</h3><p><strong>Ações disponíveis: ${markers.length}</strong></p><select id="actionMarker" hidden aria-label="Ação disponível">${markers.map(({ m, i }, n) => `<option value="${i}">Ação ${n + 1}</option>`).join("")}</select> <label>Região da próxima ação <select id="actionRegion"><option value="" disabled ${selected === null ? "selected" : ""}>Selecione uma região</option>${definitions.map((r) => `<option value="${r.id}" ${r.id === selected ? "selected" : ""}>${r.id} · ${r.name}</option>`).join("")}</select></label> <button id="showCard" class="hand-select" hidden ${d.hand.length ? "" : "disabled"}>Examinar carta selecionada</button><div id="cardDetail" class="card-detail"></div><div class="row"><button id="passAction">Passar ação</button><button id="discardAction" disabled>Descartar carta escolhida</button></div><p class="muted">Compra: ${d.draw.length} · mão: ${d.hand.length} · descarte: ${d.discard.length}. Escolha a carta somente ao chegar sua vez.</p>`;
+        `<div class="hand-content"><div class="hand-heading"><div><strong>Sua mão</strong> <small>· ${d.hand.length} ${d.hand.length === 1 ? "carta" : "cartas"}</small></div></div><select id="actionCard" class="hand-select" hidden aria-label="Carta selecionada">${d.hand.map((c, i) => `<option value="${i}">${c.name}</option>`).join("")}</select><div class="hand-wrap"><div class="hand" id="handViewport" tabindex="0" role="region" aria-label="Cartas de ${names[f]}">${d.hand.map((c, i) => handCard(f, c, i, d.hand.length)).join("") || '<p class="hand-empty">Sua mão está vazia.</p>'}</div></div><small class="hand-tip">Escolha uma carta para ver o efeito completo e preparar a ação.</small></div>`;
+      html += `<h3>Vez: ${names[f]}</h3><p><strong>Ações disponíveis: ${markers.length}</strong></p><select id="actionMarker" hidden aria-label="Ação disponível">${markers.map(({ m, i }, n) => `<option value="${i}">Ação ${n + 1}</option>`).join("")}</select> <label>Região da próxima ação <select id="actionRegion"><option value="" disabled ${selected === null ? "selected" : ""}>Selecione uma região</option>${definitions.map((r) => `<option value="${r.id}" ${r.id === selected ? "selected" : ""}>${r.id} · ${r.name}</option>`).join("")}</select></label> <button id="showCard" class="hand-select" hidden ${d.hand.length ? "" : "disabled"}>Examinar carta selecionada</button><div id="cardDetail" class="card-detail"></div><div class="row"><button id="passAction" hidden>Passar ação</button><button id="discardAction" disabled>Descartar carta escolhida</button></div><p class="muted">Compra: ${d.draw.length} · mão: ${d.hand.length} · descarte: ${d.discard.length}. Escolha a carta somente ao chegar sua vez.</p>`;
     } else
       html +=
-        '<p>Todas as ações foram resolvidas ou passadas.</p><button id="toScore">Ir à pontuação</button>';
+        '<p>Todas as ações foram resolvidas.</p><button id="toScore">Ir à pontuação</button>';
   }
 
   if (phase === "pontuação") html += scoreView();
@@ -545,13 +561,6 @@ function renderFlow() {
   if (phase === "resolução") {
     let f = activeFaction();
     if (f) {
-      $("passAction").onclick = () => {
-        let m = flow.markers[Number($("actionMarker").value)];
-        m.used = true;
-        flowLog(names[f] + " passou uma ação");
-        flow.turn = (flow.turn + 1) % flow.order.length;
-        renderFlow();
-      };
       $("discardAction").onclick = () => {
         const mi = Number($("actionMarker").value),
           ci = Number($("actionCard").value),
@@ -616,6 +625,10 @@ function renderFlow() {
         .forEach((btn) => {
           btn.onclick = () => {
             if ($("showCard").disabled) return;
+            if ($("actionDialog").open) {
+              closeActionDialog();
+              render();
+            }
             preparedMode = null;
             setMapChoice(null);
             for (const marker of flow.markers)
@@ -650,7 +663,18 @@ function renderFlow() {
               button.onclick = () => {
                 const mode = modes[Number(button.dataset.mode)];
                 preparedMode = { f, ci, mi, mode };
-                if (mode.window === "modal")
+                if (
+                  mode.window === "modal" ||
+                  [
+                    "Frutos da Mata",
+                    "Trabalhadores Zumbificado",
+                    "Harmônia",
+                    "Serviço de Transporte Pirata",
+                    "Carta de Corsário",
+                    "Pagamento de Impostos",
+                    "Remanejando Mortos",
+                  ].includes(mode.effect)
+                )
                   showPlayableAction(f, ci, mi, mode);
                 else {
                   selected = null;
@@ -696,6 +720,13 @@ function renderFlow() {
         flow.phase = "fim";
         renderFlow();
         return;
+      }
+      for (const f of factionIds) {
+        if ($("discardRemaining-" + f)?.checked) {
+          const deck = flow.decks[f];
+          deck.discard.push(...deck.hand.splice(0));
+          flowLog(names[f] + " descartou a mão ao fim da rodada.");
+        }
       }
       flow.round++;
       flow.markers = [];

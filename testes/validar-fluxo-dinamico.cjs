@@ -6,8 +6,8 @@ const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8');
 const harness = source.split('// Links dos módulos atuais')[0];
 const scenario = String.raw`
-check("edges.length===18&&!neighbors('R3').includes('R7')&&!neighbors('R7').includes('R3')&&!neighbors('R9').includes('R11')&&!neighbors('R11').includes('R9')&&!neighbors('R7').includes('R9')&&!neighbors('R9').includes('R7')&&!neighbors('R1').includes('R9')&&!neighbors('R9').includes('R1')&&!neighbors('R6').includes('R8')&&!neighbors('R8').includes('R6')&&neighbors('R7').includes('R11')&&neighbors('R11').includes('R7')&&neighbors('R3').includes('R4')&&neighbors('R4').includes('R7')");
-check("byId('R7').name==='Pico Desolado'&&!byId('R7').coast&&byId('R7').resource==='Sem recurso'&&byId('R9').name==='Baixio dos Garimpeiros'&&byId('R9').terrain==='planicie'&&byId('R11').name==='Costa do Ouro Perdido'&&['R9','R11'].every(id=>byId(id).coast&&byId(id).resource==='Ouro')");
+check("edges.length===16&&neighbors('R8').includes('R5')&&!definitions.some(r=>r.id==='R9')")
+check("byId('R4').coast&&byId('R4').terrain==='floresta'&&byId('R11').coast&&byId('R11').resource==='Ouro'")
 assert(element('diagnostics').innerHTML.includes('Verificações aprovadas'),'Diagnóstico deve refletir a nova distribuição de recursos.');
 set('orderChoice','imperio');set('handSize',5);click('startRound');
 check("flow.phase==='alistamento'&&flow.decks.imperio.hand.length===5&&state.R1.units.imperio===2");
@@ -22,7 +22,7 @@ for(let round=1;round<=6;round++){
   set('orderChoice','imperio');set('handSize',5);click('startRound');
   if(run("flow.phase==='alistamento'")){set('imperialRecruit','R1');click('confirmImperialRecruit')}
   for(let i=0;i<4;i++)click('passBid');check("flow.phase==='resolução'&&flow.markers.length===8");
-  while(run('activeFaction()!==null')){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));click('passAction')}
+  while(run('activeFaction()!==null')){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));set('actionCard',0);element('discardAction').disabled=false;click('discardAction')}
   click('toScore');check("flow.phase==='pontuação'");click('nextRound');
 }
 check("flow.phase==='preparação'&&flow.round===7&&game.imperialRecruitRound===6");
@@ -30,7 +30,7 @@ run("game.score.elfos=19;addPoints('elfos',1,'teste')");check("game.endEventsRea
 run("game.score.elfos=29;addPoints('elfos',1,'teste')");check("game.winner==='elfos'&&flow.phase==='fim'");
 // O pagamento do Corsário permanece disponível até a pontuação e não encerra a ação.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['piratas','elfos','imperio','necromante'];flow.markers=[{f:'piratas',region:'R5',used:false}];flow.decks.piratas.hand=[{name:'Carta de Corsário / Serviço de Transporte Pirata'}];state.R5.units.imperio=1;game.score.piratas=29;showCorsair('piratas',0,0)");
-set('corsairAlly','imperio');set('decision','yes');set('price',1);set('destination','R6');set('quantity',1);set('corsairMode','move');set('attackDefender','necromante');click('corsairGo');check("game.winner===null&&game.score.piratas===29&&resources.piratas.ouro===1&&state.R5.units.piratas===0&&state.R6.units.piratas===1&&flow.markers[0].used&&battle===null");
+set('corsairAlly','imperio');set('corsairOrigin','R5');set('decision','yes');set('price',1);set('destination','R6');set('quantity',1);set('corsairMode','move');set('attackDefender','necromante');click('corsairGo');check("game.winner===null&&game.score.piratas===29&&resources.piratas.ouro===1&&state.R5.units.piratas===0&&state.R6.units.piratas===1&&flow.markers[0].used&&battle===null");
 // O transporte inválido é recusado antes do pagamento.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();state.R5.units.imperio=1;game.score.piratas=29");
 set('other','imperio');set('decision','yes');set('price',1);set('transportOrigin','R1');set('destination','R1');set('quantity',1);

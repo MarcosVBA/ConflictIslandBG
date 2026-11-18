@@ -2,7 +2,7 @@
 
 ## Escopo e uso
 
-O [protótipo principal](../mapa-fluxo-dinamico.html) é um único HTML local para quatro facções e 11 regiões, controladas manualmente, sem IA ou servidor. O usuário validou o fluxo sem alocação prévia como sistema padrão. Isso não implica aprovação definitiva do equilíbrio, das propostas de facção ou de todas as interações.
+O [protótipo principal](../mapa-fluxo-dinamico.html) é um único HTML local para quatro facções e 10 regiões, controladas manualmente, sem IA ou servidor. O usuário validou o fluxo sem alocação prévia como sistema padrão. Isso não implica aprovação definitiva do equilíbrio, das propostas de facção ou de todas as interações.
 
 Os marcadores de ação ficam em reserva; a região é escolhida ao preparar a carta. A preparação inclui compra, habilidades e leilão de liderança; as ações começam pelo líder e seguem em sentido anti-horário. As regras completas estão em [Regras gerais](../regras/regras-gerais.md). O [sistema anterior e os HTMLs legados](../historico/prototipos/alocacao-de-marcadores.md) estão arquivados e não serão atualizados.
 
@@ -14,7 +14,7 @@ O usuário adotou os baralhos revisados como esquema oficial após experimentar 
 
 O baralho do [Necromante](../faccoes/necromante.md) tem 12 cartas; Monumento a Morte custa 1 Madeira e Despertar para a Morte é uma magia. A Magia da Torre e o Alistamento Obrigatório estão implementados. O imposto imperial ativo e o atraso aparecem durante a vez do Império; a mão usa cinco cartas por padrão e pode ser ajustada. Custos, propostas e demais efeitos constam nos módulos de cada facção.
 
-Os [Elfos](../faccoes/elfos.md) têm 12 cartas e começam com duas tropas em cada uma das duas florestas, sem recursos. Vingança da Terra permanece implementada, e as tropas recebidas em trocas passam à facção recebedora. No mapa, R9 e R11 são costeiras e têm Ouro; R7 é montanha sem costa ou recurso.
+Os [Elfos](../faccoes/elfos.md) têm 12 cartas e começam com duas tropas em cada uma das duas florestas, sem recursos. Vingança da Terra permanece implementada, e as tropas recebidas em trocas passam à facção recebedora. No mapa, R4 é costeira e R11 é costeira com Ouro; R7 é montanha sem costa ou recurso.
 
 A mesa jogável mostra o mapa, a faixa de facções acima dele e a mão sobre a parte inferior. O símbolo de cada facção abre seu resumo e regras, incluindo o imposto e as tecnologias do Império. Preparação e liderança ocorrem em janelas sobre o mapa; o alistamento ainda permite selecionar uma região. As unidades usam meeples e as construções usam peças coloridas. As conexões ficam visíveis e as da região selecionada recebem destaque; as curvas tentam evitar regiões e cruzamentos. Em movimentos compatíveis, o mapa destaca e permite escolher origens ou destinos; quantidades e confirmação continuam no painel. Uma região inválida pode ser inspecionada sem alterar a escolha. O protótipo oferece tela cheia quando o navegador permite. Os arquivos opcionais de arte são configurados em `jogo/apresentacao/artes.js`. O estado e as hipóteses de pontuação estão em [Pontuação](../regras/pontuacao.md).
 
@@ -36,7 +36,7 @@ O Ouro dos Piratas permanece disponível para acordos durante a rodada. Na pontu
 
 - Invasão Costeira permite movimento sem saque para costa sem inimigos; Marcha Imperial também permite movimento sem combate quando não há inimigos. Ataques também podem atingir construções sem tropas defensoras, conforme [Combate](../regras/combate.md).
 - A conciliação de dano excedente está em [Combate](../regras/combate.md). As demais cartas defensivas continuam pendentes; Guarda Imperial é uma adaptação de teste.
-- A declaração do ataque e as reações são apresentadas em etapas sucessivas e gastam a carta e a ação na confirmação. Validação, transições, disponibilidade e consumo das reações, rolagem, baixas, saque e cálculo dos efeitos posteriores estão no motor; a apresentação e a orquestração continuam na aplicação.
+- A declaração do ataque gasta carta e ação; reações gastam somente a carta e são apresentadas em etapas sucessivas. Validação, transições, disponibilidade e consumo das reações, rolagem, baixas, saque e cálculo dos efeitos posteriores estão no motor; a apresentação e a orquestração continuam na aplicação.
 - Ajustes manuais de depuração podem criar estados intermediários e não simulam automaticamente a perda da Torre.
 - Não há salvamento, semente reproduzível, exportação de relatório ou métricas automáticas de equilíbrio.
 - Os testes incluem DOM substituto e Chromium automatizado com dados controlados; não comprovam acessibilidade completa, instalação em dispositivos físicos ou todas as combinações. O fluxo foi validado pelo usuário; o equilíbrio e outras interações continuam sujeitos a partidas e revisão.

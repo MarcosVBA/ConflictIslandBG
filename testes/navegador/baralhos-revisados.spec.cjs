@@ -24,15 +24,14 @@ test('variante local prepara modo, limpa seleção e resolve combate com reaçõ
   await page.locator('#handArea [data-card-index="1"]').click();
   await page.locator('[data-mode="0"]').click();
   await page.locator('[data-region="R4"]').click();
-  expect(await page.evaluate(() => !!mapChoice)).toBe(true);
-  await page.locator('#handArea [data-card-index="0"]').click();
+  await expect(page.locator('#actionDialog')).toBeVisible();
+  await page.locator('#cancelActionDialog').click();
   expect(await page.evaluate(() => mapChoice)).toBeNull();
+  await page.locator('#handArea [data-card-index="0"]').click();
   await expect(page.locator('#cardDetail')).toContainText('Pagar imposto');
   await page.locator('[data-mode="1"]').click();
-  await page.locator('[data-region="R1"]').click();
-  await expect(page.locator('#cardDetail')).toContainText('Pagamento de Impostos');
-  await page.locator('#map').click({position:{x:5,y:5}});
-  await expect(page.locator('#cardDetail')).toBeEmpty();
+  await expect(page.locator('#actionDialog')).toContainText('Pagamento de Impostos');
+  await page.locator('#cancelActionDialog').click();
   expect(await page.evaluate(() => flow.markers.filter(m => m.used).length)).toBe(0);
   await page.evaluate(() => {
     state=initial(); resources=initialResources(); game=newGame(); flow=newFlow();
@@ -51,7 +50,7 @@ test('variante local prepara modo, limpa seleção e resolve combate com reaçõ
   await page.locator('#rollBattle').click();
   expect(await page.evaluate(() => ({dice:battle.defenseDice.length, protection:battle.defProtection}))).toEqual({dice:0,protection:2});
   await page.locator('#applyBattle').click();
-  expect(await page.evaluate(() => ({turn:flow.turn, used:flow.markers.filter(m=>m.used).length, log:flow.log.join(' ')}))).toMatchObject({turn:1,used:4,log:expect.stringContaining('Saquear')});
+  expect(await page.evaluate(() => ({turn:flow.turn, used:flow.markers.filter(m=>m.used).length, log:flow.log.join(' ')}))).toMatchObject({turn:1,used:1,log:expect.stringContaining('Saquear')});
   expect(errors).toEqual([]);
 });
 
@@ -81,4 +80,72 @@ test('trocar carta cancela remanejamento e Milagre pode ser cancelado', async ({
   await page.locator('#cancelActionDialog').click();
   await expect(page.locator('#actionDialog')).toBeHidden();
   expect(await page.evaluate(() => ({cards:flow.decks.elfos.hand.length,used:flow.markers[0].used}))).toEqual({cards:1,used:false});
+});
+
+test('acordos limitam tropas e excluem aliado da defesa', async ({ page }) => {
+  await page.route(/^https?:/, route => route.abort());
+  await page.goto(url);
+  await page.evaluate(() => {
+    state=initial(); resources=initialResources(); game=newGame(); flow=newFlow();
+    flow.phase='resolução'; flow.order=['piratas','imperio','necromante','elfos'];
+    flow.markers=[{f:'piratas',region:null,used:false}];
+    flow.decks.piratas.hand=[{name:'Carta de Corsário / Serviço de Transporte Pirata'}];
+    state.R5.units.imperio=1; state.R5.units.elfos=1;
+    renderFlow();
+  });
+  await page.locator('#handArea [data-card-index="0"]').click();
+  await page.locator('[data-mode="0"]').click();
+  await page.locator('#corsairAlly').selectOption('imperio');
+  await page.locator('#corsairOrigin').selectOption('R5');
+  await page.locator('#destination').selectOption('R5');
+  await expect(page.locator('#attackDefender option[value="imperio"]')).toHaveCount(0);
+  await expect(page.locator('#attackDefender option[value="elfos"]')).toHaveCount(1);
+  await page.locator('#corsairAlly').selectOption('elfos');
+  await expect(page.locator('#attackDefender option[value="elfos"]')).toHaveCount(0);
+  await expect(page.locator('#attackDefender option[value="imperio"]')).toHaveCount(1);
+  await page.locator('#cancelActionDialog').click();
+  await page.locator('#handArea [data-card-index="0"]').click();
+  await page.locator('[data-mode="1"]').click();
+  await page.locator('#other').selectOption('imperio');
+  await page.locator('#transportOrigin').selectOption('R1');
+  await page.locator('#quantity').fill('2');
+  await page.locator('#transportOrigin').selectOption('R5');
+  await expect(page.locator('#quantity')).toHaveValue('1');
+  await page.locator('#other').selectOption('elfos');
+  await page.evaluate(() => { for (const region of Object.values(state)) region.units.elfos=0; });
+  await page.locator('#other').selectOption('necromante');
+  await page.locator('#other').selectOption('elfos');
+  await expect(page.locator('#quantity')).toBeDisabled();
+  await expect(page.locator('#quantity')).toHaveValue('0');
+});
+
+test('limites reagem à digitação e à troca de parceiro', async ({ page }) => {
+  await page.goto(url);
+  await page.evaluate(() => {
+    state=initial(); resources=initialResources(); game=newGame(); flow=newFlow();
+    flow.phase='resolução'; flow.order=['imperio','elfos','piratas','necromante'];
+    flow.markers=[{f:'imperio',region:'R4',used:false}];
+    flow.decks.imperio.hand=[{name:'Marcha Imperial',text:'Marcha'}];
+    state.R2.units.imperio=3;
+    showPlayableAction('imperio',0,0,experimentalModes['Marcha Imperial'][0]);
+  });
+  const origin = page.locator('#dialogContent input[id^="move-"]').first();
+  await origin.fill('99');
+  expect(Number(await origin.inputValue())).toBeLessThanOrEqual(Number(await origin.getAttribute('max')));
+  await page.evaluate(() => {
+    closeActionDialog(); state=initial(); resources=initialResources(); game=newGame(); flow=newFlow();
+    flow.phase='resolução'; flow.order=['elfos','imperio','piratas','necromante'];
+    flow.markers=[{f:'elfos',region:null,used:false}];
+    flow.decks.elfos.hand=[{name:'Fúria da Ilha / Harmonia',text:'Troca'}];
+    state.R1.units.imperio=2; state.R1.units.piratas=0;
+    renderFlow();
+    showPlayableAction('elfos',0,0,experimentalModes['Fúria da Ilha / Harmônia'][1]);
+  });
+  await page.locator('#other').selectOption('imperio');
+  await page.locator('#dialogContent details summary').click();
+  await page.locator('#takeFrom-R1').fill('2');
+  await expect(page.locator('#takeTo-R10')).toHaveAttribute('max','2');
+  await page.locator('#other').selectOption('piratas');
+  await expect(page.locator('#takeFrom-R1')).toHaveValue('0');
+  await expect(page.locator('#takeTo-R10')).toHaveAttribute('max','0');
 });

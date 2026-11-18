@@ -13,19 +13,104 @@ function isAttackCard(f, n) {
   return (attackNames[f] || []).includes(n);
 }
 let battle = null;
-function openActionDialog(required) {
+let minimizedDialog = null;
+let selectionBeforeMinimize = null;
+const resumeModalButton = document.createElement("button");
+resumeModalButton.type = "button";
+resumeModalButton.id = "resumeModal";
+resumeModalButton.hidden = true;
+document.body.appendChild(resumeModalButton);
+function minimizeDialog(dialog, label) {
+  if (!dialog.open) return;
+  selectionBeforeMinimize = selected;
+  minimizedDialog = dialog;
+  resumeModalButton.textContent = "Retomar " + label;
+  resumeModalButton.hidden = false;
+  dialog.close();
+  resumeModalButton.focus();
+}
+resumeModalButton.onclick = () => {
+  if (!minimizedDialog) return;
+  const dialog = minimizedDialog;
+  selected = selectionBeforeMinimize;
+  render();
+  dialog.showModal();
+  minimizedDialog = null;
+  resumeModalButton.hidden = true;
+  dialog.focus();
+};
+for (const eventName of ["click", "keydown", "input", "change"]) {
+  document.addEventListener(
+    eventName,
+    (event) => {
+      if (!minimizedDialog) return;
+      const target = event.target;
+      if (
+        target === resumeModalButton ||
+        target.closest?.("#mapArea, #toggleRegionInfo")
+      )
+        return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    },
+    true,
+  );
+}
+function ensureMinimizeButton(dialog, label) {
+  let button = dialog.querySelector(".minimize-modal");
+  if (!button) {
+    button = document.createElement("button");
+    button.type = "button";
+    button.className = "minimize-modal";
+    button.textContent = "Minimizar";
+    dialog.prepend(button);
+  }
+  button.onclick = () => minimizeDialog(dialog, label);
+}
+
+function openActionDialog(required, nonModal = false) {
   const dialog = $("actionDialog");
+  const panel = $("dialogContent");
+  if (!panel.numericLimits && typeof panel.addEventListener === "function") {
+    panel.addEventListener(
+      "input",
+      (event) => {
+        const input = event.target;
+        if (input.type !== "number" || input.value === "") return;
+        const min = Number(input.min || 0);
+        const max = Number(input.max || Number.MAX_SAFE_INTEGER);
+        input.value = Math.max(
+          min,
+          Math.min(max, Math.floor(Number(input.value) || 0)),
+        );
+      },
+      true,
+    );
+    panel.numericLimits = true;
+  }
+  if (dialog.open && dialog.classList.contains("nonmodal") !== nonModal)
+    dialog.close();
+  dialog.classList.toggle("nonmodal", nonModal);
+  if (!required) dialog.querySelector(".minimize-modal")?.remove();
   dialog.oncancel = (event) => {
     if (required) event.preventDefault();
   };
   dialog.onclose = () => {
-    if (!dialog.open) {
+    if (!dialog.open && minimizedDialog !== dialog) {
       $("dialogContent").innerHTML = "";
-      if (!battle) preparedMode = null;
+      if (!battle) {
+        if (dialog.classList.contains("nonmodal")) render();
+        preparedMode = null;
+        setMapChoice(null);
+        for (const marker of flow.markers)
+          if (!marker.used) marker.region = null;
+      }
     }
   };
-  if (typeof dialog.showModal === "function" && !dialog.open)
-    dialog.showModal();
+  if (!dialog.open) {
+    if (nonModal && typeof dialog.show === "function") dialog.show();
+    else if (typeof dialog.showModal === "function") dialog.showModal();
+  }
 }
 function closeActionDialog() {
   const dialog = $("actionDialog");
@@ -69,7 +154,8 @@ function battleDamage(
   );
 }
 function diceRow(label, dice) {
-  if (!dice.length) return `<p>${label}: nenhum dado.</p>`;
+  if (!dice.length)
+    return `<div class="dice-row"><strong>${label}</strong><p>Nenhum dado de defesa.</p></div>`;
   return `<div class="dice-row"><strong>${label}</strong><div class="dice-tray">${dice.map(([swords, crosses]) => `<span class="game-die" role="img" aria-label="${swords} espadas, ${crosses} cruzes">${"⚔".repeat(swords)}${"✚".repeat(crosses)}${!swords && !crosses ? "—" : ""}</span>`).join("")}</div></div>`;
 }
 function buildingPieces(s, f) {
@@ -95,28 +181,27 @@ function lootGold(res, defender, amount) {
   Object.assign(res.piratas, result.recursos.piratas);
   return result.origens;
 }
-function showAuctionHand(f, hand, committed) {
+function showAuctionHand(f, hand, committed, selected, updateTotal) {
   const area = $("handArea");
   area.hidden = false;
   area.setAttribute("data-faction", f);
-  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><div><strong>Lance de ${names[f]}</strong> <small>· selecione cartas para acrescentar</small></div></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]} para o leilão">${hand.map((c, i) => handCard(f, c, i, hand.length)).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>`;
+  area.innerHTML = `<div class="hand-content"><div class="hand-heading"><strong>Lance de ${names[f]} · selecione cartas para acrescentar</strong></div><div class="hand-wrap"><div class="hand" aria-label="Cartas de ${names[f]} para o leilão">${hand.map((c, i) => handCard(f, c, i, hand.length)).join("") || '<p class="hand-empty">Nenhuma carta na mão.</p>'}</div></div></div>`;
   renderFactionStatus(f);
   area.querySelectorAll("[data-card-index]").forEach((button) => {
     const i = Number(button.dataset.cardIndex);
     if (committed.has(i)) {
       button.disabled = true;
-      button.classList.add("chosen");
+      button.classList.add("bid-selected");
       button.setAttribute("aria-pressed", "true");
       return;
     }
+    button.setAttribute("aria-pressed", "false");
     button.onclick = () => {
-      const checkbox = $("bid-" + i);
-      checkbox.checked = !checkbox.checked;
-      checkbox.onchange();
-    };
-    button.syncBid = (checked) => {
-      button.classList.toggle("chosen", checked);
-      button.setAttribute("aria-pressed", checked);
+      if (selected.has(i)) selected.delete(i);
+      else selected.add(i);
+      button.classList.toggle("bid-selected", selected.has(i));
+      button.setAttribute("aria-pressed", String(selected.has(i)));
+      updateTotal();
     };
   });
 }
@@ -144,12 +229,19 @@ function consumeActionCard(f, markerIndex, cardIndex, expected) {
 function commitBattleCard(f, markerIndex, cardIndex, expected) {
   consumeActionCard(f, markerIndex, cardIndex, expected);
 }
+function commitReactionCard(f, markerIndex, cardIndex, expected) {
+  const deck = flow.decks[f];
+  const card = deck.hand[cardIndex];
+  if (!card || card.name !== expected) throw Error("Carta indisponível.");
+  deck.discard.push(deck.hand.splice(cardIndex, 1)[0]);
+}
 function renderBattle() {
   if (!battle) return;
   const b = battle,
     s = state[b.region],
     panel = $("dialogContent");
   openActionDialog(true);
+  ensureMinimizeButton($("actionDialog"), "combate");
   if (b.stage === "reaction" && !b.attackCommitted) {
     try {
       commitBattleCard(b.f, b.mi, b.ci, b.physicalCard || b.card);
@@ -186,9 +278,9 @@ function renderBattle() {
     if (available) {
       showBattleHand("piratas");
       const defenseCount = Math.max(0, s.units[b.defender] - s.units.piratas);
-      panel.innerHTML = `<h3>Vento a Favor</h3><p>Gaste uma carta e uma ação em um dos modos.</p>${defenseCount ? '<button id="suppressDefense">Descartar dados de defesa</button>' : ""}<button id="extraLoot">Recolher mais espólios</button><button id="skipWind">Não usar</button>`;
+      panel.innerHTML = `<h3>Vento a Favor</h3><p>Descarte a carta para usar um dos modos.</p>${defenseCount ? '<button id="suppressDefense">Descartar dados de defesa</button>' : ""}<button id="extraLoot">Recolher mais espólios</button><button id="skipWind">Não usar</button>`;
       const choose = (kind) => {
-        commitBattleCard(
+        commitReactionCard(
           "piratas",
           available.acao,
           available.carta,
@@ -231,7 +323,7 @@ function renderBattle() {
       showBattleHand("elfos");
       panel.innerHTML = `<h3>Reação do atacante</h3><p>Gaste outra ação para ignorar o primeiro dano neste combate.</p><button id="useAttackDefense">Usar Conhecimentos da Floresta</button><button id="skipAttackDefense">Não usar</button>`;
       $("useAttackDefense").onclick = () => {
-        commitBattleCard(
+        commitReactionCard(
           "elfos",
           available.acao,
           available.carta,
@@ -279,7 +371,7 @@ function renderBattle() {
       $("useDefense").onclick = () => {
         if (battle !== b || b.stage !== "reaction") return;
         try {
-          commitBattleCard(b.defender, markerIndex, cardIndex, defenseName);
+          commitReactionCard(b.defender, markerIndex, cardIndex, defenseName);
           Object.assign(
             b,
             ConflictIslandBase.decidirReacao(b, "defesa", {
@@ -315,9 +407,9 @@ function renderBattle() {
         return;
       }
       showBattleHand("elfos");
-      panel.innerHTML = `<h3>Defesa Global</h3><p>Os Elfos podem gastar uma ação e proteger um lado com tropas.</p>${s.units[b.f] ? `<button id="protectAttacker">Proteger ${names[b.f]}</button>` : ""}${s.units[b.defender] ? `<button id="protectDefender">Proteger ${names[b.defender]}</button>` : ""}<button id="skipGlobal">Não usar</button>`;
+      panel.innerHTML = `<h3>Defesa Global</h3><p>Os Elfos podem descartar a carta para proteger um lado com tropas.</p>${s.units[b.f] ? `<button id="protectAttacker">Proteger ${names[b.f]}</button>` : ""}${s.units[b.defender] ? `<button id="protectDefender">Proteger ${names[b.defender]}</button>` : ""}<button id="skipGlobal">Não usar</button>`;
       const protect = (side) => {
-        commitBattleCard(
+        commitReactionCard(
           "elfos",
           available.acao,
           available.carta,
@@ -360,7 +452,7 @@ function renderBattle() {
       $("usePeace").onclick = () => {
         if (battle !== b || b.stage !== "peace") return;
         try {
-          commitBattleCard("elfos", markerIndex, cardIndex, "Canção de paz");
+          commitReactionCard("elfos", markerIndex, cardIndex, "Canção de paz");
           Object.assign(
             b,
             ConflictIslandBase.decidirReacao(b, "paz", { marker: markerIndex }),
@@ -430,7 +522,7 @@ function renderBattle() {
   }
   const result = b.result,
     face = (x) => `⚔ ${x[0]} / ✚ ${x[1]}`;
-  panel.innerHTML = `<h3>Resultado da única rolagem</h3>${b.peace ? "<p>Canção de paz: combate cancelado com resultado 0 a 0. Movimentos e custos já realizados permanecem.</p>" : ""}${b.peace ? "" : diceRow("Dados de ataque", b.attackDice) + diceRow("Dados de defesa", b.defenseDice)}<p>Espadas: ${result.swords}; cruzes: ${result.crosses}. Dano ignorado pelo atacante: ${result.attProtected}; pelo defensor: ${result.defProtected}.</p><p>Baixas simultâneas: ${result.attackerLoss} de ${names[b.f]} e ${result.defenderLoss} de ${names[b.defender]}; dano excedente: ${result.overflow}. Destruir ${b.destroy} construção(ões) do defensor.</p>${b.destroy ? "<fieldset><legend>Escolha exatamente " + b.destroy + " construção(ões) atingidas</legend>" + b.pieces.map((x, i) => `<label style="display:block"><input type="checkbox" class="destroyBuilding" value="${i}" ${b.destroy === b.pieces.length ? "checked" : ""}> ${x.label}</label>`).join("") + "</fieldset>" : ""}${b.card === "Marcha Imperial" && hasTech("Fortaleza") && !b.rerolled && !b.peace ? '<label>Dado para rerrolar <select id="rerollDie">' + b.attackDice.map((x, i) => `<option value="a${i}">Ataque ${i + 1}: ${face(x)}</option>`).join("") + b.defenseDice.map((x, i) => `<option value="d${i}">Defesa ${i + 1}: ${face(x)}</option>`).join("") + '</select></label><button id="rerollBattle">Rerrolar um dado</button>' : ""}<p class="notice">A rolagem já foi feita. Aplique o resultado antes de continuar; escolha as construções se houver alternativas.</p><button id="applyBattle">Aplicar resultado e concluir ação</button><p id="battleError" role="status"></p>`;
+  panel.innerHTML = `<div class="battle-result-heading"><small>COMBATE · RESULTADO</small><h3>O destino foi lançado</h3></div>${b.peace ? "<p>Canção de paz: combate cancelado com resultado 0 a 0. Movimentos e custos já realizados permanecem.</p>" : ""}${b.peace ? "" : diceRow("Dados de ataque", b.attackDice) + diceRow("Dados de defesa", b.defenseDice)}<div class="battle-result-summary"><p><strong>${result.swords} espadas · ${result.crosses} cruzes</strong></p><p>Dano ignorado pelo atacante: ${result.attProtected}; pelo defensor: ${result.defProtected}.</p><p>Baixas simultâneas: ${result.attackerLoss} de ${names[b.f]} e ${result.defenderLoss} de ${names[b.defender]}; dano excedente: ${result.overflow}. Destruir ${b.destroy} construção(ões) do defensor.</p></div>${b.destroy ? "<fieldset><legend>Escolha exatamente " + b.destroy + " construção(ões) atingidas</legend>" + b.pieces.map((x, i) => `<label style="display:block"><input type="checkbox" class="destroyBuilding" value="${i}" ${b.destroy === b.pieces.length ? "checked" : ""}> ${x.label}</label>`).join("") + "</fieldset>" : ""}${b.card === "Marcha Imperial" && hasTech("Fortaleza") && !b.rerolled && !b.peace ? '<label>Dado para rerrolar <select id="rerollDie">' + b.attackDice.map((x, i) => `<option value="a${i}">Ataque ${i + 1}: ${face(x)}</option>`).join("") + b.defenseDice.map((x, i) => `<option value="d${i}">Defesa ${i + 1}: ${face(x)}</option>`).join("") + '</select></label><button id="rerollBattle">Rerrolar um dado</button>' : ""}<p class="notice">A rolagem já foi feita. Aplique o resultado antes de continuar; escolha as construções se houver alternativas.</p><button id="applyBattle">Aplicar resultado e concluir ação</button><p id="battleError" role="status"></p>`;
   if (
     b.card === "Marcha Imperial" &&
     hasTech("Fortaleza") &&
@@ -463,6 +555,17 @@ function renderBattle() {
       b.destroy = Math.min(b.result.overflow, b.pieces.length);
       renderBattle();
     };
+  if (b.destroy) {
+    const choices = Array.from(panel.querySelectorAll(".destroyBuilding"));
+    const updateChoices = () => {
+      const selected = choices.filter((choice) => choice.checked).length;
+      for (const choice of choices)
+        choice.disabled = !choice.checked && selected >= b.destroy;
+      $("applyBattle").disabled = selected !== b.destroy;
+    };
+    for (const choice of choices) choice.onchange = updateChoices;
+    updateChoices();
+  }
   $("applyBattle").onclick = () => {
     if (battle !== b || b.stage !== "result") return;
     if (

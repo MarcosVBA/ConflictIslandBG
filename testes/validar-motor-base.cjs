@@ -27,7 +27,7 @@ pirata.regiao.bar=true;assert.throws(()=>motor.cartaLocal('Taverna Pirata','pira
 const outraCosta=regiao();outraCosta.units.piratas=1;const bares={R5:pirata.regiao,R8:outraCosta};assert.throws(()=>motor.cartaLocal('Taverna Pirata','piratas',outraCosta,{ouro:0,madeira:0},bares,'Ouro'),/Limite de um Bar/);pirata.regiao.units.piratas=0;pirata.regiao.units.imperio=1;assert.throws(()=>motor.cartaLocal('Taverna Pirata','piratas',outraCosta,{ouro:0,madeira:0},bares,'Ouro'),/Limite de um Bar/);pirata.regiao.bar=false;assert.equal(motor.cartaLocal('Taverna Pirata','piratas',outraCosta,{ouro:0,madeira:0},bares,'Ouro').regiao.bar,true);
 
 const coletaRegioes=[{id:'a',resource:'Madeira'},{id:'b',resource:'Ouro'},{id:'c',resource:'Sem recurso'}],coletaMapa={a:regiao(),b:regiao(),c:regiao()};coletaMapa.a.units.elfos=1;coletaMapa.b.units.elfos=1;coletaMapa.b.units.imperio=2;coletaMapa.c.units.elfos=1;
-assert.deepEqual(motor.coletaDeCartas('Frutos da Mata',coletaRegioes,coletaMapa,'a',{ouro:0,madeira:0}),{ouro:1,madeira:1});assert.deepEqual(motor.coletaDeCartas('Frutos da Mata',coletaRegioes,coletaMapa,'b',{ouro:0,madeira:0}),{ouro:1,madeira:1});assert.throws(()=>motor.coletaDeCartas('Frutos da Mata',coletaRegioes,{...coletaMapa,c:regiao()},'c',{ouro:0,madeira:0}),/tropas élficas/);
+assert.deepEqual(motor.coletaDeCartas('Frutos da Mata',coletaRegioes,coletaMapa,'a',{ouro:0,madeira:0}),{ouro:1,madeira:1});assert.deepEqual(motor.coletaDeCartas('Frutos da Mata',coletaRegioes,coletaMapa,'b',{ouro:0,madeira:0}),{ouro:1,madeira:1});assert.deepEqual(motor.coletaDeCartas('Frutos da Mata',coletaRegioes,coletaMapa,null,{ouro:0,madeira:0}),{ouro:1,madeira:1});
 coletaMapa.a.extractor=true;coletaMapa.b.extractor=true;coletaMapa.c.extractor=true;assert.deepEqual(motor.coletaDeCartas('Trabalhadores Zumbificado',coletaRegioes,coletaMapa,'a',{ouro:0,madeira:1}),{ouro:1,madeira:2});
 assert.deepEqual(motor.movimentoDeCarta('Trilhas na Mata','elfos',coletaMapa,[['a','b']],'a','b',1),{origem:0,destino:2});assert.equal(coletaMapa.a.units.elfos,1);assert.throws(()=>motor.movimentoDeCarta('Trilhas na Mata','elfos',coletaMapa,[],'a','b',1),/adjacente/);
 const movimentoPirata={a:regiao(),b:regiao()};movimentoPirata.a.units.piratas=4;assert.deepEqual(motor.movimentoDeCarta('Atrás do Tesouro','piratas',movimentoPirata,[['a','b']],'a','b',3),{origem:1,destino:3});assert.throws(()=>motor.movimentoDeCarta('Atrás do Tesouro','piratas',movimentoPirata,[['a','b']],'a','b',4),/adjacente/);
@@ -61,7 +61,7 @@ assert.deepEqual(motor.proximaFacção(ordem,0,markers),{faccao:'piratas',indice
 const deck={draw:['a'],hand:['b'],discard:['c','d']};const resultado=motor.comprarAte(deck,4,c=>c.reverse());assert.deepEqual(resultado.hand,['b','a','c','d']);assert.deepEqual(deck,{draw:['a'],hand:['b'],discard:['c','d']});
 const acoes=[{f:'elfos',used:false}],baralho={hand:[{name:'Canção de paz'}],discard:[]};
 const gasto=motor.consumirCarta(acoes,baralho,'elfos',0,0,'Canção de paz');assert.equal(gasto.marcadores[0].used,true);assert.equal(gasto.baralho.hand.length,0);assert.equal(gasto.baralho.discard[0].name,'Canção de paz');assert.equal(acoes[0].used,false);assert.equal(baralho.hand.length,1);
-assert.deepEqual(motor.reacaoDisponivel(acoes,baralho,'elfos','Canção de paz'),{acao:0,carta:0});assert.equal(motor.reacaoDisponivel(gasto.marcadores,baralho,'elfos','Canção de paz'),null);assert.equal(motor.reacaoDisponivel(acoes,baralho,'elfos','Outra'),null);
+assert.deepEqual(motor.reacaoDisponivel(acoes,baralho,'elfos','Canção de paz'),{acao:0,carta:0});assert.deepEqual(motor.reacaoDisponivel(gasto.marcadores,baralho,'elfos','Canção de paz'),{acao:-1,carta:0});assert.equal(motor.reacaoDisponivel(acoes,baralho,'elfos','Outra'),null);
 assert.throws(()=>motor.consumirCarta(acoes,baralho,'imperio',0,0,'Canção de paz'),/indisponível/);assert.throws(()=>motor.consumirCarta(acoes,baralho,'elfos',0,0,'Outra'),/indisponível/);
 const dados=motor.calcularDano(3,1,[[2,1],[2,1],[1,1]],[],0,2);assert.equal(dados.defenderLoss,1);assert.equal(dados.attackerLoss,1);assert.equal(dados.overflow,3);
 assert.deepEqual(motor.rolarDados(2,[[0,0],[1,1]],()=>.99),[[1,1],[1,1]]);assert.throws(()=>motor.rolarDados(1,[[0,0]],()=>1),/aleatória inválida/);
@@ -82,3 +82,27 @@ assert.deepEqual(baralhos.necromante.hand,['c','d','e']);assert.deepEqual(baralh
 const semLances=motor.encerrarLeilao({leader:null,offers:{}},['imperio','necromante'],baralhos);assert.equal(semLances.vencedor,'imperio');assert.deepEqual(semLances.baralhos.imperio.hand,['a','b']);
 assert.throws(()=>motor.encerrarLeilao({leader:'necromante',offers:{necromante:[0,0]}},['imperio','necromante'],baralhos),/Oferta inválida/);
 console.log('Motor independente: domínio, construções, devastação, vizinhança e recursos verificados.');
+
+// Recrutamento em Bar e floresta não devastada, inclusive sob domínio adversário.
+const barRecruta = regiao();
+barRecruta.bar = true;
+barRecruta.units.piratas = 1;
+assert.equal(motor.cartaLocal('Pirata Aprendiz', 'piratas', barRecruta, {ouro:0,madeira:0}, {R5:barRecruta}, 'Sem recurso').regiao.units.piratas, 3);
+const florestaAdversa = regiao();
+florestaAdversa.units.imperio = 1;
+assert.equal(motor.filhosDaFloresta({a:florestaAdversa}, 'a', {ouro:1,madeira:0}, 'ouro', 'a', 'floresta').mapa.a.units.elfos, 1);
+const florestaDevastada = regiao();
+florestaDevastada.units.necromante = 1;
+assert.throws(() => motor.filhosDaFloresta({a:florestaDevastada}, 'a', {ouro:1,madeira:0}, 'ouro', 'a', 'floresta'), /não devastada/);
+const furiaLocal = regiao();
+furiaLocal.units.elfos = 1;
+furiaLocal.units.imperio = 1;
+assert.equal(motor.validarFuria({a:furiaLocal}, [], 'a', 'a', 0, 'imperio').hasEnemy, true);
+const furiaVazia = regiao();
+assert.throws(() => motor.validarFuria({a:furiaLocal,b:furiaVazia}, [['a','b']], 'a', 'b', 1, 'imperio'), /defensor/);
+const mapaMovimento = {a:regiao(),b:regiao()};
+mapaMovimento.a.units.piratas = 5;
+const regioesMovimento = [{id:'a',coast:false},{id:'b',coast:false}];
+assert.equal(motor.validarAtaque(mapaMovimento, regioesMovimento, [['a','b']], {}, 'piratas', 'Invasão Costeira', 'b', 'elfos', [{id:'a',n:5}], 'move').total, 5);
+mapaMovimento.a.units.necromante = 2;
+assert.equal(motor.validarAtaque(mapaMovimento, regioesMovimento, [['a','b']], {}, 'necromante', 'Infestação', 'b', 'elfos', [{id:'a',n:2}]).hasEnemy, false);

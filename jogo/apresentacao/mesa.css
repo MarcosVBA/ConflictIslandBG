@@ -187,3 +187,37 @@ body>header small{display:block;line-height:1.1}
   .region .region-top{margin-top:3px}.region .region-top strong{font-size:13px}
   .region .region-meta{margin-top:4px}.region .region-pieces{min-height:30px;margin-top:4px}
 }
+
+.region .devastated-icon{display:inline-flex;align-items:center;justify-content:center;font-size:22px;line-height:1;color:#b593d2;text-shadow:0 0 3px #241238}
+
+.amount-field{display:block;margin:.5rem 0}.amount-controls{display:inline-flex;align-items:center;gap:.25rem}.amount-controls input{width:4rem;text-align:center}.amount-controls button{min-width:2.2rem}
+
+.action-dialog.nonmodal[open]{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);z-index:30}
+
+/* Peças e recursos usam o mesmo suporte circular no mapa. */
+.region .troop-meeple,.region .region-buildings .building-icon,.region .devastated-icon,.region .resource-token{display:inline-flex!important;align-items:center;justify-content:center;box-sizing:border-box;width:20px;height:20px;flex:none;border:1px solid currentColor;border-radius:50%;background:#172620;line-height:1}
+.region .troop-meeple svg,.region .resource-token svg{width:14px;height:14px}
+.region .region-buildings .building-icon,.region .devastated-icon{font-size:15px}
+.amount-field{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem}
+.amount-controls{vertical-align:middle}
+.action-dialog .amount-controls button,.amount-controls input{box-sizing:border-box;height:2.4rem;margin:0}
+
+/* A faixa identifica o domínio sem depender da cor do terreno. */
+.region{border-left:5px solid #a8b5aa}
+.region.imperio{border-left-color:#e0b357}.region.necromante{border-left-color:#c29ae2}.region.piratas{border-left-color:#ef8f80}.region.elfos{border-left-color:#7cddba}.region.contested{border-left-color:#f2e1aa;border-left-style:dashed}
+.region.imperio .region-meta{color:#f4d286}.region.necromante .region-meta{color:#e0bdf6}.region.piratas .region-meta{color:#ffb5aa}.region.elfos .region-meta{color:#a7f3d7}.region.contested .region-meta{color:#fff0bf}
+
+/* Resultados permanecem visíveis até a confirmação do jogador. */
+.battle-result-heading small,.round-score>small{color:#dfc77f;font-size:.65rem;font-weight:800;letter-spacing:.18em}
+.battle-result-heading h3,.round-score h3{font:1.65rem Georgia,serif;color:#f1e5c8;margin:.45rem 0 .8rem}
+.dice-row{margin:1rem 0}.dice-row strong{font-size:.8rem;color:#cbd5c4;letter-spacing:.04em}
+.dice-tray{gap:.65rem;margin-top:.5rem}.game-die{width:3.8rem;height:3.8rem;padding:.25rem;background:#eee1c3;border:2px solid #aa9163;border-radius:.45rem;color:#253329;box-shadow:inset 0 0 0 2px #f9f1d9,0 3px #56452e;font-size:1.35rem}
+.battle-result-summary{margin:1rem 0;padding:.75rem 1rem;border-left:2px solid #dec276;background:#0d1c18}.battle-result-summary p{margin:.25rem 0}
+.round-score-list{display:grid;gap:.45rem;margin:1rem 0}.round-score-row{display:grid;grid-template-columns:minmax(5rem,1fr) auto auto;gap:.6rem;align-items:center;padding:.65rem .75rem;background:#10221d;border-left:3px solid #c5b77e}.round-score-row.imperio{border-color:#e0b357}.round-score-row.necromante{border-color:#b593d2}.round-score-row.piratas{border-color:#d88073}.round-score-row.elfos{border-color:#7cc9ae}.round-score-row span{font-size:.8rem;color:#c4d0c1}.round-score-row b{color:#f2dfb2}.round-score label{display:block;margin:.4rem 0}
+@media(max-width:480px){.round-score-row{grid-template-columns:1fr auto}.round-score-row span{grid-column:1;grid-row:2}.round-score-row b{grid-column:2;grid-row:1 / 3}.game-die{width:3.25rem;height:3.25rem}}
+
+/* Moldura interna dos modais, como no conceito da mesa. */
+.action-dialog,.phase-dialog{outline:1px solid #bbaa7260;outline-offset:-7px}
+
+.hand-area .hand-card.bid-selected{outline:3px solid #f45b5b;outline-offset:-3px;background:#a52f35;box-shadow:0 0 0 2px #f45b5b}
+.minimize-modal{float:right;margin:0 0 .5rem .75rem}#resumeModal{position:fixed;z-index:100;top:1rem;right:1rem;background:#e1c078;color:#10221d;font-weight:700;padding:.7rem 1rem}#resumeModal[hidden]{display:none}

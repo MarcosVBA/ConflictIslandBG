@@ -22,7 +22,7 @@ click('reset');run("state.R1.units.imperio=7");set('handSize',5);set('orderChoic
 run("game=newGame();game.taxes=[];game.taxDiscard=[{g:1,w:0,s:0,p:2}];game.tax={g:0,w:1,s:0,p:3};replaceTax()");
 check("game.tax!==null&&game.taxes.length===1&&game.taxDiscard.length===0");
 // O Salão pode trocar o último imposto do monte usando o descarte reembaralhado.
-run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=factionIds.slice();flow.turn=0;flow.markers=[{f:'imperio',region:null,used:false}];state.R2.tech='Salão Imperial';resources.imperio.ouro=2;game.tax={g:0,w:1,s:0,p:3};game.taxes=[];game.taxDiscard=[{g:1,w:0,s:0,p:2}];renderFlow()");
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=factionIds.slice();flow.turn=0;flow.markers=[{f:'imperio',region:null,used:false}];flow.decks.imperio.hand=[{name:'Marcha Imperial'}];state.R2.tech='Salão Imperial';resources.imperio.ouro=2;game.tax={g:0,w:1,s:0,p:3};game.taxes=[];game.taxDiscard=[{g:1,w:0,s:0,p:2}];renderFlow()");
 assert(element('flow').innerHTML.includes('id=\"hallChange\"'),'Salão deve estar disponível com descarte para reembaralhar.');set('hallResource','ouro');click('hallChange');check("game.tax!==null&&game.hallUsedRound===flow.round&&resources.imperio.ouro===1&&game.taxDiscard.length===0");
 // Perda de controle remove tropas e construções e preserva só a Torre e seus dois zumbis.
 run("state=initial();state.R4.monument=true;state.R4.units.imperio=2;state.R3.units.imperio=2;state.R3.tech='Serraria';state.R3.bar=true;state.R3.buildings.piratas=1");
@@ -30,7 +30,7 @@ check("restoreTowerIfLost()&&state.R3.tower&&state.R3.units.necromante===2&&stat
 // Uma tecnologia continua concedendo seu efeito mesmo sem domínio imperial.
 run("state=initial();resources=initialResources();game=newGame();state.R2.tech='Serraria';state.R2.units.imperio=0;state.R2.units.elfos=2;flow.decks.imperio.hand=[{name:'Assegurar Recursos para o Rei'}];state.R1.units.imperio=1");
 check("hasTech('Serraria')&&calcOwner(state.R2)!=='imperio'");
-set('extra',0);run("state.R1.tech='Mercado Local';state.R1.units.imperio=0;state.R1.units.piratas=2;state.R9.units.imperio=1;executeCard('imperio','Assegurar Recursos para o Rei','R9',0)");
+set('extra',0);run("state.R1.tech='Mercado Local';state.R1.units.imperio=0;state.R1.units.piratas=2;state.R11.units.imperio=1;executeCard('imperio','Assegurar Recursos para o Rei','R11',0)");
 check("resources.imperio.ouro===3");
 // Pré-requisito existente em região não dominada permite construir tecnologia.
 run("state=initial();resources.imperio={ouro:10,madeira:10};game=newGame();state.R2.tech='Serraria';state.R2.units.imperio=0;state.R2.units.elfos=2;state.R6.units.imperio=1");
@@ -39,7 +39,7 @@ set('tech','Mercado Local');run("executeCard('imperio','O Progresso','R6',0)");c
 run("state=initial();resources.imperio={ouro:10,madeira:10};state.R6.units.imperio=1;state.R6.units.necromante=2");set('tech','Serraria');
 run("executeCard('imperio','O Progresso','R6',0)");check("state.R6.tech==='Serraria'");
 set('extra',0);run("flow.decks.imperio.hand=[{name:'Assegurar Recursos para o Rei'}];state.R6.units.imperio=0;executeCard('imperio','Assegurar Recursos para o Rei','R6',0)");
-check("(()=>{try{executeCard('imperio','Assegurar Recursos para o Rei','R9',0);return false}catch(e){return true}})()");
+check("(()=>{try{executeCard('imperio','Assegurar Recursos para o Rei','R11',0);return false}catch(e){return true}})()");
 // Movimento para a Torre pode disparar seu efeito antes da batalha.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=factionIds.slice();flow.turn=0;flow.markers=[{f:'imperio',region:'R3',used:false}];flow.decks.imperio.hand=[{name:'Tambores de Guerra',text:'Ataque'}];state.R4.units.imperio=2;showAttackMovement('imperio',0,0)");
 set('attackDefender','necromante');set('move-R4',2);click('prepareAttack');

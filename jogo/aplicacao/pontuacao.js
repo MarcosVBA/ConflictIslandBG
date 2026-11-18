@@ -13,6 +13,7 @@ function newGame() {
     taxPaid: false,
     hallUsedRound: 0,
     scoreLog: [],
+    roundScoreDelta: {},
     scored: 0,
     elfTrades: {},
     imperialRecruitRound: 0,
@@ -143,7 +144,11 @@ function beginScoring() {
     candidates = options.candidatas.map((id) => ({ id })),
     resourceTie = overdue && options.recursos.length === 2;
   const finish = (id, type) => {
+    const before = { ...game.score };
     scoreRound(id, type);
+    game.roundScoreDelta = Object.fromEntries(
+      factionIds.map((f) => [f, game.score[f] - before[f]]),
+    );
     flow.phase = game.winner ? "fim" : "pontuação";
     $("flowMessage").textContent = "";
     render();
@@ -162,7 +167,7 @@ function beginScoring() {
   } else finish(candidates[0]?.id || null, null);
 }
 function scoreView() {
-  return `<p>Pontuação da rodada aplicada. Prepare a próxima rodada.</p><button id="nextRound">Próxima rodada</button>`;
+  return `<section class="round-score"><small>FIM DA RODADA ${flow.round}</small><h3>Pontuação da rodada</h3><div class="round-score-list">${factionIds.map((f) => `<div class="round-score-row ${f}"><strong>${names[f]}</strong><span>+${game.roundScoreDelta?.[f] ?? 0} nesta pontuação</span><b>${game.score[f]} pontos</b></div>`).join("")}</div><p>Cada facção pode descartar toda a mão antes da próxima rodada.</p>${factionIds.map((f) => `<label><input type="checkbox" id="discardRemaining-${f}"> ${names[f]} · descartar ${flow.decks[f].hand.length} carta(s)</label>`).join("")}<button id="nextRound">Próxima rodada</button></section>`;
 }
 function endView() {
   const max = game.winner

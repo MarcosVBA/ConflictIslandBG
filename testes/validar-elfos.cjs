@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8');
 const harness = source.split('// Links dos módulos atuais')[0];
 const scenario = String.raw`
-check("definitions.length===11&&edges.length===18&&factionIds.length===4&&cardDefs.elfos.reduce((n,c)=>n+c[1],0)===12");
+check("definitions.length===10&&edges.length===16&&factionIds.length===4&&cardDefs.elfos.reduce((n,c)=>n+c[1],0)===12");
 check("state.R6.units.elfos===2&&state.R10.units.elfos===2&&state.R3.tower&&resources.elfos.ouro===0&&resources.elfos.madeira===0");
 run("scoreRound()");check("game.score.elfos===1");run("scoreRound()");check("game.score.elfos===1");
 run("flow.round=2;state.R2.units.imperio=0;state.R2.units.elfos=1;state.R4.units.necromante=0;state.R4.units.elfos=1;scoreRound()");check("game.score.elfos===3");

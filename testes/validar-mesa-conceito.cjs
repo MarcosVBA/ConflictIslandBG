@@ -31,11 +31,11 @@ const map=get('map'),overlay=get('overlay');overlay.hidden=true;
 const listeners={};const document={getElementById:get,createElement:()=>new Element(),documentElement:new Element(),activeElement:null,contains:()=>true,addEventListener:(name,fn)=>{listeners[name]=fn},fullscreenElement:null};
 const context={document,Math,clearTimeout(){},setTimeout(){return 1},console};vm.createContext(context);vm.runInContext(script,context);
 const run=code=>vm.runInContext(code,context);
-assert.equal(map.children.length,11);
-assert.equal(run('edges.length'),18);
+assert.equal(map.children.length,10);
+assert.equal(run('edges.length'),16);
 const principal = fs.readFileSync(path.join(__dirname, '../mapa-fluxo-dinamico.html'), 'utf8');
 assert.equal(source.match(/const edges=\[[^\n]+/)[0], principal.match(/const edges=\[[^\n]+/)[0], 'O mapa visual deve usar as conexões do protótipo jogável.');
-assert.equal((get('connections').innerHTML.match(/<path /g)||[]).length,18,'Todas as conexões devem estar visíveis.');
+assert.equal((get('connections').innerHTML.match(/<path /g)||[]).length,16,'Todas as conexões devem estar visíveis.');
 assert.equal((get('connections').innerHTML.match(/class="connection-active"/g)||[]).length,0);
 assert.equal(run("edges.some(([a,b])=>[a,b].includes('R3')&&[a,b].includes('R7'))"),false);
 assert.equal(run("edges.some(([a,b])=>[a,b].includes('R9')&&[a,b].includes('R11'))"),false);
@@ -51,7 +51,7 @@ function factionColor(id){return run(`factions.${id}.color`)}
 assert(region('R3').innerHTML.includes('building-token') && region('R3').attributes['aria-label'].includes('Torre Esquecida de Necromante'));
 assert(region('R4').innerHTML.includes('building-token') && region('R4').attributes['aria-label'].includes('Extrator de Necromante'));
 assert(region('R3').innerHTML.includes(factionColor('necromante')) && region('R4').innerHTML.includes(factionColor('necromante')),'Construções usam a cor de sua facção.');
-assert(region('R9').innerHTML.includes('title="Ouro"') && region('R11').innerHTML.includes('title="Ouro"'));
+assert(region('R11').innerHTML.includes('title="Ouro"'));
 assert(region('R10').innerHTML.includes('title="Madeira"') && !region('R7').innerHTML.includes('resource-token'));
 
 assert.equal(run('screens.length'),8);
@@ -69,7 +69,7 @@ assert.equal(run('selectedRegion'),'R10');
 assert(get('mapHint').textContent.includes('R6') && !get('mapHint').textContent.includes('R3'));
 const neighbor=map.children.find(e=>e.getAttribute('data-region-id')==='R6');
 assert(neighbor.className.includes('neighbor'));
-assert.equal((get('connections').innerHTML.match(/<path /g)||[]).length,18,'Todas as conexões permanecem visíveis ao selecionar.');
+assert.equal((get('connections').innerHTML.match(/<path /g)||[]).length,16,'Todas as conexões permanecem visíveis ao selecionar.');
 const highlighted=[...get('connections').innerHTML.matchAll(/data-edge="([^"]+)" class="connection-active"/g)].map(m=>m[1]).sort();
 assert.deepEqual(highlighted,['R10-R11','R10-R6','R10-R8','R2-R10']);
 for(const id of ['inicio','lideranca','acao','reacao','dados','pontuacao','fim']){
@@ -78,4 +78,4 @@ for(const id of ['inicio','lideranca','acao','reacao','dados','pontuacao','fim']
 run("showScreen('dados')");assert(get('modal').innerHTML.includes('⚔')&&get('modal').innerHTML.includes('✚'));
 run("showScreen('mesa')");assert.equal(overlay.hidden,true);
 assert.equal(typeof get('fullscreen').onclick,'function');
-console.log('Mesa conceitual: 11 regiões, quatro facções, mão, oito telas e controles principais verificados em DOM substituto.');
+console.log('Mesa conceitual: 10 regiões, quatro facções, mão, oito telas e controles principais verificados em DOM substituto.');

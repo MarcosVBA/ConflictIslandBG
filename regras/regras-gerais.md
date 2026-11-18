@@ -4,7 +4,7 @@ Este módulo reúne regras comuns fora de combate, dados, mapa e pontuação. Pa
 
 ## Rodada e ações
 
-**Definido; parcialmente implementado.** Não há alocação prévia nem marcadores físicos. Cada facção tem duas ações por rodada; na sua vez, escolhe carta e região. Passar, descartar uma carta ou executar uma reação permitida também consome uma ação. A escolha é validada antes de confirmar e gastar a carta, custos e ação. O protótipo ainda usa marcadores virtuais internamente.
+**Definido; parcialmente implementado.** Não há alocação prévia nem marcadores físicos. Cada facção tem duas ações por rodada; na sua vez, escolhe carta e, quando o efeito exige, região. Descartar uma carta consome uma ação; reações gastam a carta sem consumir ação. A escolha é validada antes de confirmar e gastar a carta, custos e ação. O protótipo ainda usa marcadores virtuais internamente.
 
 Depois da compra normal, resolvem-se as habilidades de preparação, incluindo o [Alistamento Obrigatório](../faccoes/imperio.md), e o leilão. O líder inicia as ações, que seguem em sentido anti-horário: Império → Necromante → Piratas → Elfos → Império. O primeiro jogador da partida é escolhido manualmente; nas rodadas seguintes, o líder anterior inicia o leilão.
 
@@ -22,7 +22,7 @@ O líder anterior tem a primeira oportunidade de lance; na primeira rodada, usa-
 
 ## Decisão sobre ações e componentes
 
-**Definido; parcialmente implementado:** a carta é usada e seu efeito é aplicado no mesmo momento, sem etapa separada de alocação de marcadores. Cada facção mantém duas ações por rodada; as ações de reação também consomem uma delas. O protótipo atual ainda representa essas ações com marcadores virtuais. Por enquanto não há limite digital de peças; futuramente haverá limite a definir. Se uma peça física necessária não estiver disponível, a ação é pulada. A representação dessa disponibilidade no jogo digital ainda precisa ser definida.
+**Definido; parcialmente implementado:** a carta é usada e seu efeito é aplicado no mesmo momento, sem etapa separada de alocação de marcadores. Cada facção mantém duas ações por rodada; reações não consomem essas ações. O protótipo atual ainda representa essas ações com marcadores virtuais. Por enquanto não há limite digital de peças; futuramente haverá limite a definir. Se uma peça física necessária não estiver disponível, a ação é pulada. A representação dessa disponibilidade no jogo digital ainda precisa ser definida.
 
 ## Demais questões da rodada
 
@@ -46,4 +46,8 @@ Madeira e Ouro são recursos representados no protótipo. O mapa identifica onde
 
 ## Modos das cartas
 
-**Definido.** Uma barra indica escolha de um modo. Jogar um modo gasta a carta inteira e uma ação, inclusive quando o outro modo é uma reação. A oferta no leilão compromete a carta inteira e usa a liderança impressa. Uma ação descrita como mover e/ou atacar permite apenas mover, apenas atacar ou mover e então combater em uma ação. A Infestação possui resolução própria descrita no módulo do Necromante. Preparações canceladas e ações inválidas preservam os recursos e o turno. Acordos válidos recusados gastam carta e ação conforme as regras de Corsário, Transporte e Harmonia.
+**Definido.** Uma barra indica escolha de um modo. Jogar um modo de ação gasta a carta inteira e uma ação; uma reação gasta a carta inteira sem consumir ação. A oferta no leilão compromete a carta inteira e usa a liderança impressa. Uma ação descrita como mover e/ou atacar permite apenas mover, apenas atacar ou mover e então combater em uma ação. A Infestação possui resolução própria descrita no módulo do Necromante. Preparações canceladas e ações inválidas preservam os recursos e o turno. Acordos válidos recusados gastam carta e ação conforme as regras de Corsário, Transporte e Harmonia.
+
+Ao fim das ações, uma facção sem cartas encerra automaticamente sua vez. Nas ações restantes, o jogador joga ou descarta uma carta para gastar uma ação. Na pontuação, cada facção pode descartar toda a mão restante. A compra até o limite ocorre na preparação da próxima rodada. Passar continua disponível no leilão.
+
+No leilão, antes de qualquer lance, a mesa pode pular a fase quando ninguém pretende ofertar. Sem lances, mantém-se o líder anterior ou o primeiro da ordem inicial, sem descarte de cartas.

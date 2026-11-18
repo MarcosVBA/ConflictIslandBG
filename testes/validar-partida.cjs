@@ -15,11 +15,10 @@ function play(region, index){run("flow.markers.find(m=>m.f===activeFaction()&&!m
 set('extra',0);play('R1',0);check("resources.imperio.ouro===2&&activeFaction()==='necromante'");
 play('R4',1);check("resources.necromante.madeira===2&&activeFaction()==='piratas'");
 play('R5',1);check("state.R5.units.piratas===2&&activeFaction()==='elfos'");
-play('R10',0);check("resources.elfos.madeira===2&&activeFaction()==='imperio'");
-for(let i=0;i<4;i++){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));click('passAction')}
+play('R10',0);check("resources.elfos.madeira===2&&activeFaction()===null");
 check("activeFaction()===null");click('toScore');
 check("flow.phase==='pontuação'&&game.score.elfos===1&&game.score.necromante===1&&game.scored===1");
-click('nextRound');check("flow.phase==='preparação'&&flow.round===2&&flow.order[0]==='imperio'");
+run("flow.decks.imperio.hand=[{name:'Teste'}];flow.decks.elfos.hand=[{name:'Mantida'}]");element('discardRemaining-imperio').checked=true;click('nextRound');check("flow.phase==='preparação'&&flow.round===2&&flow.order[0]==='imperio'&&flow.decks.imperio.hand.length===0&&flow.decks.imperio.discard.some(c=>c.name==='Teste')&&flow.decks.elfos.hand[0].name==='Mantida'");
 // Uma partida sem ações exercita as transições reais até a vitória por pontuação.
 click('reset');
 let rounds=0;
@@ -28,7 +27,7 @@ while(!run('Boolean(game.winner)') && rounds<40){
   set('orderChoice','imperio');set('handSize',5);click('startRound');
   if(run("flow.phase==='alistamento'")){set('imperialRecruit','R1');click('confirmImperialRecruit')}
   for(let i=0;i<4;i++)click('passBid');
-  while(run('activeFaction()!==null')){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));click('passAction')}
+  while(run('activeFaction()!==null')){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));set('actionCard',0);element('discardAction').disabled=false;click('discardAction')}
   click('toScore');
   if(!run('Boolean(game.winner)'))click('nextRound');
 }

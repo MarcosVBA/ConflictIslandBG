@@ -11,11 +11,33 @@ function optFactions(f) {
     .map((x) => `<option value="${x}">${names[x]}</option>`)
     .join("");
 }
+function optDefenders(f, id, ally = null) {
+  return factionIds
+    .filter(
+      (x) =>
+        x !== f &&
+        x !== ally &&
+        (state[id].units[x] > 0 || buildingCount(state[id], x) > 0),
+    )
+    .map((x) => `<option value="${x}">${names[x]}</option>`)
+    .join("");
+}
 function field(id, label, content) {
   return `<label style="display:block;margin:.5rem 0">${label} <select id="${id}">${content}</select></label>`;
 }
+function adjustAmount(id, delta) {
+  const input = $(id);
+  if (input.disabled) return;
+  const next = Math.max(
+    Number(input.min),
+    Math.min(Number(input.max), Number(input.value || 0) + delta),
+  );
+  input.value = next;
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+}
 function amount(id, label, max = 10) {
-  return `<label style="display:block;margin:.5rem 0">${label} <input id="${id}" type="number" min="0" max="${max}" value="0" style="width:5rem"></label>`;
+  return `<label class="amount-field">${label} <span class="amount-controls"><button type="button" aria-label="Diminuir ${label}" onclick="adjustAmount('${id}',-1)">−</button><input id="${id}" type="number" min="0" max="${max}" value="0" oninput="if(this.value!=='') this.value=Math.max(Number(this.min),Math.min(Number(this.max),Math.floor(Number(this.value)||0)))"><button type="button" aria-label="Aumentar ${label}" onclick="adjustAmount('${id}',1)">+</button></span></label>`;
 }
 function yesno() {
   return field(
@@ -32,7 +54,10 @@ function countValue(id, max = Number.MAX_SAFE_INTEGER) {
     raw = e.value,
     n = Number(raw);
   fail(
-    raw !== "" && Number.isSafeInteger(n) && n >= 0 && n <= max,
+    raw !== "" &&
+      Number.isSafeInteger(n) &&
+      n >= Number(e.min || 0) &&
+      n <= Math.min(max, Number(e.max || Number.MAX_SAFE_INTEGER)),
     "Informe uma quantidade válida.",
   );
   return n;
@@ -96,7 +121,10 @@ function configureActionMap(name, id) {
     const from = $("transportOrigin").value;
     valid = definitions
       .filter(
-        (x) => x.id !== from && (x.coast || neighbors(from).includes(x.id)),
+        (x) =>
+          !!state[from] &&
+          x.id !== from &&
+          (x.coast || neighbors(from).includes(x.id)),
       )
       .map((x) => x.id);
   } else if (name === "Remanejando Mortos")
@@ -157,13 +185,20 @@ function showRemanejamento(f, ci, mi) {
         draft[r.id].units.necromante > 0 &&
         neighbors(r.id).some((x) => eligible.has(x)),
     );
-    $("cardDetail").innerHTML =
+    $("dialogContent").innerHTML =
       `<h3>Remanejando Mortos</h3><p>Distribua zumbis entre regiões devastadas adjacentes, quantas vezes desejar. Ao terminar, descarte a mão e compre até cinco cartas.</p>${field("remOrigin", "Origem", origins.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join(""))}${field("remDestination", "Destino", "")}${amount("remQuantity", "Zumbis a mover", Number.MAX_SAFE_INTEGER)}<button id="remMove">Mover zumbis</button> <button id="remFinish">Concluir ação</button> <button id="remCancel">Cancelar</button><p>Movimentos preparados: ${moves.length}</p><p id="actionError" role="status"></p>`;
     const update = () => {
       const origin = $("remOrigin").value;
       $("remDestination").innerHTML = optRegions(
         (r) => neighbors(origin).includes(r.id) && eligible.has(r.id),
       );
+      const available = draft[origin]?.units.necromante || 0;
+      $("remQuantity").max = available;
+      $("remQuantity").min = available ? 1 : 0;
+      $("remQuantity").disabled = !available;
+      $("remQuantity").value = available
+        ? Math.min(available, Math.max(1, Number($("remQuantity").value) || 1))
+        : 0;
     };
     $("remOrigin").onchange = update;
     update();
@@ -218,6 +253,7 @@ function showRemanejamento(f, ci, mi) {
     };
   }
   panel();
+  openActionDialog(false, true);
 }
 function showPlayableAction(f, ci, mi, mode = null) {
   setMapChoice(null);
@@ -243,8 +279,19 @@ function showPlayableAction(f, ci, mi, mode = null) {
   }
   const semMapa =
     effect === "Novas Comandante a Bordo" ||
-    (revisedModes && effect === "Milagre da Floresta");
-  const id = m.region ?? selected,
+    (revisedModes &&
+      [
+        "Milagre da Floresta",
+        "Frutos da Mata",
+        "Trabalhadores Zumbificado",
+        "Harmônia",
+        "Serviço de Transporte Pirata",
+        "Pagamento de Impostos",
+      ].includes(effect));
+  const id =
+      effect === "Pagamento de Impostos"
+        ? definitions.find((x) => calcOwner(state[x.id]) === "imperio")?.id
+        : (m.region ?? selected),
     r = byId(id),
     s = state[id],
     name = effect;
@@ -293,7 +340,10 @@ function showPlayableAction(f, ci, mi, mode = null) {
     form = amount(
       "extra",
       "Cópias adicionais a descartar",
-      revisedModes ? 3 : 4,
+      Math.min(
+        revisedModes ? 3 : 4,
+        flow.decks[f].hand.filter((card) => card.name === c.name).length - 1,
+      ),
     );
   if (name === "Aliança com o Império")
     form =
@@ -317,7 +367,12 @@ function showPlayableAction(f, ci, mi, mode = null) {
         "filhosCost",
         "Recurso a consumir",
         '<option value="madeira">Madeira</option><option value="ouro">Ouro</option><option value="tropas">Tropa élfica</option>',
-      ) + field("filhosOrigin", "Origem, se consumir tropa", optRegions());
+      ) +
+      field(
+        "filhosOrigin",
+        "Origem, se consumir tropa",
+        optRegions((x) => state[x.id].units.elfos > 0),
+      );
   if (name === "Milagre da Floresta")
     form =
       field(
@@ -393,7 +448,9 @@ function showPlayableAction(f, ci, mi, mode = null) {
       field(
         "elfOrigin",
         "Origem adjacente",
-        optRegions((x) => neighbors(id).includes(x.id)),
+        optRegions(
+          (x) => neighbors(id).includes(x.id) && state[x.id].units.elfos > 0,
+        ),
       ) + amount("quantity", "Tropas a mover", Number.MAX_SAFE_INTEGER);
   if (name === "Pagamento de Impostos")
     form = field(
@@ -411,16 +468,266 @@ function showPlayableAction(f, ci, mi, mode = null) {
       "<p>Esta carta é usada como reação no momento indicado em seu texto. Também é possível descartá-la gastando uma ação.</p>";
     return;
   }
-  const panel = semMapa ? $("dialogContent") : $("cardDetail");
-  if (semMapa) $("cardDetail").innerHTML = "";
-  panel.innerHTML = `<h3>${name}</h3><p>${c.text}</p>${semMapa ? "" : `<p class="muted">Região da ação: ${id} · ${r.name}. Condições e escolhas são verificadas antes do consumo.</p>`}${form}<button id="executeAction">Executar ação</button>${semMapa ? ' <button id="cancelActionDialog" type="button">Cancelar</button>' : ""}<p id="actionError" role="status"></p>`;
-  if (semMapa) {
-    openActionDialog(false);
-    $("cancelActionDialog").onclick = closeActionDialog;
+  const panel = $("dialogContent");
+  $("cardDetail").innerHTML = "";
+  panel.innerHTML = `<h3>${name}</h3><p>${c.text}</p>${semMapa ? "" : `<p class="muted">Região da ação: ${id} · ${r.name}. Condições e escolhas são verificadas antes do consumo.</p>`}${form}<button id="executeAction">Executar ação</button> <button id="cancelActionDialog" type="button">Cancelar</button><p id="actionError" role="status"></p>`;
+  openActionDialog(false);
+  $("cancelActionDialog").onclick = closeActionDialog;
+  setMapChoice(null);
+  if (name === "Filhos da Floresta") {
+    const select = $("filhosCost");
+    const available = {
+      madeira: resources.elfos.madeira > 0,
+      ouro: resources.elfos.ouro > 0,
+      tropas: definitions.some((x) => state[x.id].units.elfos > 0),
+    };
+    if (select.options) {
+      for (const option of select.options)
+        option.disabled = !available[option.value];
+      if (!available[select.value])
+        select.value =
+          Array.from(select.options).find((x) => !x.disabled)?.value || "";
+    }
   }
-  configureActionMap(name, id);
-  if (name === "Serviço de Transporte Pirata")
-    $("transportOrigin").onchange = () => configureActionMap(name, id);
+  if (name === "Milagre da Floresta") {
+    const give = $("miracleGive"),
+      take = $("miracleTake");
+    const available = {
+      ouro: resources.elfos.ouro >= 3,
+      madeira: resources.elfos.madeira >= 3,
+      tropas:
+        definitions.reduce((sum, x) => sum + state[x.id].units.elfos, 0) >= 3,
+    };
+    const updateTypes = () => {
+      if (give.options) {
+        for (const option of give.options)
+          option.disabled = !available[option.value];
+        if (!available[give.value])
+          give.value =
+            Array.from(give.options).find((x) => !x.disabled)?.value || "";
+      }
+      if (take.options) {
+        const troopDestination = definitions.some(
+          (x) => calcOwner(state[x.id]) === "elfos",
+        );
+        for (const option of take.options)
+          option.disabled =
+            option.value === give.value ||
+            (option.value === "tropas" && !troopDestination);
+        if (
+          Array.from(take.options).find((x) => x.value === take.value)?.disabled
+        )
+          take.value =
+            Array.from(take.options).find((x) => !x.disabled)?.value || "";
+      }
+    };
+    updateTypes();
+    for (const region of definitions) {
+      for (const [prefix, limit] of [
+        ["miracleFrom-", Math.min(3, state[region.id].units.elfos)],
+        ["miracleTo-", calcOwner(state[region.id]) === "elfos" ? 2 : 0],
+      ]) {
+        const input = $(prefix + region.id);
+        input.max = limit;
+        input.disabled = limit === 0;
+        const label = input.closest?.("label");
+        if (label) label.hidden = input.disabled;
+      }
+    }
+    const updateMiracleLimits = () => {
+      for (const region of definitions) {
+        if ($("miracleGive").value !== "tropas")
+          $("miracleFrom-" + region.id).value = 0;
+        if ($("miracleTake").value !== "tropas")
+          $("miracleTo-" + region.id).value = 0;
+      }
+      for (const [prefix, total] of [
+        ["miracleFrom-", 3],
+        ["miracleTo-", 2],
+      ]) {
+        for (const region of definitions) {
+          const input = $(prefix + region.id);
+          const otherTotal = definitions
+            .filter((x) => x.id !== region.id)
+            .reduce((sum, x) => sum + Number($(prefix + x.id).value || 0), 0);
+          const available =
+            prefix === "miracleFrom-"
+              ? state[region.id].units.elfos
+              : calcOwner(state[region.id]) === "elfos"
+                ? 2
+                : 0;
+          const active =
+            prefix === "miracleFrom-"
+              ? $("miracleGive").value === "tropas"
+              : $("miracleTake").value === "tropas";
+          input.max = active
+            ? Math.min(available, Math.max(0, total - otherTotal))
+            : 0;
+          input.disabled = !active || Number(input.max) === 0;
+          if (Number(input.value) > Number(input.max)) input.value = input.max;
+        }
+      }
+    };
+    for (const region of definitions)
+      for (const prefix of ["miracleFrom-", "miracleTo-"])
+        $(prefix + region.id).oninput = updateMiracleLimits;
+    $("miracleGive").onchange = () => {
+      updateTypes();
+      updateMiracleLimits();
+    };
+    $("miracleTake").onchange = updateMiracleLimits;
+    updateMiracleLimits();
+  }
+  if (name === "Harmônia") {
+    const updateTrade = () => {
+      const partner = $("other").value;
+      if (!resources[partner]) return;
+      const limits = {
+        giveGold: resources.elfos.ouro,
+        giveWood: resources.elfos.madeira,
+        takeGold: resources[partner].ouro,
+        takeWood: resources[partner].madeira,
+      };
+      for (const [key, limit] of Object.entries(limits)) {
+        const input = $(key);
+        input.max = limit;
+        if (Number(input.value) > limit) input.value = limit;
+      }
+      // Normalize origins before calculating destination budgets, including when
+      // a partner change makes an earlier selection unavailable.
+      for (const region of definitions) {
+        for (const [prefix, limit] of [
+          ["giveFrom-", state[region.id].units.elfos],
+          ["takeFrom-", state[region.id].units[partner]],
+        ]) {
+          const input = $(prefix + region.id);
+          input.max = limit;
+          input.disabled = limit === 0;
+          if (Number(input.value) > limit) input.value = limit;
+        }
+      }
+      const given = definitions.reduce(
+        (sum, region) => sum + Number($("giveFrom-" + region.id).value || 0),
+        0,
+      );
+      const taken = definitions.reduce(
+        (sum, region) => sum + Number($("takeFrom-" + region.id).value || 0),
+        0,
+      );
+      for (const [prefix, budget, owner] of [
+        ["giveTo-", given, partner],
+        ["takeTo-", taken, "elfos"],
+      ]) {
+        let remaining = budget;
+        for (const region of definitions) {
+          const input = $(prefix + region.id);
+          const value =
+            calcOwner(state[region.id]) === owner
+              ? Math.min(remaining, Number(input.value) || 0)
+              : 0;
+          input.value = value;
+          remaining -= value;
+        }
+      }
+      for (const region of definitions) {
+        const local = state[region.id],
+          owner = calcOwner(local);
+        const givenElsewhere = definitions
+          .filter((x) => x.id !== region.id)
+          .reduce((sum, x) => sum + Number($("giveTo-" + x.id).value || 0), 0);
+        const takenElsewhere = definitions
+          .filter((x) => x.id !== region.id)
+          .reduce((sum, x) => sum + Number($("takeTo-" + x.id).value || 0), 0);
+        const regionLimits = {
+          "giveFrom-": local.units.elfos,
+          "giveTo-":
+            owner === partner ? Math.max(0, given - givenElsewhere) : 0,
+          "takeFrom-": local.units[partner],
+          "takeTo-":
+            owner === "elfos" ? Math.max(0, taken - takenElsewhere) : 0,
+        };
+        for (const [prefix, limit] of Object.entries(regionLimits)) {
+          const input = $(prefix + region.id);
+          input.max = limit;
+          input.disabled = limit === 0;
+          if (input.disabled || Number(input.value) > limit) input.value = "0";
+          const label = input.closest?.("label");
+          if (label) label.hidden = input.disabled;
+        }
+      }
+    };
+    for (const region of definitions) {
+      for (const prefix of ["giveFrom-", "takeFrom-", "giveTo-", "takeTo-"]) {
+        $(prefix + region.id).oninput = updateTrade;
+      }
+    }
+    $("other").onchange = updateTrade;
+    updateTrade();
+  }
+  if (name === "Trilhas na Mata") {
+    const updateTrail = () => {
+      const available = state[$("elfOrigin").value]?.units.elfos || 0;
+      const input = $("quantity");
+      input.min = available ? 1 : 0;
+      input.max = available;
+      input.disabled = !available;
+      input.value = available
+        ? Math.max(1, Math.min(available, Number(input.value) || 1))
+        : 0;
+    };
+    $("elfOrigin").onchange = updateTrail;
+    updateTrail();
+  }
+  if (name === "Reorganizar Contingente" || name === "Atrás do Tesouro") {
+    $("quantity").max = Math.min(3, state[id].units[f]);
+  }
+  if (name === "Aliança com o Império") {
+    const updateAlliance = () => {
+      for (const [key, faction, type] of [
+        ["give", f, $("giveType").value],
+        ["take", $("other").value, $("takeType").value],
+      ]) {
+        const input = $(key);
+        input.max = resources[faction]?.[type] || 0;
+        input.value = Math.min(Number(input.value) || 0, Number(input.max));
+      }
+    };
+    $("giveType").onchange = updateAlliance;
+    $("takeType").onchange = updateAlliance;
+    $("other").onchange = updateAlliance;
+    updateAlliance();
+  }
+  if (name === "Serviço de Transporte Pirata") {
+    const updateTransport = () => {
+      const partner = $("other").value;
+      $("price").max = Math.min(3, resources[partner]?.ouro || 0);
+      if (Number($("price").value) > Number($("price").max))
+        $("price").value = $("price").max;
+      const previous = $("transportOrigin").value;
+      $("transportOrigin").innerHTML = optRegions(
+        (x) => state[x.id].units[partner] > 0,
+      );
+      if (state[previous]?.units[partner] > 0)
+        $("transportOrigin").value = previous;
+      const from = $("transportOrigin").value;
+      $("destination").innerHTML = optRegions(
+        (x) =>
+          !!state[from] &&
+          x.id !== from &&
+          (x.coast || neighbors(from).includes(x.id)),
+      );
+      const available = state[from]?.units[partner] || 0;
+      $("quantity").max = available;
+      $("quantity").min = available ? 1 : 0;
+      $("quantity").disabled = !available;
+      $("quantity").value = available
+        ? Math.min(available, Math.max(1, Number($("quantity").value) || 1))
+        : 0;
+    };
+    $("other").onchange = updateTransport;
+    $("transportOrigin").onchange = updateTransport;
+    updateTransport();
+  }
   $("executeAction").onclick = () => {
     const before = clone(state),
       beforeResources = clone(resources),
@@ -464,11 +771,6 @@ function executeCard(f, name, id, ci) {
     dest = () => $("destination").value;
   switch (name) {
     case "Filhos da Floresta": {
-      if (revisedModes)
-        fail(
-          calcOwner(s) === "elfos",
-          "A floresta precisa ser dominada pelos Elfos.",
-        );
       const result = ConflictIslandBase.filhosDaFloresta(
         state,
         id,
@@ -506,10 +808,7 @@ function executeCard(f, name, id, ci) {
     }
     case "Harmônia": {
       const o = other();
-      fail(
-        o !== "elfos" && s.units[o] > 0,
-        "Escolha um adversário com tropas na região.",
-      );
+      fail(o !== "elfos" && factionIds.includes(o), "Escolha outra facção.");
       if ($("decision").value === "no") break;
       const gg = countValue("giveGold"),
         gw = countValue("giveWood"),
@@ -560,11 +859,6 @@ function executeCard(f, name, id, ci) {
     }
     case "Frutos da Mata":
     case "Trabalhadores Zumbificado": {
-      if (revisedModes && name === "Frutos da Mata")
-        fail(
-          calcOwner(s) === "elfos",
-          "A região precisa ser dominada pelos Elfos.",
-        );
       const resultado = ConflictIslandBase.coletaDeCartas(
         name,
         definitions,
@@ -621,10 +915,7 @@ function executeCard(f, name, id, ci) {
       break;
     case "Serviço de Transporte Pirata": {
       const o = other();
-      fail(
-        s.units[o] > 0 || buildingCount(s, o) > 0,
-        "A outra facção precisa estar presente.",
-      );
+      fail(o !== "piratas" && factionIds.includes(o), "Escolha outra facção.");
       if ($("decision").value === "no") break;
       const price = countValue("price", 3),
         d = dest(),
@@ -745,18 +1036,46 @@ function executeCard(f, name, id, ci) {
 function showElfFury(f, ci, mi) {
   const origin = flow.markers[mi].region,
     s = state[origin];
-  $("cardDetail").innerHTML =
-    `<h3>Furia da Ilha</h3><p>Mova até 3 tropas de ${origin} para uma região adjacente. Se houver tropas inimigas, escolha o defensor e batalhe.</p>${field(
+  $("dialogContent").innerHTML =
+    `<h3>Furia da Ilha</h3><p>Ataque em ${origin} com zero tropas movidas ou mova até 3 para uma região adjacente e ataque.</p>${field(
       "destination",
       "Destino",
-      optRegions((x) => neighbors(origin).includes(x.id)),
-    )}${amount("quantity", "Tropas a mover", 3)}${field("attackDefender", "Defensor, se houver inimigos", optFactions(f))}<button id="elfFuryGo">Confirmar movimento</button><p id="actionError" role="status"></p>`;
-  setMapChoice({
-    kind: "destination",
-    valid: neighbors(origin),
-    origin,
-    hint: "Escolha uma região adjacente para Furia da Ilha.",
-  });
+      optRegions(
+        (x) =>
+          s.units.elfos > 0 &&
+          (x.id === origin || neighbors(origin).includes(x.id)) &&
+          factionIds.some(
+            (faction) =>
+              faction !== f &&
+              (state[x.id].units[faction] > 0 ||
+                buildingCount(state[x.id], faction) > 0),
+          ),
+      ),
+    )}${amount("quantity", "Tropas a mover", 3)}${field("attackDefender", "Defensor", optFactions(f))}<button id="elfFuryGo">Confirmar ataque</button><button id="cancelActionDialog" type="button">Cancelar</button><p id="actionError" role="status"></p>`;
+  openActionDialog(false);
+  $("cancelActionDialog").onclick = closeActionDialog;
+  const updateFury = () => {
+    const destination = $("destination").value;
+    if (!state[destination]) {
+      $("quantity").min = 0;
+      $("quantity").max = 0;
+      $("quantity").value = 0;
+      $("quantity").disabled = true;
+      $("elfFuryGo").disabled = true;
+      return;
+    }
+    $("elfFuryGo").disabled = false;
+    $("quantity").disabled = destination === origin;
+    $("attackDefender").innerHTML = optDefenders(f, destination);
+    $("quantity").max = destination === origin ? 0 : Math.min(3, s.units.elfos);
+    $("quantity").min = destination === origin ? 0 : 1;
+    if (Number($("quantity").value) < Number($("quantity").min))
+      $("quantity").value = $("quantity").min;
+    if (Number($("quantity").value) > Number($("quantity").max))
+      $("quantity").value = $("quantity").max;
+  };
+  $("destination").onchange = updateFury;
+  updateFury();
   $("elfFuryGo").onclick = () => {
     try {
       const dest = $("destination").value,
@@ -771,8 +1090,10 @@ function showElfFury(f, ci, mi) {
         defender,
       );
       const before = clone(state);
-      state[origin].units.elfos = movimento.origem;
-      state[dest].units.elfos = movimento.destino;
+      if (movimento) {
+        state[origin].units.elfos = movimento.origem;
+        state[dest].units.elfos = movimento.destino;
+      }
       const towerRestored = restoreTowerIfLost();
       if (
         towerRestored &&
@@ -836,25 +1157,84 @@ function showElfFury(f, ci, mi) {
   };
 }
 function showCorsair(f, ci, mi) {
-  const m = flow.markers[mi],
-    id = m.region;
-  const destinations = optRegions(
-    (x) => x.id === id || neighbors(id).includes(x.id),
-  );
-  $("cardDetail").innerHTML =
-    `<h3>Carta de Corsário</h3><p>Proposta de teste: o aliado pode usar os piratas para uma operação imediata, movendo-os a uma região adjacente e opcionalmente atacando ali. A aceitação e todas as escolhas são manuais.</p>${field("corsairAlly", "Facção aliada", optFactions("piratas"))}${yesno()}${amount("price", "Preço em Ouro", 3)}${field("destination", "Destino", destinations)}${amount("quantity", "Piratas a mover", Number.MAX_SAFE_INTEGER)}${field("corsairMode", "Operação", '<option value="move">Mover sem ataque</option><option value="attack">Mover e atacar</option>')}${field("attackDefender", "Defensor se houver ataque", optFactions("piratas"))}<button id="corsairGo">Resolver acordo</button><p id="actionError" role="status"></p>`;
-  configureActionMap("Carta de Corsário", id);
+  $("dialogContent").innerHTML =
+    `<h3>Carta de Corsário</h3>${field("corsairAlly", "Facção aliada", optFactions("piratas"))}${yesno()}${amount("price", "Preço em Ouro", 3)}${field(
+      "corsairOrigin",
+      "Origem dos piratas",
+      optRegions((x) => state[x.id].units.piratas > 0),
+    )}${field("destination", "Destino", optRegions())}${amount("quantity", "Piratas a mover", Number.MAX_SAFE_INTEGER)}${field("corsairMode", "Operação", '<option value="move">Mover sem ataque</option><option value="attack">Atacar</option>')}${field("attackDefender", "Defensor se houver ataque", optFactions("piratas"))}<button id="corsairGo">Resolver acordo</button><button id="cancelActionDialog" type="button">Cancelar</button><p id="actionError" role="status"></p>`;
+  openActionDialog(false);
+  $("cancelActionDialog").onclick = closeActionDialog;
+  const updateCorsair = () => {
+    $("price").max = Math.min(3, resources[$("corsairAlly").value]?.ouro || 0);
+    if (Number($("price").value) > Number($("price").max))
+      $("price").value = $("price").max;
+    const origin = $("corsairOrigin").value;
+    if (!state[origin]) {
+      $("destination").innerHTML = "";
+      $("attackDefender").innerHTML = "";
+      $("quantity").min = 0;
+      $("quantity").max = 0;
+      $("quantity").value = 0;
+      $("quantity").disabled = true;
+      return;
+    }
+    const previous = $("destination").value;
+    const eligible = (x) =>
+      (x.id === origin || neighbors(origin).includes(x.id)) &&
+      ($("corsairMode").value !== "attack" ||
+        factionIds.some(
+          (side) =>
+            side !== "piratas" &&
+            side !== $("corsairAlly").value &&
+            (state[x.id].units[side] > 0 ||
+              buildingCount(state[x.id], side) > 0),
+        ));
+    $("destination").innerHTML = optRegions(eligible);
+    if (definitions.some((x) => x.id === previous && eligible(x)))
+      $("destination").value = previous;
+    const destination = $("destination").value;
+    if (!state[destination]) {
+      $("quantity").min = 0;
+      $("quantity").max = 0;
+      $("quantity").value = 0;
+      $("quantity").disabled = true;
+      $("attackDefender").innerHTML = "";
+      return;
+    }
+    $("quantity").max =
+      destination === origin ? 0 : state[origin].units.piratas;
+    const minimum =
+      $("corsairMode").value === "attack" &&
+      state[destination].units.piratas === 0
+        ? 1
+        : 0;
+    $("quantity").min = minimum;
+    $("quantity").disabled = Number($("quantity").max) === 0;
+    $("quantity").value = Math.max(
+      minimum,
+      Math.min(Number($("quantity").max), Number($("quantity").value) || 0),
+    );
+    $("attackDefender").innerHTML = optDefenders(
+      "piratas",
+      destination,
+      $("corsairAlly").value,
+    );
+  };
+  $("corsairAlly").onchange = updateCorsair;
+  $("corsairOrigin").onchange = updateCorsair;
+  $("destination").onchange = updateCorsair;
+  $("corsairMode").onchange = updateCorsair;
+  updateCorsair();
   $("corsairGo").onclick = () => {
     const before = clone(state),
       oldResources = clone(resources),
       oldGame = clone(game);
     try {
-      const ally = $("corsairAlly").value;
-      fail(
-        state[id].units[ally] > 0 || buildingCount(state[id], ally) > 0,
-        "Aliado precisa estar presente.",
-      );
+      const ally = $("corsairAlly").value,
+        id = $("corsairOrigin").value;
       if ($("decision").value === "no") {
+        closeActionDialog();
         finishAction(f, ci, mi, false, "Corsário recusado em " + id);
         return;
       }
@@ -875,6 +1255,7 @@ function showCorsair(f, ci, mi) {
         mode,
         defender,
       );
+      closeActionDialog();
       transfer(ally, "piratas", "ouro", price);
       if (game.winner) {
         finishAction(
@@ -968,38 +1349,60 @@ function showAttackMovement(f, ci, mi, mode = null) {
     (x) =>
       !localOnly &&
       x.id !== target &&
-      (coastal ? x.coast : neighbors(target).includes(x.id)) &&
+      (coastal
+        ? (mode?.operation === "move" && neighbors(target).includes(x.id)) ||
+          (r.coast && x.coast)
+        : neighbors(target).includes(x.id)) &&
       state[x.id].units[f] > 0,
   );
   const max =
-    name === "Infestação" || name === "Tambores de Guerra"
-      ? 2
-      : [
-            "Invasão Costeira",
-            "Ataque a Linha de Suprimentos",
-            "Trabalhe enquanto eles dormem",
-            "Marcha Imperial",
-          ].includes(name)
-        ? 3
-        : Number.MAX_SAFE_INTEGER;
+    coastal && mode?.operation === "move"
+      ? Number.MAX_SAFE_INTEGER
+      : name === "Infestação" || name === "Tambores de Guerra"
+        ? 2
+        : [
+              "Invasão Costeira",
+              "Ataque a Linha de Suprimentos",
+              "Trabalhe enquanto eles dormem",
+              "Marcha Imperial",
+            ].includes(name)
+          ? 3
+          : Number.MAX_SAFE_INTEGER;
   const moving = mode?.operation !== "attack",
-    attacking = mode?.operation !== "move";
-  $("cardDetail").innerHTML =
-    `<h3>${name}${mode ? " · " + mode.label : ""}</h3><p>${card.text}</p><p>Alvo: ${target} · ${r.name}.${moving ? ` Escolha tropas a mover; limite total ${max === Number.MAX_SAFE_INTEGER ? "sem limite" : max}.` : ""}</p>${attacking ? field("attackDefender", "Defensor", optFactions(f)) : ""}${moving ? origins.map((x) => amount("move-" + x.id, x.id + " · " + x.name + " (disponíveis " + state[x.id].units[f] + ")", state[x.id].units[f])).join("") || "<p>Nenhuma origem disponível.</p>" : ""}<button id="prepareAttack">${mode?.operation === "move" ? "Confirmar movimento" : "Confirmar ataque"}</button><p id="actionError" role="status"></p>`;
-  if (moving)
-    setMapChoice({
-      kind: "quantities",
-      prefix: "move-",
-      valid: origins.map((x) => x.id),
-      origin: target,
-      hint:
-        "Clique em uma origem destacada e informe quantas tropas mover para " +
-        target +
-        ".",
-    });
+    attacking = mode?.operation !== "move",
+    chooseDefender =
+      attacking &&
+      !(
+        name === "Infestação" &&
+        !factionIds.some(
+          (x) => x !== f && (s.units[x] > 0 || buildingCount(s, x) > 0),
+        )
+      );
+  $("dialogContent").innerHTML =
+    `<h3>${name}${mode ? " · " + mode.label : ""}</h3><p>${card.text}</p><p>Alvo: ${target} · ${r.name}.${moving ? ` Escolha tropas a mover; limite total ${max === Number.MAX_SAFE_INTEGER ? "sem limite" : max}.` : ""}</p>${chooseDefender ? field("attackDefender", "Defensor", optDefenders(f, target)) : ""}${moving ? origins.map((x) => amount("move-" + x.id, x.id + " · " + x.name + " (disponíveis " + state[x.id].units[f] + ")", state[x.id].units[f])).join("") || "<p>Nenhuma origem disponível.</p>" : ""}<button id="prepareAttack">${mode?.operation === "move" ? "Confirmar movimento" : "Confirmar ataque"}</button><button id="cancelActionDialog" type="button">Cancelar</button><p id="actionError" role="status"></p>`;
+  openActionDialog(false);
+  $("cancelActionDialog").onclick = closeActionDialog;
+  if (moving) {
+    const updateMoveLimits = () => {
+      for (const origin of origins) {
+        const otherTotal = origins
+          .filter((x) => x.id !== origin.id)
+          .reduce((sum, x) => sum + Number($("move-" + x.id).value || 0), 0);
+        const input = $("move-" + origin.id);
+        const singleOrigin = coastal || name === "Marcha Imperial";
+        input.disabled = singleOrigin && otherTotal > 0;
+        input.max = input.disabled
+          ? 0
+          : Math.min(state[origin.id].units[f], Math.max(0, max - otherTotal));
+      }
+    };
+    for (const origin of origins)
+      $("move-" + origin.id).oninput = updateMoveLimits;
+    updateMoveLimits();
+  }
   $("prepareAttack").onclick = () => {
     try {
-      let defender = attacking
+      let defender = chooseDefender
         ? $("attackDefender").value
         : factionIds.find((x) => x !== f);
       if (mode?.operation === "move")
@@ -1021,6 +1424,7 @@ function showAttackMovement(f, ci, mi, mode = null) {
           target,
           defender,
           moves,
+          mode?.operation,
         );
       if (mode?.operation) {
         const total = moves.reduce((sum, x) => sum + x.n, 0);
@@ -1056,7 +1460,8 @@ function showAttackMovement(f, ci, mi, mode = null) {
       }
       if (
         mode?.operation === "move" ||
-        ((coastal || name === "Marcha Imperial") && !hasEnemy)
+        ((coastal || name === "Marcha Imperial" || name === "Infestação") &&
+          !hasEnemy)
       ) {
         finishAction(
           f,

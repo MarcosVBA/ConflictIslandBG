@@ -65,7 +65,7 @@
     let recursos = {...saldo};
     if (nome === 'Pirata Aprendiz') {
       if (!['piratas','livre'].includes(dominio(regiao))) throw Error('A região deve estar sob seu controle ou sem domínio.');
-      next.units.piratas++;
+      next.units.piratas += regiao.bar ? 2 : 1;
     } else if (nome === 'Taverna Pirata') {
       if (dominio(regiao) !== 'piratas' || regiao.bar) throw Error('Exige região controlada sem Bar.');
       if (Object.values(mapa).filter(item => item.bar).length >= 1) throw Error('Limite de um Bar Pirata no mapa.');
@@ -82,9 +82,9 @@
   }
   function coletaDeCartas(nome, regioes, mapa, id, saldo) {
     const local = mapa[id];
-    if (!local || !saldo) throw Error('Região inválida.');
-    if (nome === 'Frutos da Mata' && local.units.elfos < 1) throw Error('A região escolhida precisa ter tropas élficas.');
-    if (nome === 'Trabalhadores Zumbificado' && !local.extractor) throw Error('A região escolhida precisa ter extrator.');
+    if (!saldo) throw Error('Saldo inválido.');
+    if (nome === 'Frutos da Mata' && !Object.values(mapa).some(r => r.units.elfos > 0)) throw Error('Exige tropas élficas no mapa.');
+    if (nome === 'Trabalhadores Zumbificado' && !Object.values(mapa).some(r => r.extractor)) throw Error('Exige extrator no mapa.');
     if (!['Frutos da Mata','Trabalhadores Zumbificado'].includes(nome)) throw Error('Carta de coleta inválida.');
     const resultado = {...saldo};
     for (const regiao of regioes) {
@@ -102,7 +102,7 @@
   }
   function filhosDaFloresta(mapa, id, saldo, custo, origem, terreno) {
     const regiao = mapa[id];
-    if (!regiao || terreno !== 'floresta') throw Error('Exige região de floresta.');
+    if (!regiao || terreno !== 'floresta' || devastada(regiao)) throw Error('Exige floresta não devastada.');
     const recursos = {...saldo}, next = {...mapa};
     next[id] = {...regiao, units:{...regiao.units}};
     if (custo === 'tropas') {
@@ -201,7 +201,7 @@
     return {candidatas,recursos};
   }
   function validarHarmonia(mapa, recursos, id, outro, oferta, movimentos) {
-    if (!faccoes.includes(outro) || outro==='elfos' || !mapa[id] || mapa[id].units[outro]<1) throw Error('Escolha um adversário com tropas na região.');
+    if (!faccoes.includes(outro) || outro==='elfos') throw Error('Escolha outra facção.');
     const {gg,gw,tg,tw}=oferta;
     if (![gg,gw,tg,tw].every(n=>Number.isSafeInteger(n)&&n>=0) || !Array.isArray(movimentos) || new Set(movimentos.map(x=>x.id)).size!==movimentos.length || movimentos.some(x=>!mapa[x.id] || ![x.gf,x.gt,x.tf,x.tt].every(n=>Number.isSafeInteger(n)&&n>=0))) throw Error('Informe quantidades válidas.');
     const soma=k=>movimentos.reduce((n,x)=>n+x[k],0),g=soma('gf'),t=soma('tf');
@@ -216,7 +216,7 @@
     return next;
   }
   function transportePirata(mapa, regioes, ligacoes, id, outro, saldo, preco, origem, destino, quantidade) {
-    if (!faccoes.includes(outro) || outro==='piratas' || !mapa[id] || !(mapa[id].units[outro]>0 || construcoes(mapa[id],outro)>0)) throw Error('A outra facção precisa estar presente.');
+    if (!faccoes.includes(outro) || outro==='piratas') throw Error('Escolha outra facção.');
     if (!Number.isInteger(preco) || preco<0 || preco>3 || saldo.ouro<preco) throw Error('Preço inválido ou recursos insuficientes.');
     if (!mapa[origem] || !mapa[destino] || origem===destino || !(regioes.find(r=>r.id===destino)?.coast || vizinhos(ligacoes,origem).includes(destino))) throw Error('Escolha origem e destino costeiro ou adjacente à origem.');
     if (!Number.isSafeInteger(quantidade) || quantidade<1 || mapa[origem].units[outro]<quantidade) throw Error('Escolha tropas disponíveis na origem.');
@@ -229,7 +229,7 @@
     return {oferecerTipo,oferecer,receberTipo,receber:receberValor};
   }
   function validarCorsario(mapa, ligacoes, id, aliado, saldo, preco, destino, quantidade, modo, defensor) {
-    if (!faccoes.includes(aliado) || aliado==='piratas' || !mapa[id] || !(mapa[id].units[aliado]>0 || construcoes(mapa[id],aliado)>0)) throw Error('Aliado precisa estar presente.');
+    if (!faccoes.includes(aliado) || aliado==='piratas' || !mapa[id]) throw Error('Escolha outra facção e origem válida.');
     if (!Number.isInteger(preco) || preco<0 || preco>3 || !saldo || saldo.ouro<preco) throw Error('Preço inválido ou recursos insuficientes.');
     if (!mapa[destino] || (destino!==id && !vizinhos(ligacoes,id).includes(destino))) throw Error('Escolha a região atual ou um destino adjacente.');
     if (!Number.isSafeInteger(quantidade) || quantidade<0 || mapa[id].units.piratas<quantidade || (destino===id && quantidade!==0)) throw Error('Escolha uma quantidade válida de piratas.');
@@ -237,27 +237,29 @@
     if (modo==='attack' && (!faccoes.includes(defensor) || defensor===aliado || defensor==='piratas' || !(mapa[destino].units[defensor]>0 || construcoes(mapa[destino],defensor)>0) || mapa[destino].units.piratas+(destino===id?0:quantidade)<1)) throw Error('O ataque exige piratas e uma facção adversária no destino.');
     return destino===id ? null : calcularMovimento(mapa[id].units.piratas,mapa[destino].units.piratas,quantidade);
   }
-  function validarAtaque(mapa, regioes, ligacoes, recursos, faccao, nome, alvo, defensor, movimentos) {
+  function validarAtaque(mapa, regioes, ligacoes, recursos, faccao, nome, alvo, defensor, movimentos, operacao = null) {
     const cartas={elfos:['Furia da Ilha'],piratas:['Invasão Costeira','Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem'],necromante:['Ataque Zumbi','Infestação','Horda interminável'],imperio:['Marcha Imperial','Tambores de Guerra']};
     const local=mapa[alvo],regiao=regioes.find(r=>r.id===alvo),costeiro=nome==='Invasão Costeira',localOnly=['Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem'].includes(nome);
     if (!cartas[faccao]?.includes(nome) || !local || !regiao || nome==='Furia da Ilha') throw Error('Carta ou região inválida.');
     const inimigos=faccoes.filter(f=>f!==faccao && (local.units[f]>0 || construcoes(local,f)>0));
-    if ((!(costeiro || nome==='Marcha Imperial') || inimigos.length) && !inimigos.includes(defensor)) throw Error('Escolha defensor com tropas ou construções no local.');
-    if (costeiro && !regiao.coast) throw Error('Invasão Costeira exige destino costeiro.');
+    if (!(nome==='Infestação' && !inimigos.length) && (!(costeiro || nome==='Marcha Imperial') || inimigos.length) && !inimigos.includes(defensor)) throw Error('Escolha defensor com tropas ou construções no local.');
+    if (costeiro && operacao !== 'move' && !regiao.coast) throw Error('Invasão Costeira exige destino costeiro.');
     if (nome==='Ataque a Linha de Suprimentos' && (!recursos[defensor] || recursos[defensor].ouro<1)) throw Error('O inimigo precisa ter Ouro.');
-    if (!Array.isArray(movimentos) || new Set(movimentos.map(m=>m.id)).size!==movimentos.length || movimentos.some(m=>!mapa[m.id] || m.id===alvo || !Number.isSafeInteger(m.n) || m.n<0 || m.n>mapa[m.id].units[faccao] || localOnly || (costeiro ? !regioes.find(r=>r.id===m.id)?.coast : !vizinhos(ligacoes,alvo).includes(m.id)))) throw Error('Escolha origens e tropas disponíveis.');
-    const total=movimentos.reduce((sum,m)=>sum+m.n,0),max=['Infestação','Tambores de Guerra'].includes(nome)?2:['Invasão Costeira','Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem','Marcha Imperial'].includes(nome)?3:Number.MAX_SAFE_INTEGER;
+    if (!Array.isArray(movimentos) || new Set(movimentos.map(m=>m.id)).size!==movimentos.length || movimentos.some(m=>!mapa[m.id] || m.id===alvo || !Number.isSafeInteger(m.n) || m.n<0 || m.n>mapa[m.id].units[faccao] || localOnly || (costeiro ? !(operacao === 'move' && vizinhos(ligacoes,alvo).includes(m.id)) && !(regiao.coast && regioes.find(r=>r.id===m.id)?.coast) : !vizinhos(ligacoes,alvo).includes(m.id)))) throw Error('Escolha origens e tropas disponíveis.');
+    const total=movimentos.reduce((sum,m)=>sum+m.n,0),max=costeiro && operacao==='move'?Number.MAX_SAFE_INTEGER:['Infestação','Tambores de Guerra'].includes(nome)?2:['Invasão Costeira','Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem','Marcha Imperial'].includes(nome)?3:Number.MAX_SAFE_INTEGER;
     if(total>max) throw Error('O total de tropas movidas excede o limite da carta.');
     if(local.units[faccao]+total<1) throw Error('Envie ao menos uma tropa ou tenha tropas no local.');
+    if (nome==='Infestação' && !inimigos.length && total===0) throw Error('Mova ao menos um zumbi para uma região sem defensor.');
     if((costeiro||nome==='Marcha Imperial') && movimentos.filter(m=>m.n>0).length>1) throw Error('Esta carta move de apenas uma região.');
     if(nome==='Marcha Imperial' && !vizinhos(ligacoes,alvo).some(x=>mapa[x]&&dominio(mapa[x])==='imperio')) throw Error('Marcha Imperial exige região adjacente a uma região dominada pelo Império.');
     return {hasEnemy:inimigos.length>0,total};
   }
   function validarFuria(mapa, ligacoes, origem, destino, quantidade, defensor) {
-    if (!mapa[origem] || !mapa[destino] || !vizinhos(ligacoes,origem).includes(destino) || !Number.isSafeInteger(quantidade) || quantidade<1 || quantidade>3 || mapa[origem].units.elfos<quantidade) throw Error('Escolha tropas disponíveis e destino adjacente.');
-    const inimigos=faccoes.filter(f=>f!=='elfos' && (mapa[destino].units[f]>0 || construcoes(mapa[destino],f)>0));
-    if (inimigos.length && !inimigos.includes(defensor)) throw Error('Escolha um defensor presente.');
-    return {hasEnemy:inimigos.length>0, movimento:calcularMovimento(mapa[origem].units.elfos,mapa[destino].units.elfos,quantidade)};
+    if (!mapa[origem] || !mapa[destino] || !Number.isSafeInteger(quantidade) || quantidade < 0 || quantidade > 3) throw Error('Escolha tropas disponíveis e destino válido.');
+    const parado = origem === destino;
+    if (parado ? quantidade !== 0 || mapa[origem].units.elfos < 1 : !vizinhos(ligacoes,origem).includes(destino) || quantidade < 1 || mapa[origem].units.elfos < quantidade) throw Error('Escolha tropas disponíveis e destino válido.');
+    if (!faccoes.includes(defensor) || defensor === 'elfos' || !(mapa[destino].units[defensor] || construcoes(mapa[destino], defensor))) throw Error('Escolha um defensor presente.');
+    return {hasEnemy:true, movimento:parado ? null : calcularMovimento(mapa[origem].units.elfos,mapa[destino].units.elfos,quantidade)};
   }
   function efeitosCombate(batalha, regiao, resultado, terreno, saques) {
     const eventos=[];
@@ -346,7 +348,7 @@
     if (!nome || !baralho) return null;
     const acao = marcadores.findIndex(item => item.f === faccao && !item.used);
     const carta = baralho.hand.findIndex(item => item.name === nome);
-    return acao < 0 || carta < 0 ? null : { acao, carta };
+    return carta < 0 ? null : { acao, carta };
   }
   function calcularDano(atacantes, defensores, dadosAtaque, dadosDefesa, protecaoAtaque = 0, protecaoDefesa = 0) {
     const dados = dadosAtaque.concat(dadosDefesa);

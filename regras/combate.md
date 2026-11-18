@@ -8,7 +8,7 @@ Cada batalha consiste em uma única rodada de rolagem. Após aplicar os resultad
 
 ## Reações
 
-**Definido; implementado.** Após a confirmação do ataque, os Piratas podem usar Vento a Favor quando atacam em um saque. Em seguida, o defensor pode usar Guarda Imperial, se disponível. Depois, os Elfos podem usar Defesa Global para proteger um dos lados com tropas, inclusive em batalha entre outras facções. Cada reação gasta a carta inteira e uma ação disponível. A proteção de Defesa Global soma-se à Guarda Imperial. Então os dados são rolados. Os detalhes das cartas estão nos módulos das facções.
+**Definido; implementado.** Após a confirmação do ataque, os Piratas podem usar Vento a Favor quando atacam em um saque. Em seguida, o defensor pode usar Guarda Imperial, se disponível. Depois, os Elfos podem usar Defesa Global para proteger um dos lados com tropas, inclusive em batalha entre outras facções. Cada reação gasta a carta inteira sem consumir ação. A proteção de Defesa Global soma-se à Guarda Imperial. Então os dados são rolados. Os detalhes das cartas estão nos módulos das facções.
 
 A Infestação recruta um zumbi após o combate, inclusive em resultado natural de 0 a 0. Se a Magia da Torre impedir a batalha antes da rolagem ou recuperar a Torre após as baixas, o recrutamento não ocorre.
 

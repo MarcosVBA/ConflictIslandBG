@@ -28,7 +28,7 @@ test('distribuição instala o cache e volta a abrir offline', async ({ page, co
     await expect.poll(()=>page.evaluate(async()=>!!(await caches.match('./index.html')))).toBe(true);
     await context.setOffline(true);
     await page.reload();
-    await expect(page.locator('.region')).toHaveCount(11);
+    await expect(page.locator('.region')).toHaveCount(10);
     await expect(page.locator('#startRound')).toBeVisible();
     expect(erros).toEqual([]);
   } finally {
