@@ -24,7 +24,7 @@ A barra **Ver tela**, exclusiva da demonstração, permite acessar diretamente c
 2. **Início:** escolha do primeiro jogador, seguida da preparação. As quatro facções são controladas manualmente.
 3. **Liderança:** orientação para selecionar cartas e acompanhar o maior lance. O leilão real respeitará os valores, a ordem e os destinos das cartas documentados.
 4. **Ação:** detalhe da carta, condição, região escolhida e entrada para seleção no mapa. Uma confirmação real só será habilitada quando o motor validar a escolha.
-5. **Reação:** janela antes dos dados para decisões de defesa e Canção de paz, sem ocultar que uma reação consome ação.
+5. **Reação:** janela antes dos dados para decisões de Vento a Favor, Guarda Imperial e Defesa Global, sem ocultar que uma reação consome ação.
 6. **Dados:** apresentação dos símbolos e opção de repetir a animação ilustrativa. Na implementação jogável, o resultado virá do motor e a apresentação nunca o alterará.
 7. **Pontuação:** resumo por facção e origem dos pontos antes de avançar.
 8. **Fim:** exemplo de classificação e opções de retorno; duração e empate definitivos permanecem conforme o estado das regras.

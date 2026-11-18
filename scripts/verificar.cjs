@@ -8,7 +8,6 @@ const applicationFiles = fs.readdirSync(path.join(root, 'jogo/aplicacao')).filte
 const suites = {
   rapido: [
     ['Sincronização do HTML', 'scripts/sincronizar-motor.cjs', '--verificar'],
-    ['Sincronização da variante', 'scripts/sincronizar-motor.cjs', '--baralhos-revisados', '--verificar'],
     ['Rastreabilidade', 'scripts/validar-rastreabilidade.cjs'],
     ['Formatação da aplicação', 'node_modules/prettier/bin/prettier.cjs', '--check', ...applicationFiles],
     ['Documentação', 'testes/validar-documentacao.cjs'],

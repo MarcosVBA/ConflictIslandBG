@@ -95,7 +95,8 @@ test('clicar em espaço vazio limpa a seleção sem gastar ação ou carta', asy
   await expect(page.locator('#details')).toContainText('Selecione uma região');
   expect(await page.evaluate(()=>({ouro:resources.imperio.ouro,mao:flow.decks.imperio.hand.length,acoes:flow.markers.filter(m=>m.f==='imperio'&&!m.used).length}))).toEqual(antes);
   await page.locator('#handArea [data-card-index="0"]').click();
-  await expect(page.locator('#cardDetail')).toContainText('Selecione uma região');
+  await page.locator('[data-mode="0"]').click();
+  await expect(page.locator('#cardDetail')).toContainText('Selecione a região');
   await page.locator('[data-region="R1"]').click();
   await expect(page.locator('#actionRegion')).toHaveValue('R1');
   expect(erros).toEqual([]);
@@ -163,67 +164,21 @@ test('leilão, ações das quatro facções e próxima rodada', async ({ page },
   await preparar(page);
   // Mãos fixas tornam o percurso reproduzível; os efeitos são executados pela interface.
   await configurarCenario(page, 'rodada');
-  for(const [f,region] of [['imperio','R1'],['necromante','R4'],['piratas','R5'],['elfos','R10']]) {
+  for(const [f,region,mode] of [['imperio','R1',0],['necromante','R4',1],['piratas','R5',1],['elfos','R10',0]]) {
     await expect(page.locator('#handArea')).toHaveAttribute('data-faction',f);
-    await page.locator(`[data-region="${region}"]`).click();
     await page.locator('#handArea [data-card-index="0"]').click();
+    await page.locator(`[data-mode="${mode}"]`).click();
+    await page.locator(`[data-region="${region}"]`).click();
     await evidencia(page,info,`mao-${f}`);
     await page.locator('#executeAction').click();
   }
-  const resultado=await page.evaluate(() => ({i:state.R1.units.imperio,n:resources.necromante.madeira,p:state.R5.units.piratas,e:resources.elfos.madeira}));
-  expect(resultado).toEqual({i:5,n:2,p:2,e:2});
+  const resultado=await page.evaluate(() => ({i:resources.imperio.ouro,n:resources.necromante.madeira,p:state.R5.units.piratas,e:resources.elfos.madeira}));
+  expect(resultado).toEqual({i:2,n:2,p:2,e:2});
   for(let i=0;i<4;i++) await page.locator('#passAction').click();
   await page.locator('#toScore').click();
   await expect(page.locator('#nextRound')).toBeVisible();
   await page.locator('#nextRound').click();
   await expect(page.locator('#flow')).toContainText('Rodada 2');
-  expect(erros).toEqual([]);
-});
-
-test('combate apresenta reações, dados e resultado', async ({ page }, info) => {
-  const erros=await abrir(page);
-  await preparar(page);
-  await configurarCenario(page, 'combate');
-  await page.locator('[data-region="R4"]').click();
-  await page.locator('#handArea [data-card-index="0"]').click();
-  await page.locator('#attackDefender').selectOption('necromante');
-  await page.locator('#move-R2').fill('1');
-  await page.locator('#prepareAttack').click();
-  await expect(page.locator('#actionDialog')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#actionDialog')).toBeVisible();
-  await page.locator('#skipDefense').click();
-  await page.locator('#skipPeace').click();
-  await page.locator('#rollBattle').click();
-  await expect(page.locator('.game-die').first()).toBeVisible();
-  await evidencia(page,info,'dados-combate');
-  await page.locator('#applyBattle').click();
-  await expect(page.locator('#flow')).toContainText('Vez: Necromante');
-  expect(erros).toEqual([]);
-});
-
-test('ação sem mapa abre modal e pode ser cancelada sem gastar a carta', async ({ page }) => {
-  const erros=await abrir(page);
-  await preparar(page);
-  await page.evaluate(() => {
-    flow.turn=2;
-    flow.decks.piratas.hand=[{name:'Novas Comandante a Bordo',text:'Compre novas cartas',leadership:0},{name:'Pirata Aprendiz',text:'Recrutar',leadership:1}];
-    renderFlow();
-  });
-  await page.locator('#handArea [data-card-index="0"]').click();
-  await expect(page.locator('#actionDialog')).toBeVisible();
-  await expect(page.locator('#dialogContent')).not.toContainText('Região da ação');
-  await page.locator('#cancelActionDialog').click();
-  await expect(page.locator('#actionDialog')).toBeHidden();
-  expect(await page.evaluate(() => ({cards:flow.decks.piratas.hand.length,used:flow.markers.filter(m=>m.f==='piratas'&&m.used).length}))).toEqual({cards:2,used:0});
-  await page.locator('#handArea [data-card-index="1"]').click();
-  await expect(page.locator('#cardDetail #executeAction')).toBeVisible();
-  await expect(page.locator('#executeAction')).toHaveCount(1);
-  await page.locator('#handArea [data-card-index="0"]').click();
-  await expect(page.locator('#executeAction')).toHaveCount(1);
-  await page.locator('#executeAction').click();
-  await expect(page.locator('#actionDialog')).toBeHidden();
-  expect(await page.evaluate(() => flow.markers.filter(m=>m.f==='piratas'&&m.used).length)).toBe(1);
   expect(erros).toEqual([]);
 });
 
@@ -275,24 +230,6 @@ test('vitória interrompe a partida e o cenário pode ser reiniciado', async ({ 
   await page.locator('#reset').click();
   await expect(page.locator('#startRound')).toBeVisible();
   expect(await page.evaluate(() => game.winner)).toBeNull();
-  expect(erros).toEqual([]);
-});
-
-test('Canção de paz cancela o combate sem desfazer o movimento', async ({ page }, info) => {
-  const erros=await abrir(page);
-  await preparar(page);
-  await configurarCenario(page, 'paz');
-  await page.locator('[data-region="R4"]').click();
-  await page.locator('#handArea [data-card-index="0"]').click();
-  await page.locator('#attackDefender').selectOption('necromante');
-  await page.locator('#move-R2').fill('1');
-  await page.locator('#prepareAttack').click();
-  await page.locator('#skipDefense').click();
-  await page.locator('#usePeace').click();
-  await page.locator('#rollBattle').click();
-  await evidencia(page,info,'cancao-de-paz');
-  await page.locator('#applyBattle').click();
-  expect(await page.evaluate(() => ({i:state.R4.units.imperio,n:state.R4.units.necromante,elfo:flow.decks.elfos.discard.some(c=>c.name==='Canção de paz')}))).toEqual({i:1,n:1,elfo:true});
   expect(erros).toEqual([]);
 });
 
@@ -360,8 +297,9 @@ test('ação inválida informa o problema sem gastar recursos, carta ou ação',
   const erros=await abrir(page);
   await preparar(page);
   await configurarCenario(page, 'rodada');
-  await page.locator('[data-region="R10"]').click();
   await page.locator('#handArea [data-card-index="0"]').click();
+  await page.locator('[data-mode="0"]').click();
+  await page.locator('[data-region="R10"]').click();
   const antes=await page.evaluate(() => ({ouro:resources.imperio.ouro,tropas:state.R10.units.imperio,mao:flow.decks.imperio.hand.length,acoes:flow.markers.filter(m=>m.f==='imperio'&&!m.used).length}));
   await page.locator('#executeAction').click();
   await expect(page.locator('#actionError')).not.toBeEmpty();

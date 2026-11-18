@@ -1,8 +1,7 @@
 # Elfos da Floresta
 
-Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
 
-**Conteúdo registrado pelo usuário; implementado no protótipo de quatro facções para teste.** O baralho tem 23 cartas.
+**Conteúdo registrado pelo usuário; implementado no protótipo de quatro facções para teste.** O baralho tem 12 cartas.
 
 **Início definido; implementado no protótipo principal:** os Elfos dominam duas regiões de floresta, com duas unidades em cada uma, sem recursos iniciais. As regiões do cenário de teste estão em [Mapa](../regras/mapa.md).
 
@@ -21,36 +20,16 @@ Se não houver mais tropas aliadas em jogo, aloque 3 vezes uma tropa em qualquer
 
 Sempre que trocar ao menos um recurso com um jogador, receba 1 ponto. Esse bonus se aplica a cada jogador novo, por rodada.
 
-## Baralho
+## Baralho vigente
 
-| Carta | Cópias | Região ou condição | Efeito proposto |
-| --- | ---: | --- | --- |
-| Furia da Ilha | 3 | Região com tropas aliadas | Mova até 3 tropas para uma região adjacente; Se houver tropas inimigas, batalhe com suas tropas |
-| Conhecimentos da Floresta | 4 | Ao ser atacado ou atacar | Ignore o primeiro dano na batalha |
-| Canção de paz | 1 | Qualquer combate declarado, mesmo sem os Elfos envolvidos; antes da rolagem | Os Elfos gastam uma ação disponível e descartam esta carta para cancelar o combate, como resultado 0 a 0. Movimentos e custos já realizados permanecem; cartas já declaradas e ações gastas não são recuperadas. |
-| Trilhas na Mata | 2 | Qualquer região | Mova tropas aliadas de uma região adjacente para essa |
-| Harmônia | 3 | Região com tropas inimigas | Após revelar a carta, troque com o jogador escolhido quantos recursos desejar, incluindo tropas, se ambos concordem |
-| Frutos da Mata | 6 | Qualquer região com tropas aliadas | Recolha um recurso da região em cada região com tropas élficas, mesmo que não seja floresta; uma região sem recurso não produz. |
-| Filhos da Floresta | 3 | Região de Floresta | Consuma um recurso, inclusive uma tropa élfica, e adicione 1 unidade na região do marcador; descarte todas suas cartas e compre até 5 novas cartas. |
-| Milagre da Floresta | 1 | Qualquer região | Converta 3 recursos de um mesmo tipo em 2 de outro mesmo tipo; tropas élficas contam como recurso. |
-| **Total** | **23** | | |
+O baralho tem 12 cartas. A barra indica escolha de modo e cada modo consome a carta inteira.
 
-Conhecimentos da Floresta consome uma ação disponível também ao ser usada pelo atacante. Canção de paz consome uma ação disponível e não requer região.
-
-## Liderança por carta
-
-**Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.
-
-| Carta | Liderança |
-| --- | ---: |
-| Furia da Ilha | 2 |
-| Conhecimentos da Floresta | 0 |
-| Canção de paz | 3 |
-| Trilhas na Mata | 0 |
-| Harmônia | 1 |
-| Frutos da Mata | 1 |
-| Filhos da Floresta | 0 |
-| Milagre da Floresta | 1 |
+| Carta | Cópias | Liderança | Efeito |
+| --- | ---: | ---: | --- |
+| **Fúria da Ilha / Harmônia** | 3 | 1 | **Atacar:** mova de 1 a 3 elfos de uma origem para um destino adjacente. Se houver tropas ou construções inimigas, escolha um defensor e batalhe. **Trocar:** proponha uma troca de Ouro, Madeira ou tropas com outra facção com tropas na região, mediante aceite. Tropas recebidas passam à facção recebedora e vão a regiões dominadas por ela. Receba um ponto pela primeira troca efetiva com cada facção na rodada. |
+| **Trilhas na Mata / Defesa Global** | 2 | 3 | **Mover:** escolha o destino e uma origem adjacente e mova qualquer quantidade positiva de tropas élficas disponíveis, sem abrir combate. **Defesa Global:** após a reação do defensor e antes dos dados, os Elfos podem gastar a carta e uma ação para escolher um dos dois lados com tropas. O lado escolhido ignora 1 dano às tropas nessa batalha, cumulativo com Guarda se aplicável. Funciona inclusive quando os Elfos são terceiros. A batalha segue para a rolagem. |
+| **Frutos da Mata / Filhos da Floresta** | 5 | 1 | **Colher:** a região escolhida deve ser dominada pelos Elfos e ter tropas élficas. Receba 1 recurso impresso por região com tropas élficas no mapa, incluindo regiões contestadas e outros terrenos; regiões sem recurso dão zero. **Recrutar:** escolha uma floresta dominada pelos Elfos, gaste 1 Ouro, 1 Madeira ou 1 tropa élfica de uma origem escolhida e adicione 1 elfo na floresta. É permitido gastar uma tropa da própria região. Descarte a mão restante e compre até cinco somente no modo Recrutar. |
+| **Milagre da Floresta** | 2 | 0 | Em modal, converta 3 recursos de um mesmo tipo em 2 de outro mesmo tipo. Ouro, Madeira e tropas élficas são opções. Escolha as origens das tropas gastas e as regiões dominadas que recebem tropas. A conversão de Ouro em Madeira ou vice-versa dispensa seleção de região. |
 
 ## Questões para implementação
 

@@ -8,3 +8,5 @@ Arquivos preservados para rastreabilidade. Eles refletem decisões e propostas d
 - `fontes-iniciais/`: rascunhos originais das facções e ideias de pontuação.
 
 A organização não apagou os originais. Links históricos que apontam para artefatos fora do projeto dependem de esses artefatos ainda existirem; o índice principal não depende deles.
+
+A [mesa anterior](prototipos/baralhos-anteriores/mapa-fluxo-dinamico.html) e o [registro do experimento](prototipos/baralhos-anteriores/baralhos-revisados-experimento.md) foram arquivados quando os baralhos de 12 cartas foram adotados.

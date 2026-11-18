@@ -1,6 +1,5 @@
 # Império da Gran' Vália
 
-Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
 
 **Estado: proposta para revisão e teste; implementada parcialmente no protótipo.** Valores e efeitos abaixo não são regras finais aprovadas. O Império coleta recursos, constrói tecnologias em regiões distintas, paga impostos para pontuar e pode ganhar pontos ao destruir construções inimigas.
 
@@ -37,37 +36,16 @@ Se não houver regiões controladas, adicione duas tropas em uma região com men
 
 **Definido para teste; implementado no protótipo principal:** ocorre uma vez por rodada, após a compra e antes do leilão. O máximo de sete vale para essa habilidade: se restar apenas uma vaga, a recuperação sem região dominada adiciona apenas uma tropa; com sete ou mais, não há alistamento. As cartas podem aumentar o total além de sete. As condições de O Progresso e Assegurar Recursos para o Rei também estão implementadas no protótipo principal.
 
-## Baralho principal proposto
+## Baralho vigente
 
-| Carta | Cópias | Região ou condição | Efeito proposto |
-| --- | ---: | --- | --- |
-| Marcha Imperial | 3 | Região adjacente a uma que você domina | Mova até 3 soldados de uma região adjacente para a região selecionada; Se houver inimigos, inicie uma batalha na região. |
-| Guarda Imperial | 2 | Ao ser atacado | Ignore até 1 danos às suas unidades nessa batalha. |
-| Tambores de Guerra | 2 | Região qualquer | Mova até 2 soldados adjacentes; Inicie batalha na região; ignore 1 dano às suas unidades na batalha. |
-| Alistamento | 2 | Região controlada | Pague 1 Ouro e adicione 2 soldados. |
-| O Progresso | 3 | Região com tropas aliadas e sem construção imperial | Pague o custo de uma tecnologia disponível e construa-a. |
-| Assegurar Recursos para o Rei | 5 | Região com recurso disponível e tropas/construção aliada | Colete 1 recurso; descarte cópias adicionais da mão para coletar mais 1 do mesmo tipo por cópia. |
-| Reorganizar Contingente | 2 | Região com soldados imperiais | Mova até 3 soldados para uma região adjacente. |
-| Aliança com o Império | 1 | Região com outro jogador | Façam uma troca imediata de recursos sem limite, desde que ambos concordem |
-| Pagamento de Impostos | 3 | Região controlada | Pague o imposto ativo e pontue seu valor se puder arcar com o custo. |
-| **Total** | **23** | | |
+O baralho tem 12 cartas. A barra indica escolha de modo e cada modo consome a carta inteira.
 
-
-## Liderança por carta
-
-**Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.
-
-| Carta | Liderança |
-| --- | ---: |
-| Marcha Imperial | 1 |
-| Guarda Imperial | 1 |
-| Tambores de Guerra | 2 |
-| Alistamento | 0 |
-| O Progresso | 1 |
-| Assegurar Recursos para o Rei | 1 |
-| Reorganizar Contingente | 1 |
-| Aliança com o Império | 0 |
-| Pagamento de Impostos | 1 |
+| Carta | Cópias | Liderança | Efeito |
+| --- | ---: | ---: | --- |
+| **Marcha Imperial** | 3 | 2 | Escolha **Mover**, **Atacar** ou **Mover e atacar**. O destino precisa ser adjacente a uma região dominada pelo Império. Para mover, envie de 1 a 3 soldados de uma única região adjacente; mesmo com inimigos no destino, escolher só mover encerra a ação sem combate. Para atacar, exija soldados imperiais no destino após o movimento, se houver, e escolha um defensor presente com tropas ou construções. A Fortaleza permite rerrolar um dado no modo que abriu combate. |
+| **Assegurar Recursos para o Rei** | 4 | 1 | Colete 1 recurso impresso em região com tropa ou construção imperial. Cada cópia extra descartada na mesma ação rende mais 1 do mesmo tipo, até três extras conforme a mão. Serraria ou Mercado Local dá o bônus atual, uma vez por ação. |
+| **Ordens da Coroa** | 3 | 1 | **Construir:** pague o custo da tecnologia escolhida, respeitando seu pré-requisito em outra região, com tropas no local e limite de uma construção imperial por região. Receba 1 ponto. **Pagar imposto:** pague os custos do imposto ativo e receba os pontos indicados. Exige uma região dominada, imposto ativo e saldo suficiente. Se houver custo em soldado, escolha sua origem entre regiões com soldados imperiais. O limite é um pagamento por rodada. O imposto é substituído e o atraso penalizado conforme as regras da facção. |
+| **Guarda Imperial** | 2 | 0 | Reação ao defender, antes dos dados. Gaste a carta e uma ação restante para ignorar o primeiro dano às tropas, ou os dois primeiros enquanto existir um Quartel. |
 
 ## Baralho de impostos proposto
 

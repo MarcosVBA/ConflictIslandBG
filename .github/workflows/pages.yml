@@ -30,6 +30,7 @@ jobs:
       - run: node testes/validar-elfos.cjs
       - run: node testes/validar-necromante.cjs
       - run: node testes/validar-novas-habilidades.cjs
+      - run: node testes/validar-baralhos-revisados.cjs
       - run: node testes/validar-publicacao.cjs
       - run: npm ci
       - run: npx playwright install --with-deps chromium --only-shell

@@ -1,6 +1,5 @@
 # Piratas do Mar Safira
 
-Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
 
 ## Identidade e componentes
 
@@ -20,37 +19,13 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 
 **Definido:** na fase de pontuação, após receber a renda do Bar, os Piratas devolvem à reserva todo o Ouro que possuem e recebem 1 ponto por Ouro devolvido. Durante a rodada, podem trocar o Ouro recebido antes da pontuação. Um Bar controlado gera 1 Ouro por rodada; os Piratas podem ter no máximo um Bar no mapa. O acordo de Corsário concede uma operação imediata de movimento.
 
-## Baralho registrado
+## Baralho vigente
 
-**Conteúdo registrado; implementado com adaptações de teste.** Novas Comandante a Bordo recompõe a mão até cinco cartas após descartá-la. Os textos preservam os efeitos documentados; os limites de movimento não substituem a regra de participação no combate.
+O baralho tem 12 cartas. A barra indica escolha de modo e cada modo consome a carta inteira.
 
-| Carta | Cópias | Alvo ou condição | Efeito |
-| --- | ---: | --- | --- |
-| Invasão Costeira | 3 | Região costeira | Mova até 3 unidades de uma região costeira, se houver alvos, faça um saque. |
-| Ataque a Linha de Suprimentos | 2 | Região com inimigos e tropas aliadas; O inimigo precisa ter ouro | Saqueie um inimigo. Em caso de sucesso, adicione 1 Ouro aos espólios. |
-| Trabalhe enquanto eles dormem | 1 | Região com inimigo e tropas aliadas | Saqueie; Ignore o primeiro dano recebido em combate. |
-| Carta de Corsário | 2 | Região com outro jogador presente | Proponha um preço de 0 a 3 Ouros. Se aceitar, receba o valor; O jogador que pagou a oferta pode mover piratas para areas adjacentes e realizar um saque (ouro vai para os piratas). |
-| Serviço de Transporte Pirata | 2 | Região com outro jogador presente | Proponha um preço de 0 a 3 Ouros. Se aceitar, receba o valor; O jogador que pagou a oferta pode mover unidades de uma região qualqer para outra costeira ou adjacente |
-| Pirata Aprendiz | 3 | Região sob seu controle ou sem dominio | Adicione 1 pirata na região. |
-| Mercenários Piratas | 2 | Local com Bar Pirata | Adicione 2 piratas. Você pode movê-los para uma região costeira. |
-| Atrás do Tesouro | 3 | Local com piratas | Mova até 3 piratas dessa região para outra adjacente. |
-| Novas Comandante a Bordo | 2 | Qualquer lugar | Descarte toda a mão e compre até ter 5 cartas. |
-| Taverna Pirata | 3 | Região sobre seu controle | Adicione um Bar Pirata na região, respeitando o limite de um no mapa. |
-| **Total** | **23** | | |
-
-## Liderança por carta
-
-**Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.
-
-| Carta | Liderança |
-| --- | ---: |
-| Invasão Costeira | 2 |
-| Ataque a Linha de Suprimentos | 1 |
-| Trabalhe enquanto eles dormem | 1 |
-| Carta de Corsário | 0 |
-| Serviço de Transporte Pirata | 0 |
-| Pirata Aprendiz | 1 |
-| Mercenários Piratas | 2 |
-| Atrás do Tesouro | 0 |
-| Novas Comandante a Bordo | 0 |
-| Taverna Pirata | 1 |
+| Carta | Cópias | Liderança | Efeito |
+| --- | ---: | ---: | --- |
+| **Invasão Costeira** | 4 | 1 | Escolha **Mover**, **Saquear** ou **Mover e saquear**. O destino é costeiro. Se mover, envie de 1 a 3 piratas de uma única outra costa, com ou sem conexão terrestre. Só mover pode terminar junto a inimigos sem abrir combate. O saque exige piratas no destino após o eventual movimento e um defensor com tropas ou construções ali. Sucesso concede 1 Ouro primeiro do defensor e depois da reserva. |
+| **Taverna Pirata / Pirata Aprendiz** | 3 | 1 | **Construir:** coloque um Bar em região dominada, respeitando o limite de um no mapa. **Recrutar:** adicione 1 pirata em região dominada pelos Piratas ou sem domínio. |
+| **Carta de Corsário / Serviço de Transporte Pirata** | 3 | 2 | Proponha um acordo a outra facção presente na região escolhida, aceite manual e negociação de 0 a 3 Ouros. **Corsário:** o contratante pode usar piratas presentes para mover para uma região adjacente e, se escolher atacar, realizar um saque. O ataque pode ocorrer no próprio local sem mover. O Ouro do saque vai para os Piratas. **Transporte:** mova tropas do contratante de uma região à escolha para outra região costeira ou adjacente à origem. O transporte termina no movimento. Somente os Piratas gastam carta e ação pelo acordo. |
+| **Vento a Favor** | 2 | 1 | Dois modos de reação dos **Piratas como atacantes em um saque**, incluindo o de Corsário. Após declarar o ataque e antes do defensor reagir, gaste a carta e mais uma ação. **Descartar dados de defesa:** a reserva de dados de defesa fica em zero; as cruzes dos dados de ataque e a Guarda continuam valendo. Ofereça esse modo quando houver pelo menos um dado de defesa a suprimir. **Recolher mais espólios:** se o saque for bem-sucedido, receba 1 Ouro extra pelo procedimento normal, totalizando 2. Saque malsucedido rende zero. Use no máximo uma cópia por combate. |

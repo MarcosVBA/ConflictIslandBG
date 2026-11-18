@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8');
 const harness = source.split('// Links dos módulos atuais')[0];
 const scenario = String.raw`
-check("definitions.length===11&&edges.length===18&&factionIds.length===4&&cardDefs.elfos.reduce((n,c)=>n+c[1],0)===23");
+check("definitions.length===11&&edges.length===18&&factionIds.length===4&&cardDefs.elfos.reduce((n,c)=>n+c[1],0)===12");
 check("state.R6.units.elfos===2&&state.R10.units.elfos===2&&state.R3.tower&&resources.elfos.ouro===0&&resources.elfos.madeira===0");
 run("scoreRound()");check("game.score.elfos===1");run("scoreRound()");check("game.score.elfos===1");
 run("flow.round=2;state.R2.units.imperio=0;state.R2.units.elfos=1;state.R4.units.necromante=0;state.R4.units.elfos=1;scoreRound()");check("game.score.elfos===3");
@@ -27,9 +27,6 @@ run("state=initial();game=newGame();flow=newFlow();for(const r of definitions)st
 assert(element('flow').innerHTML.includes('Vingança da Terra'));
 set('elfRevive1','R2');set('elfRevive2','R2');set('elfRevive3','R10');click('confirmElfRevive');
 check("state.R2.units.elfos===2&&state.R10.units.elfos===1");
-// Ao atacar, a proteção consome a segunda ação e reduz o dano.
-run("state=initial();game=newGame();flow=newFlow();flow.phase='resolução';flow.markers=[{f:'elfos',region:'R6',used:false},{f:'elfos',region:null,used:false}];flow.decks.elfos.hand=[{name:'Furia da Ilha'},{name:'Conhecimentos da Floresta'}];state.R6.units.imperio=1;state.R6.units.elfos=1;battle={f:'elfos',defender:'imperio',region:'R6',ci:0,mi:0,card:'Furia da Ilha',stage:'reaction'};renderBattle()");
-click('useAttackDefense');check("flow.markers.every(m=>m.used)&&flow.decks.elfos.discard.some(c=>c.name==='Conhecimentos da Floresta')");click('skipDefense');click('skipPeace');run('Math.random=()=>0.8');click('rollBattle');check("battle.attProtection===1&&battle.result.attackerLoss===0");click('applyBattle');
 console.log('Pontuação, coleta, trocas, conversão e recrutamento élficos verificados.');
 `;
 vm.runInNewContext(harness + scenario, { require, console, process, __dirname });

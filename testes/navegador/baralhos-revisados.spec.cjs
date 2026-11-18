@@ -2,14 +2,14 @@
 const { test, expect } = require('@playwright/test');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const url = pathToFileURL(path.resolve(__dirname, '../../mapa-baralhos-revisados.html')).href;
+const url = pathToFileURL(path.resolve(__dirname, '../../mapa-fluxo-dinamico.html')).href;
 
 test('variante local prepara modo, limpa seleção e resolve combate com reações', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.route(/^https?:/, route => route.abort());
   await page.goto(url);
-  await expect(page).toHaveTitle(/baralhos revisados/);
+  await expect(page).toHaveTitle(/protótipo principal/);
   await page.locator('#orderChoice').selectOption('imperio');
   await page.locator('#startRound').click();
   if (await page.locator('#confirmImperialRecruit').isVisible()) {
@@ -53,4 +53,32 @@ test('variante local prepara modo, limpa seleção e resolve combate com reaçõ
   await page.locator('#applyBattle').click();
   expect(await page.evaluate(() => ({turn:flow.turn, used:flow.markers.filter(m=>m.used).length, log:flow.log.join(' ')}))).toMatchObject({turn:1,used:4,log:expect.stringContaining('Saquear')});
   expect(errors).toEqual([]);
+});
+
+test('trocar carta cancela remanejamento e Milagre pode ser cancelado', async ({ page }) => {
+  await page.route(/^https?:/, route => route.abort());
+  await page.goto(url);
+  await page.evaluate(() => {
+    state=initial(); resources=initialResources(); game=newGame(); flow=newFlow();
+    flow.phase='resolução'; flow.order=['necromante','piratas','elfos','imperio'];
+    flow.markers=[{f:'necromante',region:'R4',used:false}];
+    flow.decks.necromante.hand=[{name:'Remanejando Mortos'},{name:'Extratores da Torre'}];
+    renderFlow();showRemanejamento('necromante',0,0);
+  });
+  await page.locator('#remOrigin').selectOption('R3');
+  await page.locator('#remDestination').selectOption('R4');
+  await page.locator('#remQuantity').fill('1');
+  await page.locator('#remMove').click();
+  await page.locator('#handArea [data-card-index="1"]').click();
+  expect(await page.evaluate(() => ({a:state.R3.units.necromante,b:state.R4.units.necromante,used:flow.markers[0].used}))).toEqual({a:2,b:1,used:false});
+  await page.evaluate(() => {
+    flow=newFlow();flow.phase='resolução';flow.order=['elfos','imperio','necromante','piratas'];
+    flow.markers=[{f:'elfos',region:null,used:false}];flow.decks.elfos.hand=[{name:'Milagre da Floresta'}];renderFlow();
+  });
+  await page.locator('#handArea [data-card-index="0"]').click();
+  await page.locator('[data-mode="0"]').click();
+  await expect(page.locator('#actionDialog')).toBeVisible();
+  await page.locator('#cancelActionDialog').click();
+  await expect(page.locator('#actionDialog')).toBeHidden();
+  expect(await page.evaluate(() => ({cards:flow.decks.elfos.hand.length,used:flow.markers[0].used}))).toEqual({cards:1,used:false});
 });

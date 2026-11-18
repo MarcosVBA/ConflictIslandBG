@@ -2,7 +2,7 @@
 // Estado reproduzível apenas para testes; ações continuam sendo feitas pela interface.
 async function configurarCenario(page, nome) {
   const cenarios = {
-    rodada: { imperio: 'Alistamento', necromante: 'Trabalhadores Zumbificado', piratas: 'Pirata Aprendiz', elfos: 'Frutos da Mata' },
+    rodada: { imperio: 'Assegurar Recursos para o Rei', necromante: 'Extratores da Torre', piratas: 'Taverna Pirata / Pirata Aprendiz', elfos: 'Frutos da Mata / Filhos da Floresta' },
     combate: { imperio: 'Marcha Imperial', necromante: 'Praga Resistente', elfos: 'Canção de paz' },
     paz: { imperio: 'Marcha Imperial', elfos: 'Canção de paz' },
   };

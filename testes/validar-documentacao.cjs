@@ -72,14 +72,12 @@ for (const file of modules) for (const match of read(file).matchAll(/\[[^\]]+\]\
   const href = match[1].split('#')[0];
   if (href && !/^[a-z]+:/i.test(href)) assert(fs.existsSync(path.resolve(root,path.dirname(file),decodeURIComponent(href))), `Link quebrado em ${file}: ${href}`);
 }
-for (const [faction, section] of [['piratas','## Baralho registrado'],['necromante','## Baralho registrado'],['imperio','## Baralho principal proposto'],['elfos','## Baralho']]) {
-  const content = read(`faccoes/${faction}.md`).split(section)[1]?.split('\n## ')[0];
+for (const faction of ['piratas','necromante','imperio','elfos']) {
+  const content = read(`faccoes/${faction}.md`).split('## Baralho vigente')[1]?.split('\n## ')[0];
   assert(content, `Baralho ausente: ${faction}`);
-  const rows = [...content.matchAll(/^\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|/gm)].map(m=>[m[1].trim(),Number(m[2])]);
-  assert(JSON.stringify(rows) === run(`JSON.stringify(cardDefs.${faction}.map(([name,count])=>[name,count]))`), `Baralho divergente: ${faction}`);
-  const leadership = read(`faccoes/${faction}.md`).split('## Liderança por carta')[1]?.split('\n## ')[0];
-  const values = [...leadership.matchAll(/^\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|/gm)].map(m=>[m[1].trim(),Number(m[2])]);
-  assert(JSON.stringify(values) === run(`JSON.stringify(cardDefs.${faction}.map(([name])=>[name,leadershipValues[name]]))`), `Liderança divergente: ${faction}`);
+  const rows = [...content.matchAll(/^\|\s*\*\*(.*?)\*\*\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|/gm)].map(m=>[m[1],Number(m[2]),Number(m[3])]);
+  assert(JSON.stringify(rows) === run(`JSON.stringify(cardDefs.${faction}.map(([name,count])=>[name,count,leadershipValues[name]]))`), `Baralho ou liderança divergente: ${faction}`);
+  assert(rows.reduce((sum,row)=>sum+row[1],0)===12, `Quantidade divergente: ${faction}`);
 }
 const mapText=read('regras/mapa.md');
 const rows=[...mapText.matchAll(/^\|\s*(R\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*(Sim|Não)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|/gm)];

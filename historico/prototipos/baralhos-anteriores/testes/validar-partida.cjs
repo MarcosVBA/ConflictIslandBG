@@ -1,0 +1,45 @@
+'use strict';
+
+// Percorre uma rodada completa com as quatro facções e o fluxo real da mesa.
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const source = fs.readFileSync(path.join(__dirname, 'validar-documentacao.cjs'), 'utf8');
+const harness = source.split('// Links dos módulos atuais')[0];
+const scenario = String.raw`
+set('orderChoice','imperio');set('handSize',5);click('startRound');
+set('imperialRecruit','R1');click('confirmImperialRecruit');
+for(let i=0;i<4;i++)click('passBid');
+run("flow.decks.imperio.hand=[{name:'Alistamento',text:'',leadership:0}];flow.decks.necromante.hand=[{name:'Trabalhadores Zumbificado',text:'',leadership:0}];flow.decks.piratas.hand=[{name:'Pirata Aprendiz',text:'',leadership:1}];flow.decks.elfos.hand=[{name:'Frutos da Mata',text:'',leadership:1}];renderFlow()");
+function play(region){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));set('actionRegion',region);element('actionRegion').onchange();cards[0].onclick();click('executeAction')}
+play('R1');check("state.R1.units.imperio===5&&resources.imperio.ouro===0&&activeFaction()==='necromante'");
+play('R4');check("resources.necromante.madeira===2&&activeFaction()==='piratas'");
+play('R5');check("state.R5.units.piratas===2&&activeFaction()==='elfos'");
+play('R10');check("resources.elfos.madeira===2&&activeFaction()==='imperio'");
+for(let i=0;i<4;i++){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));click('passAction')}
+check("activeFaction()===null");click('toScore');
+check("flow.phase==='pontuação'&&game.score.elfos===1&&game.score.necromante===1&&game.scored===1");
+click('nextRound');check("flow.phase==='preparação'&&flow.round===2&&flow.order[0]==='imperio'");
+// Uma partida sem ações exercita as transições reais até a vitória por pontuação.
+click('reset');
+let rounds=0;
+while(!run('Boolean(game.winner)') && rounds<40){
+  rounds++;
+  set('orderChoice','imperio');set('handSize',5);click('startRound');
+  if(run("flow.phase==='alistamento'")){set('imperialRecruit','R1');click('confirmImperialRecruit')}
+  for(let i=0;i<4;i++)click('passBid');
+  while(run('activeFaction()!==null')){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));click('passAction')}
+  click('toScore');
+  if(!run('Boolean(game.winner)'))click('nextRound');
+}
+check("game.winner!==null&&game.score[game.winner]>=30&&flow.phase==='fim'&&game.endEventsReady");
+assert(rounds>1&&rounds<=40,'A partida deve atingir a vitória em rodadas sucessivas.');
+click('reset');check("flow.phase==='preparação'&&flow.round===1&&game.winner===null");
+// O jogador escolhe entre tecnologias de maior nível e recursos empatados.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';game.tax={g:1,w:0,s:0,p:2};game.delay=2;state.R1.tech='Salão Imperial';state.R2.tech='Fortaleza';state.R5.tech='Serraria';resources.imperio.ouro=2;resources.imperio.madeira=2;beginScoring()");
+assert(element('flowMessage').innerHTML.includes('id="penaltyTech"')&&element('flowMessage').innerHTML.includes('id="penaltyResource"'),'Empates de imposto exigem as escolhas do jogador.');
+set('penaltyTech','R2');set('penaltyResource','madeira');click('confirmPenalty');
+check("state.R1.tech==='Salão Imperial'&&state.R2.tech===null&&state.R5.tech==='Serraria'&&resources.imperio.ouro===2&&resources.imperio.madeira===1&&game.delay===0&&game.tax!==null&&flow.phase==='pontuação'");
+console.log('Rodada com ações das quatro facções e partida até a vitória verificadas.');
+`;
+vm.runInNewContext(harness + scenario, { require, console, process, __dirname });

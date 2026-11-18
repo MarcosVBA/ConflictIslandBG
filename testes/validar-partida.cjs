@@ -10,12 +10,12 @@ const scenario = String.raw`
 set('orderChoice','imperio');set('handSize',5);click('startRound');
 set('imperialRecruit','R1');click('confirmImperialRecruit');
 for(let i=0;i<4;i++)click('passBid');
-run("flow.decks.imperio.hand=[{name:'Alistamento',text:'',leadership:0}];flow.decks.necromante.hand=[{name:'Trabalhadores Zumbificado',text:'',leadership:0}];flow.decks.piratas.hand=[{name:'Pirata Aprendiz',text:'',leadership:1}];flow.decks.elfos.hand=[{name:'Frutos da Mata',text:'',leadership:1}];renderFlow()");
-function play(region){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));set('actionRegion',region);element('actionRegion').onchange();cards[0].onclick();click('executeAction')}
-play('R1');check("state.R1.units.imperio===5&&resources.imperio.ouro===0&&activeFaction()==='necromante'");
-play('R4');check("resources.necromante.madeira===2&&activeFaction()==='piratas'");
-play('R5');check("state.R5.units.piratas===2&&activeFaction()==='elfos'");
-play('R10');check("resources.elfos.madeira===2&&activeFaction()==='imperio'");
+run("flow.decks.imperio.hand=[{name:'Assegurar Recursos para o Rei'}];flow.decks.necromante.hand=[{name:'Extratores da Torre'}];flow.decks.piratas.hand=[{name:'Taverna Pirata / Pirata Aprendiz'}];flow.decks.elfos.hand=[{name:'Frutos da Mata / Filhos da Floresta'}];renderFlow()");
+function play(region, index){run("flow.markers.find(m=>m.f===activeFaction()&&!m.used).region="+JSON.stringify(region)+";preparedMode={f:activeFaction(),ci:0,mi:flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used),mode:experimentalModes[flow.decks[activeFaction()].hand[0].name]["+index+"]};showPlayableAction(preparedMode.f,0,preparedMode.mi,preparedMode.mode)");click('executeAction')}
+set('extra',0);play('R1',0);check("resources.imperio.ouro===2&&activeFaction()==='necromante'");
+play('R4',1);check("resources.necromante.madeira===2&&activeFaction()==='piratas'");
+play('R5',1);check("state.R5.units.piratas===2&&activeFaction()==='elfos'");
+play('R10',0);check("resources.elfos.madeira===2&&activeFaction()==='imperio'");
 for(let i=0;i<4;i++){set('actionMarker',run('flow.markers.findIndex(m=>m.f===activeFaction()&&!m.used)'));click('passAction')}
 check("activeFaction()===null");click('toScore');
 check("flow.phase==='pontuação'&&game.score.elfos===1&&game.score.necromante===1&&game.scored===1");

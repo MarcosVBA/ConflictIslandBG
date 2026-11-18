@@ -43,3 +43,7 @@ A condição especial de região devastada é definida em [Necromante](../faccoe
 Madeira e Ouro são recursos representados no protótipo. O mapa identifica onde estão disponíveis, sem definir renda automática geral. Cada facção tem regras próprias de coleta e uso no seu documento. A composição e o efeito de cada carta pertencem ao respectivo documento de facção.
 
 **Pendente:** regras gerais de produção, suprimentos físicos e condições de coleta que não estejam determinadas por carta ou facção.
+
+## Modos das cartas
+
+**Definido.** Uma barra indica escolha de um modo. Jogar um modo gasta a carta inteira e uma ação, inclusive quando o outro modo é uma reação. A oferta no leilão compromete a carta inteira e usa a liderança impressa. Uma ação descrita como mover e/ou atacar permite apenas mover, apenas atacar ou mover e então combater em uma ação. A Infestação possui resolução própria descrita no módulo do Necromante. Preparações canceladas e ações inválidas preservam os recursos e o turno. Acordos válidos recusados gastam carta e ação conforme as regras de Corsário, Transporte e Harmonia.

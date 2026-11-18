@@ -8,13 +8,13 @@ Os marcadores de ação ficam em reserva; a região é escolhida ao preparar a c
 
 A partida não é salva ao fechar ou recarregar. O cenário inicial é o de [Mapa](../regras/mapa.md); o extrator inicial é provisório e ajustável. Restaurar o cenário reinicia também rodada, placar, cartas e impostos. A [IA para facções](../ideias/ia-para-faccoes.md) permanece adiada.
 
-O experimento de [baralhos revisados](baralhos-revisados.md) mantém decisões de teste separadas das tabelas vigentes e dispõe de uma [mesa local própria](../mapa-baralhos-revisados.html). As suítes de regras e navegador passaram; a checagem completa também passou. O playtest comparativo humano ainda não foi realizado, portanto o equilíbrio e o tempo de decisão permanecem sem avaliação.
+O usuário adotou os baralhos revisados como esquema oficial após experimentar uma partida mais dinâmica. Cada facção tem 12 cartas. O equilíbrio permanece sujeito a partidas adicionais.
 
 ## Implementação e adaptações
 
-O baralho do [Necromante](../faccoes/necromante.md) tem 20 cartas; Monumento a Morte custa 1 Madeira e Despertar para a Morte é uma magia. A Magia da Torre e o Alistamento Obrigatório estão implementados. O imposto imperial ativo e o atraso aparecem durante a vez do Império; a mão usa cinco cartas por padrão e pode ser ajustada. Custos, propostas e demais efeitos constam nos módulos de cada facção.
+O baralho do [Necromante](../faccoes/necromante.md) tem 12 cartas; Monumento a Morte custa 1 Madeira e Despertar para a Morte é uma magia. A Magia da Torre e o Alistamento Obrigatório estão implementados. O imposto imperial ativo e o atraso aparecem durante a vez do Império; a mão usa cinco cartas por padrão e pode ser ajustada. Custos, propostas e demais efeitos constam nos módulos de cada facção.
 
-Os [Elfos](../faccoes/elfos.md) têm 23 cartas e começam com duas tropas em cada uma das duas florestas, sem recursos; Vingança da Terra solicita imediatamente três escolhas de floresta ao ficarem sem tropas, após concluir a resolução da ação ou combate em andamento; Conhecimentos da Floresta pode ser usada pelo atacante gastando outra ação; Canção de paz pode cancelar um combate mesmo com terceiros, e as trocas de tropas convertem unidades para a facção recebedora em regiões por ela dominadas. No mapa, R9 e R11 são costeiras e têm Ouro; R7 é montanha sem costa ou recurso.
+Os [Elfos](../faccoes/elfos.md) têm 12 cartas e começam com duas tropas em cada uma das duas florestas, sem recursos. Vingança da Terra permanece implementada, e as tropas recebidas em trocas passam à facção recebedora. No mapa, R9 e R11 são costeiras e têm Ouro; R7 é montanha sem costa ou recurso.
 
 A mesa jogável mostra o mapa, a faixa de facções acima dele e a mão sobre a parte inferior. O símbolo de cada facção abre seu resumo e regras, incluindo o imposto e as tecnologias do Império. Preparação e liderança ocorrem em janelas sobre o mapa; o alistamento ainda permite selecionar uma região. As unidades usam meeples e as construções usam peças coloridas. As conexões ficam visíveis e as da região selecionada recebem destaque; as curvas tentam evitar regiões e cruzamentos. Em movimentos compatíveis, o mapa destaca e permite escolher origens ou destinos; quantidades e confirmação continuam no painel. Uma região inválida pode ser inspecionada sem alterar a escolha. O protótipo oferece tela cheia quando o navegador permite. Os arquivos opcionais de arte são configurados em `jogo/apresentacao/artes.js`. O estado e as hipóteses de pontuação estão em [Pontuação](../regras/pontuacao.md).
 
@@ -24,7 +24,7 @@ As informações da região selecionada podem ser abertas em uma camada translú
 
 Clicar em uma área vazia do mapa limpa a região e a carta em preparação, sem gastar recursos ou ações. Combates já declarados continuam sujeitos à resolução obrigatória; as escolhas das janelas modais não são canceladas por um clique no mapa.
 
-Após a escolha do alvo, as decisões e os dados de combate aparecem em uma janela modal que não permite cancelar o combate declarado. A carta Novas Comandante a Bordo também usa uma janela cancelável antes da confirmação; escolhas que precisam do mapa permanecem no painel. Os resumos de pontuação, hipóteses, baralhos e registro ficam em Ferramentas. Outras ações independentes do mapa ainda podem precisar da mesma adaptação.
+Após a escolha do alvo, as decisões e os dados de combate aparecem em uma janela modal que não permite cancelar o combate declarado. Milagre da Floresta usa uma janela cancelável antes da confirmação; escolhas que precisam do mapa permanecem no painel. Os resumos de pontuação, hipóteses, baralhos e registro ficam em Ferramentas. Outras ações independentes do mapa ainda podem precisar da mesma adaptação.
 
 A distribuição do site é preparada a partir do HTML principal. A cópia publicada adiciona instalação e cache opcionais; o HTML de origem continua independente. A partida permanece em memória mesmo na versão instalada.
 
@@ -32,11 +32,11 @@ O Ouro dos Piratas permanece disponível para acordos durante a rodada. Na pontu
 
 ## Limitações
 
-- Na variante experimental, o teste de navegador prepara o estado da batalha para exercitar a reação; não percorre toda a declaração do combate pela interface. A proteção do atacante por Defesa Global e o saque sem movimento da Invasão não têm cenário automatizado específico. O playtest comparativo e a validação visual humana permanecem pendentes.
+- No teste da mesa, o navegador prepara o estado da batalha para exercitar a reação; não percorre toda a declaração do combate pela interface. A proteção do atacante por Defesa Global e o saque sem movimento da Invasão não têm cenário automatizado específico. O playtest comparativo e a validação visual humana permanecem pendentes.
 
 - Invasão Costeira permite movimento sem saque para costa sem inimigos; Marcha Imperial também permite movimento sem combate quando não há inimigos. Ataques também podem atingir construções sem tropas defensoras, conforme [Combate](../regras/combate.md).
 - A conciliação de dano excedente está em [Combate](../regras/combate.md). As demais cartas defensivas continuam pendentes; Guarda Imperial é uma adaptação de teste.
-- A declaração do ataque, a defesa e Canção de paz são apresentadas em etapas sucessivas e gastam a carta e a ação na confirmação. Validação, transições, disponibilidade e consumo das reações, rolagem, baixas, saque e cálculo dos efeitos posteriores estão no motor; a apresentação e a orquestração continuam na aplicação.
+- A declaração do ataque e as reações são apresentadas em etapas sucessivas e gastam a carta e a ação na confirmação. Validação, transições, disponibilidade e consumo das reações, rolagem, baixas, saque e cálculo dos efeitos posteriores estão no motor; a apresentação e a orquestração continuam na aplicação.
 - Ajustes manuais de depuração podem criar estados intermediários e não simulam automaticamente a perda da Torre.
 - Não há salvamento, semente reproduzível, exportação de relatório ou métricas automáticas de equilíbrio.
 - Os testes incluem DOM substituto e Chromium automatizado com dados controlados; não comprovam acessibilidade completa, instalação em dispositivos físicos ou todas as combinações. O fluxo foi validado pelo usuário; o equilíbrio e outras interações continuam sujeitos a partidas e revisão.

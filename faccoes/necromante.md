@@ -1,6 +1,5 @@
 # Necromante da Torre Esquecida
 
-Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
 
 ## Identidade e região devastada
 
@@ -26,41 +25,16 @@ Ao perder o domínio da Torre, inclusive por empate, remova imediatamente todas 
 | 5 | 3 |
 | 6 ou mais | 4 |
 
-## Baralho registrado
+## Baralho vigente
 
-**Definido; implementado:** Remanejando Mortos e Monumento a Morte recompõem a mão até cinco cartas após descartá-la.
+O baralho tem 12 cartas. A barra indica escolha de modo e cada modo consome a carta inteira.
 
-
-| Carta | Cópias | Alvo ou condição | Efeito |
-| --- | ---: | --- | --- |
-| Ataque Zumbi | 2 | Região com unidades inimigas | Mova quantas unidades quiser de regiões adjacentes e batalhe. Se eliminar todos os inimigos e restarem tropas, converta metade das tropas eliminadas, arredondando para cima. |
-| Infestação | 2 | Região com unidades inimigas | Mova até 2 unidades de regiões adjacentes e batalhe. Ao fim da batalha, adicione 1 zumbi no local. |
-| Horda interminável | 2 | Região com unidades inimigas | Mova quantas unidades quiser de regiões adjacentes e batalhe. Ignore o primeiro dano às suas unidades. Se eliminar todos os inimigos e restarem tropas, converta metade das tropas eliminadas, arredondando para cima. |
-| Praga Resistente | 2 | Ao receber um ataque | Ignore o primeiro dano às suas unidades |
-| Magia das Trevas | 3 | Qualquer região, conforme a magia | Escolha uma magia, pague seu custo e execute o efeito. |
-| Trabalhadores Zumbificado | 3 | Região com extrator | Colete 1 recurso por extrator colocado no mapa. |
-| Projeto de Poder Maligno | 3 | Região com suas unidades e algum recurso | Adicione 1 extrator, no limite de 1 por região. |
-| Remanejando Mortos | 2 | Qualquer região | Descarte a mão e distribua zumbis entre regiões devastadas conectadas, movendo quantas tropas e quantas vezes desejar; compre até ter 5 cartas. |
-| Monumento a Morte | 1 | Região devastada, com ao menos uma região dominada por oponentes | Construa um monumento por 1 madeira, pontue 2 por região com monumento, descarte toda a mão e compre até ter 5 cartas. |
-| **Total** | **20** | | |
-
-**Implementado no protótipo principal:** Monumento a Morte exige e consome 1 Madeira. Sem o recurso, a ação não é realizada e a carta e o marcador permanecem disponíveis.
-
-## Liderança por carta
-
-**Valores definidos pelo usuário para teste; o balanceamento não é final.** Cada cópia da carta usa o mesmo valor.
-
-| Carta | Liderança |
-| --- | ---: |
-| Ataque Zumbi | 1 |
-| Infestação | 1 |
-| Horda interminável | 3 |
-| Praga Resistente | 0 |
-| Magia das Trevas | 1 |
-| Trabalhadores Zumbificado | 0 |
-| Projeto de Poder Maligno | 1 |
-| Remanejando Mortos | 0 |
-| Monumento a Morte | 1 |
+| Carta | Cópias | Liderança | Efeito |
+| --- | ---: | ---: | --- |
+| **Infestação** | 3 | 1 | Escolha um defensor com tropas ou construções. Ataque com os zumbis já presentes e/ou mova até 2 zumbis no total de regiões adjacentes. Após aplicar o combate, adicione 1 zumbi na região, inclusive com resultado natural de 0 a 0 ou sem sobreviventes. Se a Magia da Torre impedir a batalha antes da rolagem ou recuperar a Torre após as baixas, omita o recrutamento. |
+| **Extratores da Torre** | 4 | 1 | **Construir:** construa um extrator em região com zumbi, recurso impresso e sem extrator. **Colher:** escolha uma região com extrator e receba 1 recurso impresso de cada região do mapa com extrator. |
+| **Magia das Trevas / Monumento à Morte** | 2 | 2 | **Magia:** escolha uma das quatro magias atuais, com seus custos e alvos. **Monumento:** gaste 1 Madeira em região devastada sem monumento, desde que algum oponente domine uma região no mapa. Pontue 2 por região com monumento, incluindo o novo. Depois, descarte a mão restante e compre até cinco cartas, salvo se a partida tiver terminado. A reposição pertence ao modo Monumento. |
+| **Remanejando Mortos** | 3 | 0 | Reutilize o remanejamento atual. As regiões elegíveis são as devastadas ao começar a ação e continuam elegíveis até concluir. Permita mover quantos zumbis quiser, quantas vezes quiser, entre regiões elegíveis ligadas diretamente. Preserve a possibilidade de concluir com zero deslocamentos. Ao concluir, descarte a mão restante e compre até cinco. Cancelar desfaz a prévia inteira. |
 
 ## Magias das Trevas
 

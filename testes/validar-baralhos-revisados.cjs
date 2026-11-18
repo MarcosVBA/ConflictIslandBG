@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const harness = fs.readFileSync(path.join(root, 'testes/validar-documentacao.cjs'), 'utf8')
   .split('// Links dos módulos atuais')[0]
-  .replace("const html = read('mapa-fluxo-dinamico.html');", "const html = read('mapa-baralhos-revisados.html');");
+  .replace("const html = read('mapa-fluxo-dinamico.html');", "const html = read('mapa-fluxo-dinamico.html');");
 const scenario = String.raw`
 const expected = {
  imperio:[['Marcha Imperial',3,2],['Assegurar Recursos para o Rei',4,1],['Ordens da Coroa',3,1],['Guarda Imperial',2,0]],
@@ -33,6 +33,9 @@ run("state=initial();resources=initialResources();game=newGame();flow=newFlow();
 set('attackDefender','necromante');click('prepareAttack');check("battle&&battle.stage==='roll'&&state.R2.units.imperio===1&&flow.markers[0].used");run('Math.random=()=>0');click('rollBattle');click('applyBattle');
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.markers=[{f:'imperio',region:'R4',used:false}];flow.decks.imperio.hand=[{name:'Marcha Imperial',text:'Marcha'}];showAttackMovement('imperio',0,0,experimentalModes['Marcha Imperial'][2])");
 set('attackDefender','necromante');set('move-R2',1);click('prepareAttack');check("battle&&state.R2.units.imperio===0&&state.R4.units.imperio===1&&flow.markers[0].used");run('Math.random=()=>0');click('rollBattle');click('applyBattle');
+// Construção inimiga sem tropas continua sendo alvo válido.
+run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['imperio','necromante','piratas','elfos'];flow.markers=[{f:'imperio',region:'R8',used:false}];flow.decks.imperio.hand=[{name:'Marcha Imperial'}];state.R8.units.imperio=1;state.R8.bar=true;showAttackMovement('imperio',0,0,experimentalModes['Marcha Imperial'][1])");
+set('attackDefender','piratas');click('prepareAttack');check("battle&&battle.defender==='piratas'");run('Math.random=()=>0.99');click('rollBattle');check("battle.defenseDice.length===0&&battle.destroy===1");checkedBuildings=[{value:'0'}];click('applyBattle');checkedBuildings=[];check("!state.R8.bar");
 // Invasão também oferece movimento puro ocupado e movimento seguido de saque.
 run("state=initial();resources=initialResources();game=newGame();flow=newFlow();flow.phase='resolução';flow.order=['piratas','imperio','necromante','elfos'];flow.markers=[{f:'piratas',region:'R9',used:false}];flow.decks.piratas.hand=[{name:'Invasão Costeira',text:'Invasão'}];state.R9.units.imperio=1;showAttackMovement('piratas',0,0,experimentalModes['Invasão Costeira'][0])");
 set('move-R5',1);click('prepareAttack');check("!battle&&state.R9.units.piratas===1&&state.R9.units.imperio===1&&flow.markers[0].used");
@@ -75,6 +78,7 @@ run("setup('elfos','Fúria da Ilha / Harmônia','R10',0)");set('destination','R8
 run("setup('elfos','Trilhas na Mata / Defesa Global','R8',0)");set('elfOrigin','R10');set('quantity',1);click('executeAction');check("state.R8.units.elfos===1&&flow.decks.elfos.discard[0].name==='Trilhas na Mata / Defesa Global'");
 run("setup('necromante','Magia das Trevas / Monumento à Morte','R2',0)");set('spell','Despertar para a Morte');set('other','imperio');click('executeAction');check("state.R2.units.necromante===1&&resources.necromante.madeira===0&&flow.decks.necromante.discard[0].name.includes('Monumento')");
 run("setup('necromante','Magia das Trevas / Monumento à Morte','R3',1)");click('executeAction');check("state.R3.monument&&game.score.necromante===2&&flow.decks.necromante.hand.length===5&&flow.decks.necromante.discard[0].name.includes('Monumento')");
+run("setup('necromante','Magia das Trevas / Monumento à Morte','R3',1);game.score.necromante=29;flow.decks.necromante.hand.push({name:'Infestação'})");click('executeAction');check("game.winner==='necromante'&&flow.phase==='fim'&&flow.decks.necromante.hand.length===1&&flow.decks.necromante.discard.length===1");
 run("setup('necromante','Remanejando Mortos','R3',0)");click('remFinish');check("flow.markers[0].used&&flow.decks.necromante.hand.length===5&&state.R3.units.necromante===2");
 run("setup('elfos','Milagre da Floresta',null,0);state.R10.units.elfos=3");set('miracleGive','tropas');set('miracleTake','madeira');for(const r of JSON.parse(run('JSON.stringify(definitions.map(x=>x.id))'))){set('miracleFrom-'+r,0);set('miracleTo-'+r,0)}set('miracleFrom-R10',3);click('executeAction');check("resources.elfos.madeira===2&&state.R10.units.elfos===0&&flow.markers[0].used");
 // Saque com espólios extras usa primeiro o saldo do defensor e depois a reserva.
@@ -90,9 +94,9 @@ console.log('Baralhos revisados: catálogo, compra, ações, reações e Infesta
 `;
 vm.runInNewContext(harness + scenario, { require, console, process, __dirname });
 const captures = [];
-for (const file of ['mapa-fluxo-dinamico.html', 'mapa-baralhos-revisados.html']) {
+for (const file of ['mapa-fluxo-dinamico.html', 'historico/prototipos/baralhos-anteriores/mapa-fluxo-dinamico.html']) {
   const capture = {};
-  const base = harness.replace("const html = read('mapa-baralhos-revisados.html');", `const html = read('${file}');`);
+  const base = harness.replace("const html = read('mapa-fluxo-dinamico.html');", `const html = read('${file}');`);
   vm.runInNewContext(base + "\ncapture.value=run('JSON.stringify({definitions,edges,state,resources,round:flow.round,phase:flow.phase,order:flow.order,handSize:flow.handSize})');", { require, console, process, __dirname, capture });
   captures.push(capture.value);
 }

@@ -48,8 +48,8 @@
     ]
   },
   {
-    "id": "COMBATE-PAZ",
-    "assunto": "Combate, defesa e Canção de paz",
+    "id": "COMBATE-REACOES",
+    "assunto": "Combate e reações de defesa",
     "estado": "definida",
     "fontes": [
       "regras/combate.md",
@@ -192,8 +192,8 @@
   },
   {
     "id": "BARALHOS-REVISADOS",
-    "assunto": "Experimento de baralhos revisados",
-    "estado": "em-teste",
+    "assunto": "Baralhos oficiais de 12 cartas",
+    "estado": "definida",
     "fontes": [
       "prototipo/baralhos-revisados.md",
       "faccoes/imperio.md",
@@ -202,7 +202,7 @@
       "faccoes/elfos.md"
     ],
     "implementacao": [
-      "jogo/dados/cartas-revisadas.js",
+      "jogo/dados/cartas.js",
       "scripts/sincronizar-motor.cjs",
       "jogo/aplicacao/fluxo.js",
       "jogo/aplicacao/acoes.js",

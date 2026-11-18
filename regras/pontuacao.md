@@ -7,3 +7,5 @@
 **Definido; implementado:** a partida termina imediatamente quando uma facção atinge 30 pontos de vitória. Ao alcançar 20 pontos, preparar a futura utilização de cartas de eventos de final de jogo; seus efeitos e seu baralho ainda não foram definidos. O protótipo registra o marco de 20 pontos; as cartas de evento ainda não foram definidas nem implementadas.
 
 **Adiado:** [eventos por marcos de pontuação](../ideias/eventos.md). Outras direções ainda não aprovadas estão em [Ideias para formas de pontuar](../ideias/pontuacao.md).
+
+Os modos de cartas podem conceder pontos imediatamente, incluindo construção imperial, Monumento à Morte e a primeira troca efetiva dos Elfos com cada facção na rodada. Os custos e condições constam nos módulos das facções.

@@ -12,7 +12,7 @@ Exemplos de prioridades a explorar, não regras aprovadas: Piratas buscarem cost
 
 1. Separar melhor a lógica do jogo dos controles de interface, oferecendo uma forma comum de verificar e executar ações para pessoas e IA.
 2. Criar uma primeira IA para cada facção, capaz de participar do leilão, alocar marcadores, usar cartas e concluir a partida respeitando as regras.
-3. Acrescentar decisões sobre combate, reações, ofertas e negociação, incluindo intervenções como Canção de paz, e melhorar as escolhas com base em partidas de teste.
+3. Acrescentar decisões sobre combate, reações, ofertas e negociação, incluindo intervenções como Defesa Global, e melhorar as escolhas com base em partidas de teste.
 
 A IA deve utilizar apenas as informações que sua facção poderia conhecer, sem consultar indevidamente as mãos dos adversários. Os testes devem verificar legalidade das ações, avanço e conclusão da partida, escolhas de reações e situações sem ações válidas; partidas observadas serão necessárias para avaliar qualidade e equilíbrio.
 

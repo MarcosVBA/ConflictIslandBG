@@ -51,7 +51,7 @@ Essa árvore é proposta, não uma descrição de arquivos já existentes. Evita
 4. **Transição e eventos:** o processamento recebe estado, comando e fonte de aleatoriedade controlável e retorna novo estado e eventos estruturados, ou erro sem alterações. Eventos como recurso recebido, movimento, carta descartada, reação, resultado de dados e pontuação alimentam interface, histórico e animações; efeitos não dependem de callbacks visuais.
 5. **Escolhas pendentes:** quando uma regra exigir seleção de região, oponente, tropas, reação, construção ou acordo, o motor interrompe a resolução com opções válidas e aguarda a decisão autorizada. Não presumir aceitação ou escolher automaticamente um resultado estratégico; considerar efeitos que invalidem as opções.
 6. **Aleatoriedade e reprodutibilidade:** embaralhamento e dados recebem uma fonte injetável; testes usam sequência conhecida. Guardar os resultados necessários no estado e histórico, sem depender de animações nem repetir uma rolagem por redesenho da tela.
-7. **Ordem e atomicidade:** definir fronteiras explícitas de declaração, pagamento, movimentação, reações, dados, efeitos e conclusão. Resolver transições automáticas até a próxima escolha, aplicando cada efeito uma vez; cancelar só quando a regra permitir e com as consequências já definidas. Preservar ações e custos de Canção de paz e a interrupção da Magia da Torre conforme a documentação.
+7. **Ordem e atomicidade:** definir fronteiras explícitas de declaração, pagamento, movimentação, reações, dados, efeitos e conclusão. Resolver transições automáticas até a próxima escolha, aplicando cada efeito uma vez; cancelar só quando a regra permitir e com as consequências já definidas. Preservar ações e custos das reações e a interrupção da Magia da Torre conforme a documentação.
 
 A implementação pode usar funções puras ou outra técnica equivalente, desde que o motor não dependa de `document`, elementos visuais, áudio, relógio ou armazenamento. A aplicação coordena sessão e persistência; a interface apresenta o estado e emite comandos. O contrato também deve permitir futuramente um controlador automatizado, sem implementar IA agora.
 
@@ -61,14 +61,14 @@ A implementação pode usar funções puras ou outra técnica equivalente, desde
 2. **Preparação:** completar mãos, revelar imposto, processar reforço da Torre e Alistamento Obrigatório na ordem documentada, solicitando escolhas quando houver. Registrar efeitos obrigatórios e prevenir aplicação dupla.
 3. **Liderança:** conduzir oportunidades em sentido anti-horário, ofertas crescentes e cartas comprometidas; descartar apenas as cartas do vencedor, devolver as demais e manter o líder anterior se todos passarem.
 4. **Ações:** apresentar a facção ativa, duas ações em reserva e opções compatíveis. Escolher região e carta na hora, executar efeitos e alternar até esgotar as ações. Passar, descartar e reagir consomem ação conforme as regras.
-5. **Combate e reações:** orientar movimentação, escolha de defensor, custos e reações; permitir Canção de paz de terceiro; rolar e aplicar dados, proteção, baixas, dano excedente, efeitos posteriores e pontuação na ordem autorizada. Explicar os resultados e pedir ao jogador escolhas obrigatórias.
+5. **Combate e reações:** orientar movimentação, escolha de defensor, custos e reações; permitir Defesa Global de terceiro; rolar e aplicar dados, proteção, baixas, dano excedente, efeitos posteriores e pontuação na ordem autorizada. Explicar os resultados e pedir ao jogador escolhas obrigatórias.
 6. **Pontuação e fim:** aplicar pontuação e manutenção da rodada uma vez, mostrar origem dos pontos e avançar. A duração de seis rodadas e o empate compartilhado são hipóteses atuais de teste, não decisões finais.
 7. **Retomada:** planejar salvamento local de estado versionado e recuperação após interrupção, incluindo escolhas pendentes, sem repetir ações. Informar claramente quando uma versão de dados não puder ser restaurada; o usuário deve poder iniciar outra partida. Detalhar limites de privacidade de mãos e armazenamento compartilhado.
 
 ### Casos de maior risco
 
-- Carta inválida, custo insuficiente ou troca recusada não devem consumir recursos, carta ou ação indevidamente.
-- Reação defensiva seguida de Canção de paz preserva movimento e custos já realizados, com os marcadores e cartas declarados gastos; batalha termina 0 a 0.
+- Carta inválida ou custo insuficiente preservam os recursos, carta e ação. Um acordo válido recusado gasta a carta e a ação, sem efetuar a troca ou operação.
+- Guarda Imperial e Defesa Global acumulam proteção ao lado escolhido, com cartas e ações gastas.
 - Perda de controle da Torre pode ocorrer durante uma movimentação ou combate; aplicar a recuperação no momento definido e impedir a continuação de um combate sem participantes válidos.
 - O limite de sete do Alistamento Obrigatório aplica-se à habilidade, inclusive quando há seis tropas e nenhuma região dominada; outras fontes podem superar sete.
 - Habilidades obrigatórias, renda, pontuação e penalidades não podem ser aplicadas duas vezes ao renderizar, retornar de uma tela ou restaurar a partida.

@@ -1292,15 +1292,76 @@ render();
 // Fluxo da rodada e escolhas dos jogadores; efeitos são resolvidos pelo jogo.
 const factionIds = ["imperio", "necromante", "piratas", "elfos"];
 // INÍCIO DADOS CARTAS
-/* Dados do protótipo; incorporados ao HTML pelo script de sincronização. */
-const cardDefs={
- elfos:[['Furia da Ilha',3,'Mova até 3 tropas para região adjacente; se houver inimigos, batalhe.'],['Conhecimentos da Floresta',4,'Ao atacar ou ser atacado, ignore o primeiro dano.'],['Canção de paz',1,'Antes dos dados, cancele qualquer combate gastando uma ação.'],['Trilhas na Mata',2,'Mova tropas de uma região adjacente para a região escolhida.'],['Harmônia',3,'Troque recursos, incluindo tropas, com acordo de outro jogador.'],['Frutos da Mata',6,'Região com tropas élficas: colete um recurso por região com tropas élficas e recurso disponível.'],['Filhos da Floresta',3,'Região de floresta: consuma um recurso, adicione uma unidade, descarte a mão e compre até cinco cartas.'],['Milagre da Floresta',1,'Converta três recursos em dois outros, incluindo tropas.']],
- piratas:[['Invasão Costeira',3,'Região costeira: mova até 3 unidades de uma costa e, se houver alvos, faça um saque.'],['Ataque a Linha de Suprimentos',2,'Tropas piratas e inimigo com Ouro: saqueie; sucesso adiciona 1 Ouro.'],['Trabalhe enquanto eles dormem',1,'Inimigo e tropas aliadas presentes: saqueie e ignore o primeiro dano.'],['Carta de Corsário',2,'Outro jogador presente: proponha 0 a 3 Ouros; se aceitar, ele pode mover piratas para região adjacente e realizar saque para os Piratas.'],['Serviço de Transporte Pirata',2,'Outro jogador presente: proponha 0 a 3 Ouros; se aceitar, mova tropas dele de qualquer região a uma costa ou região adjacente.'],['Pirata Aprendiz',3,'Região controlada ou sem domínio: adicione 1 pirata.'],['Mercenários Piratas',2,'Bar Pirata: adicione 2 piratas, com movimento opcional para qualquer costa.'],['Atrás do Tesouro',3,'Local com piratas: mova até 3 para uma região adjacente.'],['Novas Comandante a Bordo',2,'Qualquer lugar: descarte toda a mão e compre até ter 5 cartas.'],['Taverna Pirata',3,'Região controlada: adicione um Bar Pirata, até o limite de um no mapa.']],
- necromante:[['Ataque Zumbi',2,'Inimigos: mova tropas adjacentes, batalhe e converta metade das baixas inimigas se vencer com sobreviventes.'],['Infestação',2,'Inimigos: mova até 2 tropas adjacentes, batalhe e adicione 1 zumbi ao fim.'],['Horda interminável',2,'Inimigos: ataque de regiões adjacentes; ignore o primeiro dano e converta metade das baixas se vencer com sobreviventes.'],['Praga Resistente',2,'Ao receber um ataque: ignore o primeiro dano às suas unidades.'],['Magia das Trevas',3,'Escolha e pague uma magia; consulte o documento da facção.'],['Trabalhadores Zumbificado',3,'Região com extrator: colete 1 recurso por extrator no mapa.'],['Projeto de Poder Maligno',3,'Suas unidades e recurso: adicione 1 extrator, limite de 1 por região.'],['Remanejando Mortos',2,'Distribua zumbis entre regiões devastadas adjacentes quantas vezes desejar; descarte a mão e compre até 5 cartas.'],['Monumento a Morte',1,'Região devastada e oponente com domínio: pague 1 Madeira, construa monumento, pontue 2 por região com monumento, descarte a mão e compre até ter 5 cartas.']],
- imperio:[['Marcha Imperial',3,'Região adjacente a uma que você domina: mova até 3 soldados de uma região adjacente; se houver inimigos, inicie batalha.'],['Guarda Imperial',2,'Reação: gaste uma ação; ignore 1 dano, ou 2 enquanto existir um Quartel.'],['Tambores de Guerra',2,'Qualquer região: mova até 2 soldados adjacentes, batalhe e ignore 1 dano.'],['Alistamento',2,'Região controlada: pague 1 Ouro e adicione 2 soldados.'],['O Progresso',3,'Região com soldados imperiais e sem construção imperial: pague e construa tecnologia.'],['Assegurar Recursos para o Rei',5,'Região com recurso e tropas ou construção imperial: colete 1; descarte cópias extras para coletar mais.'],['Reorganizar Contingente',2,'Região com soldados: mova até 3 para uma região adjacente.'],['Aliança com o Império',1,'Outro jogador presente: troquem recursos mediante acordo.'],['Pagamento de Impostos',3,'Região controlada: pague o imposto ativo e pontue seu valor.']]
+/* Catálogo experimental: cada tupla representa uma carta física. */
+const cardDefs = {
+  imperio: [
+    ['Marcha Imperial', 3, 'Mova e/ou ataque em região adjacente ao seu domínio.'],
+    ['Assegurar Recursos para o Rei', 4, 'Colete recurso impresso e descarte cópias adicionais para coletar mais.'],
+    ['Ordens da Coroa', 3, 'Construa uma tecnologia ou pague o imposto ativo.'],
+    ['Guarda Imperial', 2, 'Reação defensiva: ignore dano às tropas.'],
+  ],
+  piratas: [
+    ['Invasão Costeira', 4, 'Mova e/ou saqueie em região costeira.'],
+    ['Taverna Pirata / Pirata Aprendiz', 3, 'Construa um Bar ou recrute um pirata.'],
+    ['Carta de Corsário / Serviço de Transporte Pirata', 3, 'Proponha um acordo de Corsário ou Transporte.'],
+    ['Vento a Favor', 2, 'Reação em saque: suprima dados de defesa ou receba Ouro extra em caso de sucesso.'],
+  ],
+  necromante: [
+    ['Infestação', 3, 'Ataque com zumbis presentes e/ou até dois de regiões adjacentes; depois recrute um.'],
+    ['Extratores da Torre', 4, 'Construa um extrator ou colha recursos dos extratores.'],
+    ['Magia das Trevas / Monumento à Morte', 2, 'Use uma magia ou construa um monumento e reponha a mão.'],
+    ['Remanejando Mortos', 3, 'Mova zumbis entre regiões devastadas adjacentes e reponha a mão.'],
+  ],
+  elfos: [
+    ['Fúria da Ilha / Harmônia', 3, 'Mova e ataque ou proponha uma troca.'],
+    ['Trilhas na Mata / Defesa Global', 2, 'Mova tropas ou proteja um dos lados de uma batalha.'],
+    ['Frutos da Mata / Filhos da Floresta', 5, 'Colha recursos ou recrute um elfo e reponha a mão.'],
+    ['Milagre da Floresta', 2, 'Converta três recursos de um tipo em dois de outro.'],
+  ],
 };
-// Valores de liderança definidos para teste; iguais para cópias da mesma carta.
-const leadershipValues=Object.freeze({"Invasão Costeira":2,"Ataque a Linha de Suprimentos":1,"Trabalhe enquanto eles dormem":1,"Carta de Corsário":0,"Serviço de Transporte Pirata":0,"Pirata Aprendiz":1,"Mercenários Piratas":2,"Atrás do Tesouro":0,"Novas Comandante a Bordo":0,"Taverna Pirata":1,"Ataque Zumbi":1,"Infestação":1,"Horda interminável":3,"Praga Resistente":0,"Magia das Trevas":1,"Trabalhadores Zumbificado":0,"Projeto de Poder Maligno":1,"Remanejando Mortos":0,"Monumento a Morte":1,"Marcha Imperial":1,"Guarda Imperial":1,"Tambores de Guerra":2,"Alistamento":0,"O Progresso":1,"Assegurar Recursos para o Rei":1,"Reorganizar Contingente":1,"Aliança com o Império":0,"Pagamento de Impostos":1,"Furia da Ilha":2,"Conhecimentos da Floresta":0,"Canção de paz":3,"Trilhas na Mata":0,"Harmônia":1,"Frutos da Mata":1,"Filhos da Floresta":0,"Milagre da Floresta":1});
+const leadershipValues = Object.freeze({
+  'Marcha Imperial': 2, 'Assegurar Recursos para o Rei': 1, 'Ordens da Coroa': 1, 'Guarda Imperial': 0,
+  'Invasão Costeira': 1, 'Taverna Pirata / Pirata Aprendiz': 1, 'Carta de Corsário / Serviço de Transporte Pirata': 2, 'Vento a Favor': 1,
+  'Infestação': 1, 'Extratores da Torre': 1, 'Magia das Trevas / Monumento à Morte': 2, 'Remanejando Mortos': 0,
+  'Fúria da Ilha / Harmônia': 1, 'Trilhas na Mata / Defesa Global': 3, 'Frutos da Mata / Filhos da Floresta': 1, 'Milagre da Floresta': 0,
+});
+const experimentalConditions = Object.freeze({
+  'Marcha Imperial': 'Destino adjacente a domínio imperial; mova 1 a 3 soldados de uma origem adjacente. Ataque exige soldados e defensor presente; Fortaleza permite rerrolar um dado.',
+  'Assegurar Recursos para o Rei': 'Região com recurso e tropa ou construção imperial. Cada cópia extra descartada rende mais um recurso, até três; Serraria ou Mercado Local dá bônus uma vez.',
+  'Ordens da Coroa': 'Construir exige soldados, região sem construção imperial, custo e pré-requisito; rende 1 ponto. Imposto exige região dominada, imposto ativo e pagamento; escolha a origem do soldado quando exigido.',
+  'Guarda Imperial': 'Ao defender, antes dos dados, gaste carta e ação para ignorar 1 dano às tropas, ou 2 com Quartel.',
+  'Invasão Costeira': 'Destino costeiro; mova 1 a 3 piratas de uma única outra costa. Para saquear, tenha piratas e escolha defensor com tropas ou construções.',
+  'Taverna Pirata / Pirata Aprendiz': 'Construir Bar exige região dominada e não pode haver outro Bar. Recrutar exige região dominada pelos Piratas ou sem domínio.',
+  'Carta de Corsário / Serviço de Transporte Pirata': 'Outra facção presente aceita ou recusa preço de 0 a 3 Ouros. Corsário move piratas para região adjacente e pode saquear; Transporte move tropas do contratante para costa ou região adjacente à origem.',
+  'Vento a Favor': 'Piratas atacantes em saque: após declaração e antes da reação defensiva, gaste carta e ação. Suprima dados de defesa existentes ou ganhe 1 Ouro extra em saque bem-sucedido. Uma cópia por combate.',
+  'Infestação': 'Escolha defensor com tropas ou construções; ataque com zumbis presentes e/ou mova até 2 de regiões adjacentes. Recrute 1 após combate, salvo interrupção ou recuperação da Torre.',
+  'Extratores da Torre': 'Construir exige zumbi, recurso impresso e região sem extrator. Colher exige região com extrator e rende 1 recurso impresso por extrator no mapa.',
+  'Magia das Trevas / Monumento à Morte': 'Magia exige custos e alvos da magia escolhida. Monumento exige região devastada sem monumento, 1 Madeira e domínio de algum oponente; pontue 2 por monumento e reponha a mão.',
+  'Remanejando Mortos': 'Mova quantos zumbis quiser, inclusive zero movimentos, entre regiões inicialmente devastadas ligadas diretamente. Ao concluir, descarte a mão e compre até cinco.',
+  'Fúria da Ilha / Harmônia': 'Atacar move 1 a 3 elfos para região adjacente e enfrenta inimigo presente. Trocar exige outra facção com tropas e aceite; primeira troca efetiva por facção rende 1 ponto na rodada.',
+  'Trilhas na Mata / Defesa Global': 'Mover leva quantidade positiva de elfos de uma origem adjacente. Defesa Global: após reação defensiva e antes dos dados, gaste carta e ação para proteger um lado com tropas, inclusive em combate de terceiros.',
+  'Frutos da Mata / Filhos da Floresta': 'Colher exige região dominada com tropas élficas e rende um recurso impresso por região com elfos. Recrutar exige floresta dominada e 1 Ouro, Madeira ou tropa élfica; depois reponha a mão.',
+  'Milagre da Floresta': 'Converta 3 unidades de um tipo em 2 de outro: Ouro, Madeira ou tropas élficas. Tropas recebidas vão a regiões dominadas pelos Elfos.',
+});
+// janela: mapa, modal ou reação; o efeito identifica a regra utilizada.
+const experimentalModes = Object.freeze({
+  'Marcha Imperial': [{label:'Mover', effect:'Marcha Imperial', window:'mapa', operation:'move'}, {label:'Atacar', effect:'Marcha Imperial', window:'mapa', operation:'attack'}, {label:'Mover e atacar', effect:'Marcha Imperial', window:'mapa', operation:'both'}],
+  'Assegurar Recursos para o Rei': [{label:'Coletar', effect:'Assegurar Recursos para o Rei', window:'mapa'}],
+  'Ordens da Coroa': [{label:'Construir', effect:'O Progresso', window:'mapa'}, {label:'Pagar imposto', effect:'Pagamento de Impostos', window:'mapa'}],
+  'Guarda Imperial': [{label:'Defender', effect:'Guarda Imperial', window:'reação'}],
+  'Invasão Costeira': [{label:'Mover', effect:'Invasão Costeira', window:'mapa', operation:'move'}, {label:'Saquear', effect:'Invasão Costeira', window:'mapa', operation:'attack'}, {label:'Mover e saquear', effect:'Invasão Costeira', window:'mapa', operation:'both'}],
+  'Taverna Pirata / Pirata Aprendiz': [{label:'Construir', effect:'Taverna Pirata', window:'mapa'}, {label:'Recrutar', effect:'Pirata Aprendiz', window:'mapa'}],
+  'Carta de Corsário / Serviço de Transporte Pirata': [{label:'Corsário', effect:'Carta de Corsário', window:'mapa'}, {label:'Transporte', effect:'Serviço de Transporte Pirata', window:'mapa'}],
+  'Vento a Favor': [{label:'Descartar dados de defesa', effect:'Vento a Favor', window:'reação'}, {label:'Recolher mais espólios', effect:'Vento a Favor', window:'reação'}],
+  'Infestação': [{label:'Atacar', effect:'Infestação', window:'mapa'}],
+  'Extratores da Torre': [{label:'Construir', effect:'Projeto de Poder Maligno', window:'mapa'}, {label:'Colher', effect:'Trabalhadores Zumbificado', window:'mapa'}],
+  'Magia das Trevas / Monumento à Morte': [{label:'Magia', effect:'Magia das Trevas', window:'mapa'}, {label:'Monumento', effect:'Monumento a Morte', window:'mapa'}],
+  'Remanejando Mortos': [{label:'Remanejar', effect:'Remanejando Mortos', window:'mapa'}],
+  'Fúria da Ilha / Harmônia': [{label:'Atacar', effect:'Furia da Ilha', window:'mapa'}, {label:'Trocar', effect:'Harmônia', window:'mapa'}],
+  'Trilhas na Mata / Defesa Global': [{label:'Mover', effect:'Trilhas na Mata', window:'mapa'}, {label:'Defesa Global', effect:'Defesa Global', window:'reação'}],
+  'Frutos da Mata / Filhos da Floresta': [{label:'Colher', effect:'Frutos da Mata', window:'mapa'}, {label:'Recrutar', effect:'Filhos da Floresta', window:'mapa'}],
+  'Milagre da Floresta': [{label:'Converter', effect:'Milagre da Floresta', window:'modal'}],
+});
 // FIM DADOS CARTAS
 const revisedModes =
   typeof experimentalModes === "undefined" ? null : experimentalModes;
