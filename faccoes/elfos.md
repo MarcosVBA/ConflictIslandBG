@@ -1,5 +1,7 @@
 # Elfos da Floresta
 
+Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
+
 **Conteúdo registrado pelo usuário; implementado no protótipo de quatro facções para teste.** O baralho tem 23 cartas.
 
 **Início definido; implementado no protótipo principal:** os Elfos dominam duas regiões de floresta, com duas unidades em cada uma, sem recursos iniciais. As regiões do cenário de teste estão em [Mapa](../regras/mapa.md).

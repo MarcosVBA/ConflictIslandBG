@@ -1,5 +1,7 @@
 # Piratas do Mar Safira
 
+Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
+
 ## Identidade e componentes
 
 Facção voltada a ataques, saques, mobilidade costeira e acordos. Seu crescimento pode ser prejudicado por perdas e por defesa fraca. O Ouro acumulado pode gerar pontos no fim da rodada; Bares são sua única fonte passiva de Ouro, com limite de um Bar no mapa.

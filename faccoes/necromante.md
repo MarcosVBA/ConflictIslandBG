@@ -1,5 +1,7 @@
 # Necromante da Torre Esquecida
 
+Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
+
 ## Identidade e região devastada
 
 Facção de domínio territorial, zumbis, extratores e magias. Seu cenário inicial está em [Mapa](../regras/mapa.md). A recuperação da Torre segue a Magia da Torre abaixo.

@@ -19,7 +19,10 @@ function openActionDialog(required) {
     if (required) event.preventDefault();
   };
   dialog.onclose = () => {
-    if (!dialog.open) $("dialogContent").innerHTML = "";
+    if (!dialog.open) {
+      $("dialogContent").innerHTML = "";
+      if (!battle) preparedMode = null;
+    }
   };
   if (typeof dialog.showModal === "function" && !dialog.open)
     dialog.showModal();
@@ -149,9 +152,17 @@ function renderBattle() {
   openActionDialog(true);
   if (b.stage === "reaction" && !b.attackCommitted) {
     try {
-      commitBattleCard(b.f, b.mi, b.ci, b.card);
+      commitBattleCard(b.f, b.mi, b.ci, b.physicalCard || b.card);
       b.attackCommitted = true;
-      flowLog(names[b.f] + " declarou " + b.card + " em " + b.region + ".");
+      flowLog(
+        names[b.f] +
+          " declarou " +
+          (b.physicalCard || b.card) +
+          (b.modeLabel ? " · " + b.modeLabel : "") +
+          " em " +
+          b.region +
+          ".",
+      );
     } catch (e) {
       panel.innerHTML =
         '<p role="alert">' +
@@ -160,19 +171,81 @@ function renderBattle() {
       return;
     }
   }
-  if (b.stage === "reaction" && b.f === "elfos" && !b.attackerReactionDecided) {
-    const available = ConflictIslandBase.reacaoDisponivel(flow.markers, flow.decks.elfos, "elfos", "Conhecimentos da Floresta");
+  if (
+    revisedModes &&
+    b.stage === "reaction" &&
+    b.f === "piratas" &&
+    !b.windDecided
+  ) {
+    const available = ConflictIslandBase.reacaoDisponivel(
+      flow.markers,
+      flow.decks.piratas,
+      "piratas",
+      "Vento a Favor",
+    );
+    if (available) {
+      showBattleHand("piratas");
+      const defenseCount = Math.max(0, s.units[b.defender] - s.units.piratas);
+      panel.innerHTML = `<h3>Vento a Favor</h3><p>Gaste uma carta e uma ação em um dos modos.</p>${defenseCount ? '<button id="suppressDefense">Descartar dados de defesa</button>' : ""}<button id="extraLoot">Recolher mais espólios</button><button id="skipWind">Não usar</button>`;
+      const choose = (kind) => {
+        commitBattleCard(
+          "piratas",
+          available.acao,
+          available.carta,
+          "Vento a Favor",
+        );
+        b.suppressDefense = kind === "defesa";
+        b.extraLoot = kind === "ouro";
+        b.windDecided = true;
+        flowLog(
+          "Piratas usaram Vento a Favor: " +
+            (b.suppressDefense
+              ? "dados de defesa suprimidos."
+              : "Ouro extra em caso de sucesso."),
+        );
+        renderBattle();
+      };
+      if (defenseCount) $("suppressDefense").onclick = () => choose("defesa");
+      $("extraLoot").onclick = () => choose("ouro");
+      $("skipWind").onclick = () => {
+        b.windDecided = true;
+        renderBattle();
+      };
+      return;
+    }
+    b.windDecided = true;
+  }
+  if (
+    !revisedModes &&
+    b.stage === "reaction" &&
+    b.f === "elfos" &&
+    !b.attackerReactionDecided
+  ) {
+    const available = ConflictIslandBase.reacaoDisponivel(
+      flow.markers,
+      flow.decks.elfos,
+      "elfos",
+      "Conhecimentos da Floresta",
+    );
     if (available) {
       showBattleHand("elfos");
       panel.innerHTML = `<h3>Reação do atacante</h3><p>Gaste outra ação para ignorar o primeiro dano neste combate.</p><button id="useAttackDefense">Usar Conhecimentos da Floresta</button><button id="skipAttackDefense">Não usar</button>`;
       $("useAttackDefense").onclick = () => {
-        commitBattleCard("elfos", available.acao, available.carta, "Conhecimentos da Floresta");
+        commitBattleCard(
+          "elfos",
+          available.acao,
+          available.carta,
+          "Conhecimentos da Floresta",
+        );
         b.attackerReactionProtection = 1;
         b.attackerReactionDecided = true;
         flowLog("Elfos usaram Conhecimentos da Floresta no ataque.");
         renderBattle();
       };
-      $("skipAttackDefense").onclick = () => { b.attackerReactionDecided = true; renderBattle(); };
+      $("skipAttackDefense").onclick = () => {
+        b.attackerReactionDecided = true;
+        renderBattle();
+      };
       return;
     }
     b.attackerReactionDecided = true;
@@ -182,9 +255,9 @@ function renderBattle() {
     const defenseName =
       b.defender === "imperio"
         ? "Guarda Imperial"
-        : b.defender === "necromante"
+        : !revisedModes && b.defender === "necromante"
           ? "Praga Resistente"
-          : b.defender === "elfos"
+          : !revisedModes && b.defender === "elfos"
             ? "Conhecimentos da Floresta"
             : null;
     const available = ConflictIslandBase.reacaoDisponivel(
@@ -196,7 +269,12 @@ function renderBattle() {
       cardIndex = available?.carta,
       markerIndex = available?.acao;
     const canReact = !!available;
-    panel.innerHTML = `<h3>Combate em ${b.region}</h3><p>${names[b.f]} enfrenta ${names[b.defender]}. O ataque e sua ação já foram gastos.</p><p>${names[b.defender]} decide se usa uma reação defensiva antes de os Elfos decidirem sobre Canção de paz.</p>${canReact ? `<button id="useDefense">Usar ${defenseName}</button>` : "<p>Nenhuma reação defensiva disponível.</p>"}<button id="skipDefense">Não reagir</button><p id="battleError" role="status"></p>`;
+    if (revisedModes && !canReact) {
+      Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+      renderBattle();
+      return;
+    }
+    panel.innerHTML = `<h3>Combate em ${b.region}</h3><p>${names[b.f]} enfrenta ${names[b.defender]}. O ataque e sua ação já foram gastos.</p><p>${names[b.defender]} decide se usa uma reação defensiva antes de os Elfos decidirem sobre ${revisedModes ? "Defesa Global" : "Canção de paz"}.</p>${canReact ? `<button id="useDefense">Usar ${defenseName}</button>` : "<p>Nenhuma reação defensiva disponível.</p>"}<button id="skipDefense">Não reagir</button><p id="battleError" role="status"></p>`;
     if (canReact)
       $("useDefense").onclick = () => {
         if (battle !== b || b.stage !== "reaction") return;
@@ -224,6 +302,49 @@ function renderBattle() {
     return;
   }
   if (b.stage === "peace") {
+    if (revisedModes) {
+      const available = ConflictIslandBase.reacaoDisponivel(
+        flow.markers,
+        flow.decks.elfos,
+        "elfos",
+        "Trilhas na Mata / Defesa Global",
+      );
+      if (!available || (!s.units[b.f] && !s.units[b.defender])) {
+        Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+        renderBattle();
+        return;
+      }
+      showBattleHand("elfos");
+      panel.innerHTML = `<h3>Defesa Global</h3><p>Os Elfos podem gastar uma ação e proteger um lado com tropas.</p>${s.units[b.f] ? `<button id="protectAttacker">Proteger ${names[b.f]}</button>` : ""}${s.units[b.defender] ? `<button id="protectDefender">Proteger ${names[b.defender]}</button>` : ""}<button id="skipGlobal">Não usar</button>`;
+      const protect = (side) => {
+        commitBattleCard(
+          "elfos",
+          available.acao,
+          available.carta,
+          "Trilhas na Mata / Defesa Global",
+        );
+        if (side === "attacker")
+          b.attackerReactionProtection =
+            (b.attackerReactionProtection || 0) + 1;
+        else b.defProtection = (b.defProtection || 0) + 1;
+        flowLog(
+          "Elfos usaram Trilhas na Mata / Defesa Global · Defesa Global para proteger " +
+            names[side === "attacker" ? b.f : b.defender] +
+            ".",
+        );
+        Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+        renderBattle();
+      };
+      if (s.units[b.f])
+        $("protectAttacker").onclick = () => protect("attacker");
+      if (s.units[b.defender])
+        $("protectDefender").onclick = () => protect("defender");
+      $("skipGlobal").onclick = () => {
+        Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+        renderBattle();
+      };
+      return;
+    }
     showBattleHand("elfos");
     const available = ConflictIslandBase.reacaoDisponivel(
         flow.markers,
@@ -277,12 +398,13 @@ function renderBattle() {
       b.attackerCount = current.units[b.f];
       b.defenderCount = current.units[b.defender];
       b.attackDice = b.peace ? [] : rollDice(b.attackerCount, attackFaces);
-      b.defenseDice = b.peace
-        ? []
-        : rollDice(
-            Math.max(0, b.defenderCount - b.attackerCount),
-            defenseFaces,
-          );
+      b.defenseDice =
+        b.peace || b.suppressDefense
+          ? []
+          : rollDice(
+              Math.max(0, b.defenderCount - b.attackerCount),
+              defenseFaces,
+            );
       b.attProtection = [
         "Trabalhe enquanto eles dormem",
         "Horda interminável",
@@ -386,12 +508,18 @@ function renderBattle() {
       loot = lootGold(
         resources,
         b.defender,
-        b.card === "Ataque a Linha de Suprimentos" ? 2 : 1,
+        b.card === "Ataque a Linha de Suprimentos" || b.extraLoot ? 2 : 1,
       );
     flow.turn = (flow.turn + 1) % flow.order.length;
-    restoreTowerIfLost();
-    afterBattle(b, region, result, loot);
-    const note = `${b.card} em ${b.region}: ${result.defenderLoss} defensores e ${result.attackerLoss} atacantes eliminados; ${b.destroy} construções destruídas; ataque ${success ? "bem-sucedido" : "sem sucesso"}${loot.length ? "; Ouro: " + loot.join(" e ") : ""}${b.reaction ? "; " + b.reaction.name + " consumiu uma ação" : ""}. Efeitos de combate aplicados.`;
+    const towerRestoredAfter = restoreTowerIfLost();
+    afterBattle(
+      b,
+      region,
+      result,
+      loot,
+      !!(revisedModes && b.card === "Infestação" && towerRestoredAfter),
+    );
+    const note = `${b.physicalCard || b.card}${b.modeLabel ? " · " + b.modeLabel : ""} em ${b.region}: ${result.defenderLoss} defensores e ${result.attackerLoss} atacantes eliminados; ${b.destroy} construções destruídas; ataque ${success ? "bem-sucedido" : "sem sucesso"}${loot.length ? "; Ouro: " + loot.join(" e ") : ""}${b.reaction ? "; " + b.reaction.name + " consumiu uma ação" : ""}. Efeitos de combate aplicados.`;
     flowLog(note);
     battle = null;
     selected = b.region;

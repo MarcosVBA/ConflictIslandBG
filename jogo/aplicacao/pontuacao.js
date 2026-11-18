@@ -173,7 +173,7 @@ function endView() {
       : factionIds.filter((f) => game.score[f] === max);
   return `<h3>Fim da partida de teste</h3><p>${w.length > 1 ? "Empate: " : "Vencedor: "}${w.map((f) => names[f]).join(", ")} — ${max} pontos.</p><p>Use “Restaurar cenário inicial” para jogar novamente.</p><details><summary>Origem dos pontos</summary><ul>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("")}</ul></details>`;
 }
-function afterBattle(b, region, result, loot) {
+function afterBattle(b, region, result, loot, skipInfestationRecruit = false) {
   const events = ConflictIslandBase.efeitosCombate(
     b,
     region,
@@ -185,7 +185,7 @@ function afterBattle(b, region, result, loot) {
     if (game.winner) break;
     if (event.tipo === "pontos")
       addPoints(event.faccao, event.quantidade, event.motivo);
-    else if (event.tipo === "zumbis")
+    else if (event.tipo === "zumbis" && !skipInfestationRecruit)
       region.units.necromante += event.quantidade;
   }
 }

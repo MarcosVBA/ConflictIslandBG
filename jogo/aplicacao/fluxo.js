@@ -1,6 +1,9 @@
 // Fluxo da rodada e escolhas dos jogadores; efeitos são resolvidos pelo jogo.
 const factionIds = ["imperio", "necromante", "piratas", "elfos"];
 // @dados CARTAS
+const revisedModes =
+  typeof experimentalModes === "undefined" ? null : experimentalModes;
+let preparedMode = null;
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -119,7 +122,7 @@ function factionInfo(f) {
   }
   if (f === "elfos") {
     const forest = elfForestPoints(definitions, state);
-    details = `<p><strong>${forest.owned}</strong> florestas dominadas · <strong>${forest.points}</strong> pontos na pontuação de rodada</p><small>Canção de paz pode ser usada antes dos dados.</small>`;
+    details = `<p><strong>${forest.owned}</strong> florestas dominadas · <strong>${forest.points}</strong> pontos na pontuação de rodada</p><small>${revisedModes ? "Defesa Global pode proteger um lado antes dos dados." : "Canção de paz pode ser usada antes dos dados."}</small>`;
   }
   const rules = {
     imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
@@ -127,6 +130,11 @@ function factionInfo(f) {
     piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
     elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; todas rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
   };
+  if (revisedModes)
+    rules.elfos = rules.elfos.replace(
+      "<p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>",
+      "<p><strong>Defesa Global:</strong> antes dos dados, gaste a carta e uma ação para proteger um dos lados com tropas.</p>",
+    );
   const deck = flow.decks[f];
   return `<div class="faction-info" aria-label="Informações de ${names[f]}"><h2>${names[f]}</h2><p><strong>${game.score[f]} pontos</strong> · ◆ ${res.ouro} ouro · ♣ ${res.madeira} madeira</p><p>${troops} tropas · ${owned} regiões dominadas</p><p>Baralho: ${deck.draw.length} · mão: ${deck.hand.length} · descarte: ${deck.discard.length}</p>${details}<h3>Regras da facção</h3>${rules[f]}</div>`;
 }
@@ -310,6 +318,7 @@ function renderRoundPhases(phase) {
   $("headerPhases").innerHTML = content;
 }
 function renderFlow() {
+  preparedMode = null;
   if (!battle) closeActionDialog();
   $("handArea").innerHTML = "";
   $("handArea").hidden = true;
@@ -335,16 +344,30 @@ function renderFlow() {
     "</details><details><summary>Registro da rodada</summary><ol>" +
     flow.log.map((x) => "<li>" + x + "</li>").join("") +
     "</ol></details>";
-  if (phase !== "fim" && !battle && definitions.every((r) => state[r.id].units.elfos === 0)) {
+  if (
+    phase !== "fim" &&
+    !battle &&
+    definitions.every((r) => state[r.id].units.elfos === 0)
+  ) {
     const florestas = definitions.filter((r) => r.terrain === "floresta");
-    const options = florestas.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join("");
+    const options = florestas
+      .map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`)
+      .join("");
     target.innerHTML = `<h3>Vingança da Terra</h3><p>Os Elfos ficaram sem tropas. Escolha uma floresta para cada uma das três tropas.</p>${[1, 2, 3].map((i) => `<label>Tropa ${i} <select id="elfRevive${i}">${options}</select></label>`).join("")}<button id="confirmElfRevive">Adicionar tropas</button>`;
     $("confirmElfRevive").onclick = () => {
       const ids = [1, 2, 3].map((i) => $("elfRevive" + i).value);
-      if (definitions.some((r) => state[r.id].units.elfos > 0) || ids.some((id) => !florestas.some((r) => r.id === id))) return;
+      if (
+        definitions.some((r) => state[r.id].units.elfos > 0) ||
+        ids.some((id) => !florestas.some((r) => r.id === id))
+      )
+        return;
       for (const id of ids) state[id].units.elfos++;
-      flowLog("Vingança da Terra: tropas adicionadas em " + ids.join(", ") + ".");
-      refreshOwners(); render(); renderFlow();
+      flowLog(
+        "Vingança da Terra: tropas adicionadas em " + ids.join(", ") + ".",
+      );
+      refreshOwners();
+      render();
+      renderFlow();
     };
     return;
   }
@@ -556,6 +579,16 @@ function renderFlow() {
         selected = id;
         for (const m of flow.markers) if (m.f === f && !m.used) m.region = null;
         setMapChoice(null);
+        if (preparedMode && preparedMode.f === f) {
+          flow.markers[preparedMode.mi].region = id;
+          showPlayableAction(
+            f,
+            preparedMode.ci,
+            preparedMode.mi,
+            preparedMode.mode,
+          );
+          return;
+        }
         $("discardAction").disabled = true;
         $("cardDetail").innerHTML = "";
         $("handArea")
@@ -566,6 +599,7 @@ function renderFlow() {
           });
       };
       $("actionMarker").onchange = () => {
+        preparedMode = null;
         for (const m of flow.markers) if (m.f === f && !m.used) m.region = null;
         setMapChoice(null);
         $("discardAction").disabled = true;
@@ -582,6 +616,10 @@ function renderFlow() {
         .forEach((btn) => {
           btn.onclick = () => {
             if ($("showCard").disabled) return;
+            preparedMode = null;
+            setMapChoice(null);
+            for (const marker of flow.markers)
+              if (marker.f === f && !marker.used) marker.region = null;
             $("handArea")
               .querySelectorAll("[data-card-index]")
               .forEach((x) => {
@@ -602,6 +640,30 @@ function renderFlow() {
           m = flow.markers[mi],
           id = $("actionRegion").value;
         if (!c || !m || m.used || m.f !== f) return;
+        if (revisedModes) {
+          const modes = revisedModes[c.name] || [];
+          $("cardDetail").innerHTML =
+            `<h3>${c.name}</h3><p>${experimentalConditions[c.name]}</p>${modes.map((mode, i) => (mode.window === "reação" ? `<p>${mode.label}: disponível como reação na janela indicada.</p>` : `<button type="button" data-mode="${i}">${mode.label}</button>`)).join("")}`;
+          $("cardDetail")
+            .querySelectorAll("[data-mode]")
+            .forEach((button) => {
+              button.onclick = () => {
+                const mode = modes[Number(button.dataset.mode)];
+                preparedMode = { f, ci, mi, mode };
+                if (mode.window === "modal")
+                  showPlayableAction(f, ci, mi, mode);
+                else {
+                  selected = null;
+                  m.region = null;
+                  $("actionRegion").value = "";
+                  $("cardDetail").innerHTML =
+                    `<h3>${c.name} · ${mode.label}</h3><p>${experimentalConditions[c.name]}</p><p>Selecione a região no mapa para preparar este modo.</p>`;
+                  render();
+                }
+              };
+            });
+          return;
+        }
         const semRegiao = [
           "Guarda Imperial",
           "Praga Resistente",

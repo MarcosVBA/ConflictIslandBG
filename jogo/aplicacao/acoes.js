@@ -67,6 +67,9 @@ function move(from, to, f, n) {
 }
 function finishAction(f, ci, mi, discardAll, description) {
   const deck = flow.decks[f];
+  if (revisedModes && preparedMode && deck.hand[ci])
+    description =
+      deck.hand[ci].name + " · " + preparedMode.mode.label + ": " + description;
   consumeActionCard(f, mi, ci);
   if (discardAll && !game.winner) {
     deck.discard.push(...deck.hand.splice(0));
@@ -216,32 +219,35 @@ function showRemanejamento(f, ci, mi) {
   }
   panel();
 }
-function showPlayableAction(f, ci, mi) {
+function showPlayableAction(f, ci, mi, mode = null) {
   setMapChoice(null);
   let c = flow.decks[f].hand[ci];
-  if (c && c.name === "Remanejando Mortos") {
+  const effect = mode?.effect || c?.name;
+  if (c && effect === "Remanejando Mortos") {
     showRemanejamento(f, ci, mi);
     return;
   }
   const m = flow.markers[mi];
   if (!c || !m || m.used || m.f !== f) return;
-  if (c.name === "Furia da Ilha") {
+  if (effect === "Furia da Ilha") {
     showElfFury(f, ci, mi);
     return;
   }
-  if (isAttackCard(f, c.name)) {
-    showAttackMovement(f, ci, mi);
+  if (isAttackCard(f, effect)) {
+    showAttackMovement(f, ci, mi, mode);
     return;
   }
-  if (c.name === "Carta de Corsário") {
+  if (effect === "Carta de Corsário") {
     showCorsair(f, ci, mi);
     return;
   }
-  const semMapa = c.name === "Novas Comandante a Bordo";
+  const semMapa =
+    effect === "Novas Comandante a Bordo" ||
+    (revisedModes && effect === "Milagre da Floresta");
   const id = m.region ?? selected,
     r = byId(id),
     s = state[id],
-    name = c.name;
+    name = effect;
   let form = "";
   const other = () => field("other", "Outra facção", optFactions(f));
   const destination = (filter = () => true) =>
@@ -284,7 +290,11 @@ function showPlayableAction(f, ci, mi) {
         .join(""),
     );
   if (name === "Assegurar Recursos para o Rei")
-    form = amount("extra", "Cópias adicionais a descartar", 4);
+    form = amount(
+      "extra",
+      "Cópias adicionais a descartar",
+      revisedModes ? 3 : 4,
+    );
   if (name === "Aliança com o Império")
     form =
       other() +
@@ -418,6 +428,9 @@ function showPlayableAction(f, ci, mi) {
       beforeFlow = clone(flow);
     try {
       executeCard(f, name, id, ci);
+      const refused =
+        ["Harmônia", "Serviço de Transporte Pirata"].includes(name) &&
+        $("decision").value === "no";
       const activeIndex = flow.decks[f].hand.indexOf(c);
       fail(activeIndex >= 0, "Carta ativa indisponível.");
       finishAction(
@@ -430,7 +443,8 @@ function showPlayableAction(f, ci, mi) {
           "Monumento a Morte",
           "Filhos da Floresta",
         ].includes(name),
-        semMapa ? name : name + " em " + id,
+        (semMapa ? name : name + " em " + id) +
+          (refused ? ": acordo recusado" : ""),
       );
     } catch (e) {
       state = before;
@@ -450,6 +464,11 @@ function executeCard(f, name, id, ci) {
     dest = () => $("destination").value;
   switch (name) {
     case "Filhos da Floresta": {
+      if (revisedModes)
+        fail(
+          calcOwner(s) === "elfos",
+          "A floresta precisa ser dominada pelos Elfos.",
+        );
       const result = ConflictIslandBase.filhosDaFloresta(
         state,
         id,
@@ -541,6 +560,11 @@ function executeCard(f, name, id, ci) {
     }
     case "Frutos da Mata":
     case "Trabalhadores Zumbificado": {
+      if (revisedModes && name === "Frutos da Mata")
+        fail(
+          calcOwner(s) === "elfos",
+          "A região precisa ser dominada pelos Elfos.",
+        );
       const resultado = ConflictIslandBase.coletaDeCartas(
         name,
         definitions,
@@ -788,6 +812,8 @@ function showElfFury(f, ci, mi) {
         ci,
         mi,
         card: "Furia da Ilha",
+        physicalCard: flow.decks[f].hand[ci].name,
+        modeLabel: preparedMode?.mode.label,
         stage: "reaction",
         beforeMove: before,
         towerRestored,
@@ -886,6 +912,8 @@ function showCorsair(f, ci, mi) {
           ci,
           mi,
           card: "Carta de Corsário",
+          physicalCard: flow.decks[f].hand[ci].name,
+          modeLabel: preparedMode?.mode.label,
           stage: "reaction",
           beforeMove: before,
           beforePaymentResources: oldResources,
@@ -924,13 +952,13 @@ function showCorsair(f, ci, mi) {
     }
   };
 }
-function showAttackMovement(f, ci, mi) {
+function showAttackMovement(f, ci, mi, mode = null) {
   const card = flow.decks[f].hand[ci],
     marker = flow.markers[mi],
     target = marker.region,
     r = byId(target),
     s = state[target],
-    name = card.name;
+    name = mode?.effect || card.name;
   const coastal = name === "Invasão Costeira",
     localOnly = [
       "Ataque a Linha de Suprimentos",
@@ -954,24 +982,34 @@ function showAttackMovement(f, ci, mi) {
           ].includes(name)
         ? 3
         : Number.MAX_SAFE_INTEGER;
+  const moving = mode?.operation !== "attack",
+    attacking = mode?.operation !== "move";
   $("cardDetail").innerHTML =
-    `<h3>${name}</h3><p>${card.text}</p><p>Alvo: ${target} · ${r.name}. Todas as tropas presentes de cada lado participarão. Escolha tropas a mover das origens permitidas; limite total ${max === Number.MAX_SAFE_INTEGER ? "sem limite" : max}.</p>${field("attackDefender", "Defensor", optFactions(f))}${origins.map((x) => amount("move-" + x.id, x.id + " · " + x.name + " (disponíveis " + state[x.id].units[f] + ")", state[x.id].units[f])).join("") || "<p>Nenhuma origem disponível; tropas já presentes ainda podem atacar.</p>"}<p class="muted">Os saques locais usam as tropas já presentes.</p><button id="prepareAttack">Confirmar ataque</button><p id="actionError" role="status"></p>`;
-  setMapChoice({
-    kind: "quantities",
-    prefix: "move-",
-    valid: origins.map((x) => x.id),
-    origin: target,
-    hint:
-      "Clique em uma origem destacada e informe quantas tropas mover para " +
-      target +
-      ".",
-  });
+    `<h3>${name}${mode ? " · " + mode.label : ""}</h3><p>${card.text}</p><p>Alvo: ${target} · ${r.name}.${moving ? ` Escolha tropas a mover; limite total ${max === Number.MAX_SAFE_INTEGER ? "sem limite" : max}.` : ""}</p>${attacking ? field("attackDefender", "Defensor", optFactions(f)) : ""}${moving ? origins.map((x) => amount("move-" + x.id, x.id + " · " + x.name + " (disponíveis " + state[x.id].units[f] + ")", state[x.id].units[f])).join("") || "<p>Nenhuma origem disponível.</p>" : ""}<button id="prepareAttack">${mode?.operation === "move" ? "Confirmar movimento" : "Confirmar ataque"}</button><p id="actionError" role="status"></p>`;
+  if (moving)
+    setMapChoice({
+      kind: "quantities",
+      prefix: "move-",
+      valid: origins.map((x) => x.id),
+      origin: target,
+      hint:
+        "Clique em uma origem destacada e informe quantas tropas mover para " +
+        target +
+        ".",
+    });
   $("prepareAttack").onclick = () => {
     try {
-      const defender = $("attackDefender").value,
-        moves = origins.map((x) => ({
+      let defender = attacking
+        ? $("attackDefender").value
+        : factionIds.find((x) => x !== f);
+      if (mode?.operation === "move")
+        defender =
+          factionIds.find(
+            (x) => x !== f && (s.units[x] > 0 || buildingCount(s, x) > 0),
+          ) || defender;
+      const moves = origins.map((x) => ({
           id: x.id,
-          n: countValue("move-" + x.id, state[x.id].units[f]),
+          n: moving ? countValue("move-" + x.id, state[x.id].units[f]) : 0,
         })),
         { hasEnemy } = ConflictIslandBase.validarAtaque(
           state,
@@ -984,6 +1022,21 @@ function showAttackMovement(f, ci, mi) {
           defender,
           moves,
         );
+      if (mode?.operation) {
+        const total = moves.reduce((sum, x) => sum + x.n, 0);
+        fail(
+          mode.operation === "attack" ? total === 0 : total > 0,
+          mode.operation === "attack"
+            ? "Este modo não move tropas."
+            : "Mova ao menos uma tropa.",
+        );
+        if (mode.operation !== "move")
+          fail(
+            hasEnemy &&
+              (s.units[defender] > 0 || buildingCount(s, defender) > 0),
+            "Escolha defensor com tropas ou construções.",
+          );
+      }
       const beforeMove = clone(state);
       for (const x of moves) if (x.n) move(x.id, target, f, x.n);
       const towerRestored = restoreTowerIfLost();
@@ -1001,13 +1054,21 @@ function showAttackMovement(f, ci, mi) {
         );
         return;
       }
-      if ((coastal || name === "Marcha Imperial") && !hasEnemy) {
+      if (
+        mode?.operation === "move" ||
+        ((coastal || name === "Marcha Imperial") && !hasEnemy)
+      ) {
         finishAction(
           f,
           ci,
           mi,
           false,
-          name + " em " + target + " sem inimigos: movimento realizado sem combate.",
+          name +
+            " em " +
+            target +
+            (hasEnemy
+              ? ": movimento realizado sem combate."
+              : " sem inimigos: movimento realizado sem combate."),
         );
         return;
       }
@@ -1018,6 +1079,8 @@ function showAttackMovement(f, ci, mi) {
         ci,
         mi,
         card: name,
+        physicalCard: card.name,
+        modeLabel: mode?.label,
         stage: "reaction",
         beforeMove,
         towerRestored,

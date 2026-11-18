@@ -189,5 +189,28 @@
     ],
     "implementacao": [],
     "testes": []
+  },
+  {
+    "id": "BARALHOS-REVISADOS",
+    "assunto": "Experimento de baralhos revisados",
+    "estado": "em-teste",
+    "fontes": [
+      "prototipo/baralhos-revisados.md",
+      "faccoes/imperio.md",
+      "faccoes/piratas.md",
+      "faccoes/necromante.md",
+      "faccoes/elfos.md"
+    ],
+    "implementacao": [
+      "jogo/dados/cartas-revisadas.js",
+      "scripts/sincronizar-motor.cjs",
+      "jogo/aplicacao/fluxo.js",
+      "jogo/aplicacao/acoes.js",
+      "jogo/aplicacao/combate.js"
+    ],
+    "testes": [
+      "testes/validar-baralhos-revisados.cjs",
+      "testes/navegador/baralhos-revisados.spec.cjs"
+    ]
   }
 ]

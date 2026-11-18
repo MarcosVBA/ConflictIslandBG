@@ -19,6 +19,7 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Facção e baralho dos Elfos | [Elfos](faccoes/elfos.md) |
 | Ideias para facções futuras | [Dragões](faccoes/dragoes.md) |
 | Ideias gerais em exploração ou adiadas | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) · [IA para facções](ideias/ia-para-faccoes.md) |
+| Experimento de baralhos de 12 cartas | [Baralhos revisados](prototipo/baralhos-revisados.md) |
 | Estado, hipóteses, divergências e testes do jogo | [Estado do protótipo](prototipo/estado-e-testes.md) |
 | Índice de decisões, implementação e testes | [Matriz de rastreabilidade](prototipo/rastreabilidade.md) |
 | Planejamento do protótipo para quatro facções | [Plano de quatro facções](prototipo/plano-quatro-faccoes.md) |
@@ -26,7 +27,7 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Conceito de mesa e telas | [Plano de interface](prototipo/plano-interface.md) · [Abrir demonstração visual](prototipo/mesa-conceito.html) |
 | Partidas e revisão de interface | [Roteiro de validação humana](prototipo/roteiro-validacao.md) |
 
-[Abrir o protótipo principal](mapa-fluxo-dinamico.html): quatro facções, controle manual e fluxo sem alocação prévia. O jogo funciona em um único HTML local, sem servidor ou IA. As versões com alocação prévia estão preservadas como [legado](historico/prototipos/alocacao-de-marcadores.md), sem atualizações futuras.
+[Abrir o protótipo principal](mapa-fluxo-dinamico.html): quatro facções, controle manual e fluxo sem alocação prévia. [Abrir a mesa experimental de baralhos revisados](mapa-baralhos-revisados.html), com 12 cartas por facção; suas regras e roteiro comparativo estão no documento do experimento. O jogo funciona em um único HTML local, sem servidor ou IA. As versões com alocação prévia estão preservadas como [legado](historico/prototipos/alocacao-de-marcadores.md), sem atualizações futuras.
 
 ## Site e instalação no celular
 

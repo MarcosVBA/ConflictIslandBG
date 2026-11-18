@@ -8,6 +8,8 @@ Os marcadores de ação ficam em reserva; a região é escolhida ao preparar a c
 
 A partida não é salva ao fechar ou recarregar. O cenário inicial é o de [Mapa](../regras/mapa.md); o extrator inicial é provisório e ajustável. Restaurar o cenário reinicia também rodada, placar, cartas e impostos. A [IA para facções](../ideias/ia-para-faccoes.md) permanece adiada.
 
+O experimento de [baralhos revisados](baralhos-revisados.md) mantém decisões de teste separadas das tabelas vigentes e dispõe de uma [mesa local própria](../mapa-baralhos-revisados.html). As suítes de regras e navegador passaram; a checagem completa também passou. O playtest comparativo humano ainda não foi realizado, portanto o equilíbrio e o tempo de decisão permanecem sem avaliação.
+
 ## Implementação e adaptações
 
 O baralho do [Necromante](../faccoes/necromante.md) tem 20 cartas; Monumento a Morte custa 1 Madeira e Despertar para a Morte é uma magia. A Magia da Torre e o Alistamento Obrigatório estão implementados. O imposto imperial ativo e o atraso aparecem durante a vez do Império; a mão usa cinco cartas por padrão e pode ser ajustada. Custos, propostas e demais efeitos constam nos módulos de cada facção.
@@ -29,6 +31,8 @@ A distribuição do site é preparada a partir do HTML principal. A cópia publi
 O Ouro dos Piratas permanece disponível para acordos durante a rodada. Na pontuação, após receber a renda do Bar controlado, todo o saldo de Ouro dos Piratas retorna à reserva e gera 1 ponto por Ouro; saque e recebimento não geram pontos imediatamente.
 
 ## Limitações
+
+- Na variante experimental, o teste de navegador prepara o estado da batalha para exercitar a reação; não percorre toda a declaração do combate pela interface. A proteção do atacante por Defesa Global e o saque sem movimento da Invasão não têm cenário automatizado específico. O playtest comparativo e a validação visual humana permanecem pendentes.
 
 - Invasão Costeira permite movimento sem saque para costa sem inimigos; Marcha Imperial também permite movimento sem combate quando não há inimigos. Ataques também podem atingir construções sem tropas defensoras, conforme [Combate](../regras/combate.md).
 - A conciliação de dano excedente está em [Combate](../regras/combate.md). As demais cartas defensivas continuam pendentes; Guarda Imperial é uma adaptação de teste.

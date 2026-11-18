@@ -2,9 +2,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const htmlPath = path.join(root, 'mapa-fluxo-dinamico.html');
+const experimental = process.argv.includes('--baralhos-revisados');
+const htmlPath = path.join(root, experimental ? 'mapa-baralhos-revisados.html' : 'mapa-fluxo-dinamico.html');
+const templatePath = path.join(root, 'mapa-fluxo-dinamico.html');
 const source = fs.readFileSync(path.join(root, 'jogo/motor/base.js'), 'utf8').trimEnd();
-const html = fs.readFileSync(htmlPath, 'utf8');
+const html = fs.readFileSync(templatePath, 'utf8');
 const pattern = /<!-- INÍCIO MOTOR BASE -->[\s\S]*?<!-- FIM MOTOR BASE -->/;
 const block = `<!-- INÍCIO MOTOR BASE -->\n<script>\n${source}\n</script>\n<!-- FIM MOTOR BASE -->`;
 if (!pattern.test(html)) throw Error('Marcadores do motor ausentes no HTML.');
@@ -20,7 +22,7 @@ for (const [name, file] of [['MAPA','mapa.js'],['FLUXO','fluxo.js'],['COMBATE','
   for (const [dataName, dataFile] of [['MAPA','mapa.js'],['CARTAS','cartas.js'],['IMPERIO','imperio.js']]) {
     const placeholder = `// @dados ${dataName}`;
     if (source.includes(placeholder)) {
-      const data = fs.readFileSync(path.join(root, 'jogo/dados', dataFile), 'utf8').trimEnd();
+      const data = fs.readFileSync(path.join(root, 'jogo/dados', experimental && dataName === 'CARTAS' ? 'cartas-revisadas.js' : dataFile), 'utf8').trimEnd();
       source = source.replace(placeholder, () => `// INÍCIO DADOS ${dataName}\n${data}\n// FIM DADOS ${dataName}`);
     }
   }
@@ -33,7 +35,7 @@ for (const [name, file] of [['MAPA','mapa.js'],['FLUXO','fluxo.js'],['COMBATE','
   next = next.replace(appPattern, () => `<!-- INÍCIO APLICAÇÃO ${name} -->\n<script>\n${source}\n</script>\n<!-- FIM APLICAÇÃO ${name} -->`);
 }
 for (const [name, file] of [['MAPA', 'mapa.js'], ['CARTAS', 'cartas.js'], ['IMPERIO', 'imperio.js']]) {
-  const data = fs.readFileSync(path.join(root, 'jogo/dados', file), 'utf8').trimEnd();
+  const data = fs.readFileSync(path.join(root, 'jogo/dados', experimental && name === 'CARTAS' ? 'cartas-revisadas.js' : file), 'utf8').trimEnd();
   const dataPattern = new RegExp(`// INÍCIO DADOS ${name}\\n[\\s\\S]*?// FIM DADOS ${name}`);
   if (!dataPattern.test(next)) throw Error(`Marcadores de dados ${name} ausentes no HTML.`);
   next = next.replace(dataPattern, () => `// INÍCIO DADOS ${name}\n${data}\n// FIM DADOS ${name}`);
@@ -46,7 +48,12 @@ const styles = fs.readFileSync(path.join(root, 'jogo/apresentacao/mesa.css'), 'u
 const stylePattern = /\/\* INÍCIO ESTILO MESA \*\/[\s\S]*?\/\* FIM ESTILO MESA \*\//;
 if (!stylePattern.test(next)) throw Error('Marcadores de estilo ausentes no HTML.');
 next = next.replace(stylePattern, () => `/* INÍCIO ESTILO MESA */\n${styles}\n/* FIM ESTILO MESA */`);
+if (experimental) {
+  next = next.replace('<title>Conflict Island — protótipo principal</title>', '<title>Conflict Island — baralhos revisados (experimento)</title>');
+  next = next.replace('<small>A ILHA DE CÂLEPOO</small>', '<small>BARALHOS REVISADOS · EXPERIMENTO</small>');
+}
 if (process.argv.includes('--verificar')) {
-  if (next !== html) throw Error('Motor, dados ou apresentação incorporados desatualizados. Execute node scripts/sincronizar-motor.cjs.');
+  const actual = fs.existsSync(htmlPath) ? fs.readFileSync(htmlPath, 'utf8') : '';
+  if (next !== actual) throw Error('Motor, dados ou apresentação incorporados desatualizados. Execute node scripts/sincronizar-motor.cjs' + (experimental ? ' --baralhos-revisados' : '') + '.');
   console.log('Motor, dados e apresentação incorporados estão sincronizados.');
 } else fs.writeFileSync(htmlPath, next);

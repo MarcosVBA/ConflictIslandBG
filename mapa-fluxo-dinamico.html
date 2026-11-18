@@ -1302,6 +1302,9 @@ const cardDefs={
 // Valores de liderança definidos para teste; iguais para cópias da mesma carta.
 const leadershipValues=Object.freeze({"Invasão Costeira":2,"Ataque a Linha de Suprimentos":1,"Trabalhe enquanto eles dormem":1,"Carta de Corsário":0,"Serviço de Transporte Pirata":0,"Pirata Aprendiz":1,"Mercenários Piratas":2,"Atrás do Tesouro":0,"Novas Comandante a Bordo":0,"Taverna Pirata":1,"Ataque Zumbi":1,"Infestação":1,"Horda interminável":3,"Praga Resistente":0,"Magia das Trevas":1,"Trabalhadores Zumbificado":0,"Projeto de Poder Maligno":1,"Remanejando Mortos":0,"Monumento a Morte":1,"Marcha Imperial":1,"Guarda Imperial":1,"Tambores de Guerra":2,"Alistamento":0,"O Progresso":1,"Assegurar Recursos para o Rei":1,"Reorganizar Contingente":1,"Aliança com o Império":0,"Pagamento de Impostos":1,"Furia da Ilha":2,"Conhecimentos da Floresta":0,"Canção de paz":3,"Trilhas na Mata":0,"Harmônia":1,"Frutos da Mata":1,"Filhos da Floresta":0,"Milagre da Floresta":1});
 // FIM DADOS CARTAS
+const revisedModes =
+  typeof experimentalModes === "undefined" ? null : experimentalModes;
+let preparedMode = null;
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -1420,7 +1423,7 @@ function factionInfo(f) {
   }
   if (f === "elfos") {
     const forest = elfForestPoints(definitions, state);
-    details = `<p><strong>${forest.owned}</strong> florestas dominadas · <strong>${forest.points}</strong> pontos na pontuação de rodada</p><small>Canção de paz pode ser usada antes dos dados.</small>`;
+    details = `<p><strong>${forest.owned}</strong> florestas dominadas · <strong>${forest.points}</strong> pontos na pontuação de rodada</p><small>${revisedModes ? "Defesa Global pode proteger um lado antes dos dados." : "Canção de paz pode ser usada antes dos dados."}</small>`;
   }
   const rules = {
     imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
@@ -1428,6 +1431,11 @@ function factionInfo(f) {
     piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
     elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; todas rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
   };
+  if (revisedModes)
+    rules.elfos = rules.elfos.replace(
+      "<p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>",
+      "<p><strong>Defesa Global:</strong> antes dos dados, gaste a carta e uma ação para proteger um dos lados com tropas.</p>",
+    );
   const deck = flow.decks[f];
   return `<div class="faction-info" aria-label="Informações de ${names[f]}"><h2>${names[f]}</h2><p><strong>${game.score[f]} pontos</strong> · ◆ ${res.ouro} ouro · ♣ ${res.madeira} madeira</p><p>${troops} tropas · ${owned} regiões dominadas</p><p>Baralho: ${deck.draw.length} · mão: ${deck.hand.length} · descarte: ${deck.discard.length}</p>${details}<h3>Regras da facção</h3>${rules[f]}</div>`;
 }
@@ -1611,6 +1619,7 @@ function renderRoundPhases(phase) {
   $("headerPhases").innerHTML = content;
 }
 function renderFlow() {
+  preparedMode = null;
   if (!battle) closeActionDialog();
   $("handArea").innerHTML = "";
   $("handArea").hidden = true;
@@ -1636,16 +1645,30 @@ function renderFlow() {
     "</details><details><summary>Registro da rodada</summary><ol>" +
     flow.log.map((x) => "<li>" + x + "</li>").join("") +
     "</ol></details>";
-  if (phase !== "fim" && !battle && definitions.every((r) => state[r.id].units.elfos === 0)) {
+  if (
+    phase !== "fim" &&
+    !battle &&
+    definitions.every((r) => state[r.id].units.elfos === 0)
+  ) {
     const florestas = definitions.filter((r) => r.terrain === "floresta");
-    const options = florestas.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join("");
+    const options = florestas
+      .map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`)
+      .join("");
     target.innerHTML = `<h3>Vingança da Terra</h3><p>Os Elfos ficaram sem tropas. Escolha uma floresta para cada uma das três tropas.</p>${[1, 2, 3].map((i) => `<label>Tropa ${i} <select id="elfRevive${i}">${options}</select></label>`).join("")}<button id="confirmElfRevive">Adicionar tropas</button>`;
     $("confirmElfRevive").onclick = () => {
       const ids = [1, 2, 3].map((i) => $("elfRevive" + i).value);
-      if (definitions.some((r) => state[r.id].units.elfos > 0) || ids.some((id) => !florestas.some((r) => r.id === id))) return;
+      if (
+        definitions.some((r) => state[r.id].units.elfos > 0) ||
+        ids.some((id) => !florestas.some((r) => r.id === id))
+      )
+        return;
       for (const id of ids) state[id].units.elfos++;
-      flowLog("Vingança da Terra: tropas adicionadas em " + ids.join(", ") + ".");
-      refreshOwners(); render(); renderFlow();
+      flowLog(
+        "Vingança da Terra: tropas adicionadas em " + ids.join(", ") + ".",
+      );
+      refreshOwners();
+      render();
+      renderFlow();
     };
     return;
   }
@@ -1857,6 +1880,16 @@ function renderFlow() {
         selected = id;
         for (const m of flow.markers) if (m.f === f && !m.used) m.region = null;
         setMapChoice(null);
+        if (preparedMode && preparedMode.f === f) {
+          flow.markers[preparedMode.mi].region = id;
+          showPlayableAction(
+            f,
+            preparedMode.ci,
+            preparedMode.mi,
+            preparedMode.mode,
+          );
+          return;
+        }
         $("discardAction").disabled = true;
         $("cardDetail").innerHTML = "";
         $("handArea")
@@ -1867,6 +1900,7 @@ function renderFlow() {
           });
       };
       $("actionMarker").onchange = () => {
+        preparedMode = null;
         for (const m of flow.markers) if (m.f === f && !m.used) m.region = null;
         setMapChoice(null);
         $("discardAction").disabled = true;
@@ -1883,6 +1917,10 @@ function renderFlow() {
         .forEach((btn) => {
           btn.onclick = () => {
             if ($("showCard").disabled) return;
+            preparedMode = null;
+            setMapChoice(null);
+            for (const marker of flow.markers)
+              if (marker.f === f && !marker.used) marker.region = null;
             $("handArea")
               .querySelectorAll("[data-card-index]")
               .forEach((x) => {
@@ -1903,6 +1941,30 @@ function renderFlow() {
           m = flow.markers[mi],
           id = $("actionRegion").value;
         if (!c || !m || m.used || m.f !== f) return;
+        if (revisedModes) {
+          const modes = revisedModes[c.name] || [];
+          $("cardDetail").innerHTML =
+            `<h3>${c.name}</h3><p>${experimentalConditions[c.name]}</p>${modes.map((mode, i) => (mode.window === "reação" ? `<p>${mode.label}: disponível como reação na janela indicada.</p>` : `<button type="button" data-mode="${i}">${mode.label}</button>`)).join("")}`;
+          $("cardDetail")
+            .querySelectorAll("[data-mode]")
+            .forEach((button) => {
+              button.onclick = () => {
+                const mode = modes[Number(button.dataset.mode)];
+                preparedMode = { f, ci, mi, mode };
+                if (mode.window === "modal")
+                  showPlayableAction(f, ci, mi, mode);
+                else {
+                  selected = null;
+                  m.region = null;
+                  $("actionRegion").value = "";
+                  $("cardDetail").innerHTML =
+                    `<h3>${c.name} · ${mode.label}</h3><p>${experimentalConditions[c.name]}</p><p>Selecione a região no mapa para preparar este modo.</p>`;
+                  render();
+                }
+              };
+            });
+          return;
+        }
         const semRegiao = [
           "Guarda Imperial",
           "Praga Resistente",
@@ -1979,7 +2041,10 @@ function openActionDialog(required) {
     if (required) event.preventDefault();
   };
   dialog.onclose = () => {
-    if (!dialog.open) $("dialogContent").innerHTML = "";
+    if (!dialog.open) {
+      $("dialogContent").innerHTML = "";
+      if (!battle) preparedMode = null;
+    }
   };
   if (typeof dialog.showModal === "function" && !dialog.open)
     dialog.showModal();
@@ -2109,9 +2174,17 @@ function renderBattle() {
   openActionDialog(true);
   if (b.stage === "reaction" && !b.attackCommitted) {
     try {
-      commitBattleCard(b.f, b.mi, b.ci, b.card);
+      commitBattleCard(b.f, b.mi, b.ci, b.physicalCard || b.card);
       b.attackCommitted = true;
-      flowLog(names[b.f] + " declarou " + b.card + " em " + b.region + ".");
+      flowLog(
+        names[b.f] +
+          " declarou " +
+          (b.physicalCard || b.card) +
+          (b.modeLabel ? " · " + b.modeLabel : "") +
+          " em " +
+          b.region +
+          ".",
+      );
     } catch (e) {
       panel.innerHTML =
         '<p role="alert">' +
@@ -2120,19 +2193,81 @@ function renderBattle() {
       return;
     }
   }
-  if (b.stage === "reaction" && b.f === "elfos" && !b.attackerReactionDecided) {
-    const available = ConflictIslandBase.reacaoDisponivel(flow.markers, flow.decks.elfos, "elfos", "Conhecimentos da Floresta");
+  if (
+    revisedModes &&
+    b.stage === "reaction" &&
+    b.f === "piratas" &&
+    !b.windDecided
+  ) {
+    const available = ConflictIslandBase.reacaoDisponivel(
+      flow.markers,
+      flow.decks.piratas,
+      "piratas",
+      "Vento a Favor",
+    );
+    if (available) {
+      showBattleHand("piratas");
+      const defenseCount = Math.max(0, s.units[b.defender] - s.units.piratas);
+      panel.innerHTML = `<h3>Vento a Favor</h3><p>Gaste uma carta e uma ação em um dos modos.</p>${defenseCount ? '<button id="suppressDefense">Descartar dados de defesa</button>' : ""}<button id="extraLoot">Recolher mais espólios</button><button id="skipWind">Não usar</button>`;
+      const choose = (kind) => {
+        commitBattleCard(
+          "piratas",
+          available.acao,
+          available.carta,
+          "Vento a Favor",
+        );
+        b.suppressDefense = kind === "defesa";
+        b.extraLoot = kind === "ouro";
+        b.windDecided = true;
+        flowLog(
+          "Piratas usaram Vento a Favor: " +
+            (b.suppressDefense
+              ? "dados de defesa suprimidos."
+              : "Ouro extra em caso de sucesso."),
+        );
+        renderBattle();
+      };
+      if (defenseCount) $("suppressDefense").onclick = () => choose("defesa");
+      $("extraLoot").onclick = () => choose("ouro");
+      $("skipWind").onclick = () => {
+        b.windDecided = true;
+        renderBattle();
+      };
+      return;
+    }
+    b.windDecided = true;
+  }
+  if (
+    !revisedModes &&
+    b.stage === "reaction" &&
+    b.f === "elfos" &&
+    !b.attackerReactionDecided
+  ) {
+    const available = ConflictIslandBase.reacaoDisponivel(
+      flow.markers,
+      flow.decks.elfos,
+      "elfos",
+      "Conhecimentos da Floresta",
+    );
     if (available) {
       showBattleHand("elfos");
       panel.innerHTML = `<h3>Reação do atacante</h3><p>Gaste outra ação para ignorar o primeiro dano neste combate.</p><button id="useAttackDefense">Usar Conhecimentos da Floresta</button><button id="skipAttackDefense">Não usar</button>`;
       $("useAttackDefense").onclick = () => {
-        commitBattleCard("elfos", available.acao, available.carta, "Conhecimentos da Floresta");
+        commitBattleCard(
+          "elfos",
+          available.acao,
+          available.carta,
+          "Conhecimentos da Floresta",
+        );
         b.attackerReactionProtection = 1;
         b.attackerReactionDecided = true;
         flowLog("Elfos usaram Conhecimentos da Floresta no ataque.");
         renderBattle();
       };
-      $("skipAttackDefense").onclick = () => { b.attackerReactionDecided = true; renderBattle(); };
+      $("skipAttackDefense").onclick = () => {
+        b.attackerReactionDecided = true;
+        renderBattle();
+      };
       return;
     }
     b.attackerReactionDecided = true;
@@ -2142,9 +2277,9 @@ function renderBattle() {
     const defenseName =
       b.defender === "imperio"
         ? "Guarda Imperial"
-        : b.defender === "necromante"
+        : !revisedModes && b.defender === "necromante"
           ? "Praga Resistente"
-          : b.defender === "elfos"
+          : !revisedModes && b.defender === "elfos"
             ? "Conhecimentos da Floresta"
             : null;
     const available = ConflictIslandBase.reacaoDisponivel(
@@ -2156,7 +2291,12 @@ function renderBattle() {
       cardIndex = available?.carta,
       markerIndex = available?.acao;
     const canReact = !!available;
-    panel.innerHTML = `<h3>Combate em ${b.region}</h3><p>${names[b.f]} enfrenta ${names[b.defender]}. O ataque e sua ação já foram gastos.</p><p>${names[b.defender]} decide se usa uma reação defensiva antes de os Elfos decidirem sobre Canção de paz.</p>${canReact ? `<button id="useDefense">Usar ${defenseName}</button>` : "<p>Nenhuma reação defensiva disponível.</p>"}<button id="skipDefense">Não reagir</button><p id="battleError" role="status"></p>`;
+    if (revisedModes && !canReact) {
+      Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+      renderBattle();
+      return;
+    }
+    panel.innerHTML = `<h3>Combate em ${b.region}</h3><p>${names[b.f]} enfrenta ${names[b.defender]}. O ataque e sua ação já foram gastos.</p><p>${names[b.defender]} decide se usa uma reação defensiva antes de os Elfos decidirem sobre ${revisedModes ? "Defesa Global" : "Canção de paz"}.</p>${canReact ? `<button id="useDefense">Usar ${defenseName}</button>` : "<p>Nenhuma reação defensiva disponível.</p>"}<button id="skipDefense">Não reagir</button><p id="battleError" role="status"></p>`;
     if (canReact)
       $("useDefense").onclick = () => {
         if (battle !== b || b.stage !== "reaction") return;
@@ -2184,6 +2324,49 @@ function renderBattle() {
     return;
   }
   if (b.stage === "peace") {
+    if (revisedModes) {
+      const available = ConflictIslandBase.reacaoDisponivel(
+        flow.markers,
+        flow.decks.elfos,
+        "elfos",
+        "Trilhas na Mata / Defesa Global",
+      );
+      if (!available || (!s.units[b.f] && !s.units[b.defender])) {
+        Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+        renderBattle();
+        return;
+      }
+      showBattleHand("elfos");
+      panel.innerHTML = `<h3>Defesa Global</h3><p>Os Elfos podem gastar uma ação e proteger um lado com tropas.</p>${s.units[b.f] ? `<button id="protectAttacker">Proteger ${names[b.f]}</button>` : ""}${s.units[b.defender] ? `<button id="protectDefender">Proteger ${names[b.defender]}</button>` : ""}<button id="skipGlobal">Não usar</button>`;
+      const protect = (side) => {
+        commitBattleCard(
+          "elfos",
+          available.acao,
+          available.carta,
+          "Trilhas na Mata / Defesa Global",
+        );
+        if (side === "attacker")
+          b.attackerReactionProtection =
+            (b.attackerReactionProtection || 0) + 1;
+        else b.defProtection = (b.defProtection || 0) + 1;
+        flowLog(
+          "Elfos usaram Trilhas na Mata / Defesa Global · Defesa Global para proteger " +
+            names[side === "attacker" ? b.f : b.defender] +
+            ".",
+        );
+        Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+        renderBattle();
+      };
+      if (s.units[b.f])
+        $("protectAttacker").onclick = () => protect("attacker");
+      if (s.units[b.defender])
+        $("protectDefender").onclick = () => protect("defender");
+      $("skipGlobal").onclick = () => {
+        Object.assign(b, ConflictIslandBase.decidirReacao(b, "passar"));
+        renderBattle();
+      };
+      return;
+    }
     showBattleHand("elfos");
     const available = ConflictIslandBase.reacaoDisponivel(
         flow.markers,
@@ -2237,12 +2420,13 @@ function renderBattle() {
       b.attackerCount = current.units[b.f];
       b.defenderCount = current.units[b.defender];
       b.attackDice = b.peace ? [] : rollDice(b.attackerCount, attackFaces);
-      b.defenseDice = b.peace
-        ? []
-        : rollDice(
-            Math.max(0, b.defenderCount - b.attackerCount),
-            defenseFaces,
-          );
+      b.defenseDice =
+        b.peace || b.suppressDefense
+          ? []
+          : rollDice(
+              Math.max(0, b.defenderCount - b.attackerCount),
+              defenseFaces,
+            );
       b.attProtection = [
         "Trabalhe enquanto eles dormem",
         "Horda interminável",
@@ -2346,12 +2530,18 @@ function renderBattle() {
       loot = lootGold(
         resources,
         b.defender,
-        b.card === "Ataque a Linha de Suprimentos" ? 2 : 1,
+        b.card === "Ataque a Linha de Suprimentos" || b.extraLoot ? 2 : 1,
       );
     flow.turn = (flow.turn + 1) % flow.order.length;
-    restoreTowerIfLost();
-    afterBattle(b, region, result, loot);
-    const note = `${b.card} em ${b.region}: ${result.defenderLoss} defensores e ${result.attackerLoss} atacantes eliminados; ${b.destroy} construções destruídas; ataque ${success ? "bem-sucedido" : "sem sucesso"}${loot.length ? "; Ouro: " + loot.join(" e ") : ""}${b.reaction ? "; " + b.reaction.name + " consumiu uma ação" : ""}. Efeitos de combate aplicados.`;
+    const towerRestoredAfter = restoreTowerIfLost();
+    afterBattle(
+      b,
+      region,
+      result,
+      loot,
+      !!(revisedModes && b.card === "Infestação" && towerRestoredAfter),
+    );
+    const note = `${b.physicalCard || b.card}${b.modeLabel ? " · " + b.modeLabel : ""} em ${b.region}: ${result.defenderLoss} defensores e ${result.attackerLoss} atacantes eliminados; ${b.destroy} construções destruídas; ataque ${success ? "bem-sucedido" : "sem sucesso"}${loot.length ? "; Ouro: " + loot.join(" e ") : ""}${b.reaction ? "; " + b.reaction.name + " consumiu uma ação" : ""}. Efeitos de combate aplicados.`;
     flowLog(note);
     battle = null;
     selected = b.region;
@@ -2544,7 +2734,7 @@ function endView() {
       : factionIds.filter((f) => game.score[f] === max);
   return `<h3>Fim da partida de teste</h3><p>${w.length > 1 ? "Empate: " : "Vencedor: "}${w.map((f) => names[f]).join(", ")} — ${max} pontos.</p><p>Use “Restaurar cenário inicial” para jogar novamente.</p><details><summary>Origem dos pontos</summary><ul>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("")}</ul></details>`;
 }
-function afterBattle(b, region, result, loot) {
+function afterBattle(b, region, result, loot, skipInfestationRecruit = false) {
   const events = ConflictIslandBase.efeitosCombate(
     b,
     region,
@@ -2556,7 +2746,7 @@ function afterBattle(b, region, result, loot) {
     if (game.winner) break;
     if (event.tipo === "pontos")
       addPoints(event.faccao, event.quantidade, event.motivo);
-    else if (event.tipo === "zumbis")
+    else if (event.tipo === "zumbis" && !skipInfestationRecruit)
       region.units.necromante += event.quantidade;
   }
 }
@@ -2629,6 +2819,9 @@ function move(from, to, f, n) {
 }
 function finishAction(f, ci, mi, discardAll, description) {
   const deck = flow.decks[f];
+  if (revisedModes && preparedMode && deck.hand[ci])
+    description =
+      deck.hand[ci].name + " · " + preparedMode.mode.label + ": " + description;
   consumeActionCard(f, mi, ci);
   if (discardAll && !game.winner) {
     deck.discard.push(...deck.hand.splice(0));
@@ -2778,32 +2971,35 @@ function showRemanejamento(f, ci, mi) {
   }
   panel();
 }
-function showPlayableAction(f, ci, mi) {
+function showPlayableAction(f, ci, mi, mode = null) {
   setMapChoice(null);
   let c = flow.decks[f].hand[ci];
-  if (c && c.name === "Remanejando Mortos") {
+  const effect = mode?.effect || c?.name;
+  if (c && effect === "Remanejando Mortos") {
     showRemanejamento(f, ci, mi);
     return;
   }
   const m = flow.markers[mi];
   if (!c || !m || m.used || m.f !== f) return;
-  if (c.name === "Furia da Ilha") {
+  if (effect === "Furia da Ilha") {
     showElfFury(f, ci, mi);
     return;
   }
-  if (isAttackCard(f, c.name)) {
-    showAttackMovement(f, ci, mi);
+  if (isAttackCard(f, effect)) {
+    showAttackMovement(f, ci, mi, mode);
     return;
   }
-  if (c.name === "Carta de Corsário") {
+  if (effect === "Carta de Corsário") {
     showCorsair(f, ci, mi);
     return;
   }
-  const semMapa = c.name === "Novas Comandante a Bordo";
+  const semMapa =
+    effect === "Novas Comandante a Bordo" ||
+    (revisedModes && effect === "Milagre da Floresta");
   const id = m.region ?? selected,
     r = byId(id),
     s = state[id],
-    name = c.name;
+    name = effect;
   let form = "";
   const other = () => field("other", "Outra facção", optFactions(f));
   const destination = (filter = () => true) =>
@@ -2846,7 +3042,11 @@ function showPlayableAction(f, ci, mi) {
         .join(""),
     );
   if (name === "Assegurar Recursos para o Rei")
-    form = amount("extra", "Cópias adicionais a descartar", 4);
+    form = amount(
+      "extra",
+      "Cópias adicionais a descartar",
+      revisedModes ? 3 : 4,
+    );
   if (name === "Aliança com o Império")
     form =
       other() +
@@ -2980,6 +3180,9 @@ function showPlayableAction(f, ci, mi) {
       beforeFlow = clone(flow);
     try {
       executeCard(f, name, id, ci);
+      const refused =
+        ["Harmônia", "Serviço de Transporte Pirata"].includes(name) &&
+        $("decision").value === "no";
       const activeIndex = flow.decks[f].hand.indexOf(c);
       fail(activeIndex >= 0, "Carta ativa indisponível.");
       finishAction(
@@ -2992,7 +3195,8 @@ function showPlayableAction(f, ci, mi) {
           "Monumento a Morte",
           "Filhos da Floresta",
         ].includes(name),
-        semMapa ? name : name + " em " + id,
+        (semMapa ? name : name + " em " + id) +
+          (refused ? ": acordo recusado" : ""),
       );
     } catch (e) {
       state = before;
@@ -3012,6 +3216,11 @@ function executeCard(f, name, id, ci) {
     dest = () => $("destination").value;
   switch (name) {
     case "Filhos da Floresta": {
+      if (revisedModes)
+        fail(
+          calcOwner(s) === "elfos",
+          "A floresta precisa ser dominada pelos Elfos.",
+        );
       const result = ConflictIslandBase.filhosDaFloresta(
         state,
         id,
@@ -3103,6 +3312,11 @@ function executeCard(f, name, id, ci) {
     }
     case "Frutos da Mata":
     case "Trabalhadores Zumbificado": {
+      if (revisedModes && name === "Frutos da Mata")
+        fail(
+          calcOwner(s) === "elfos",
+          "A região precisa ser dominada pelos Elfos.",
+        );
       const resultado = ConflictIslandBase.coletaDeCartas(
         name,
         definitions,
@@ -3350,6 +3564,8 @@ function showElfFury(f, ci, mi) {
         ci,
         mi,
         card: "Furia da Ilha",
+        physicalCard: flow.decks[f].hand[ci].name,
+        modeLabel: preparedMode?.mode.label,
         stage: "reaction",
         beforeMove: before,
         towerRestored,
@@ -3448,6 +3664,8 @@ function showCorsair(f, ci, mi) {
           ci,
           mi,
           card: "Carta de Corsário",
+          physicalCard: flow.decks[f].hand[ci].name,
+          modeLabel: preparedMode?.mode.label,
           stage: "reaction",
           beforeMove: before,
           beforePaymentResources: oldResources,
@@ -3486,13 +3704,13 @@ function showCorsair(f, ci, mi) {
     }
   };
 }
-function showAttackMovement(f, ci, mi) {
+function showAttackMovement(f, ci, mi, mode = null) {
   const card = flow.decks[f].hand[ci],
     marker = flow.markers[mi],
     target = marker.region,
     r = byId(target),
     s = state[target],
-    name = card.name;
+    name = mode?.effect || card.name;
   const coastal = name === "Invasão Costeira",
     localOnly = [
       "Ataque a Linha de Suprimentos",
@@ -3516,24 +3734,34 @@ function showAttackMovement(f, ci, mi) {
           ].includes(name)
         ? 3
         : Number.MAX_SAFE_INTEGER;
+  const moving = mode?.operation !== "attack",
+    attacking = mode?.operation !== "move";
   $("cardDetail").innerHTML =
-    `<h3>${name}</h3><p>${card.text}</p><p>Alvo: ${target} · ${r.name}. Todas as tropas presentes de cada lado participarão. Escolha tropas a mover das origens permitidas; limite total ${max === Number.MAX_SAFE_INTEGER ? "sem limite" : max}.</p>${field("attackDefender", "Defensor", optFactions(f))}${origins.map((x) => amount("move-" + x.id, x.id + " · " + x.name + " (disponíveis " + state[x.id].units[f] + ")", state[x.id].units[f])).join("") || "<p>Nenhuma origem disponível; tropas já presentes ainda podem atacar.</p>"}<p class="muted">Os saques locais usam as tropas já presentes.</p><button id="prepareAttack">Confirmar ataque</button><p id="actionError" role="status"></p>`;
-  setMapChoice({
-    kind: "quantities",
-    prefix: "move-",
-    valid: origins.map((x) => x.id),
-    origin: target,
-    hint:
-      "Clique em uma origem destacada e informe quantas tropas mover para " +
-      target +
-      ".",
-  });
+    `<h3>${name}${mode ? " · " + mode.label : ""}</h3><p>${card.text}</p><p>Alvo: ${target} · ${r.name}.${moving ? ` Escolha tropas a mover; limite total ${max === Number.MAX_SAFE_INTEGER ? "sem limite" : max}.` : ""}</p>${attacking ? field("attackDefender", "Defensor", optFactions(f)) : ""}${moving ? origins.map((x) => amount("move-" + x.id, x.id + " · " + x.name + " (disponíveis " + state[x.id].units[f] + ")", state[x.id].units[f])).join("") || "<p>Nenhuma origem disponível.</p>" : ""}<button id="prepareAttack">${mode?.operation === "move" ? "Confirmar movimento" : "Confirmar ataque"}</button><p id="actionError" role="status"></p>`;
+  if (moving)
+    setMapChoice({
+      kind: "quantities",
+      prefix: "move-",
+      valid: origins.map((x) => x.id),
+      origin: target,
+      hint:
+        "Clique em uma origem destacada e informe quantas tropas mover para " +
+        target +
+        ".",
+    });
   $("prepareAttack").onclick = () => {
     try {
-      const defender = $("attackDefender").value,
-        moves = origins.map((x) => ({
+      let defender = attacking
+        ? $("attackDefender").value
+        : factionIds.find((x) => x !== f);
+      if (mode?.operation === "move")
+        defender =
+          factionIds.find(
+            (x) => x !== f && (s.units[x] > 0 || buildingCount(s, x) > 0),
+          ) || defender;
+      const moves = origins.map((x) => ({
           id: x.id,
-          n: countValue("move-" + x.id, state[x.id].units[f]),
+          n: moving ? countValue("move-" + x.id, state[x.id].units[f]) : 0,
         })),
         { hasEnemy } = ConflictIslandBase.validarAtaque(
           state,
@@ -3546,6 +3774,21 @@ function showAttackMovement(f, ci, mi) {
           defender,
           moves,
         );
+      if (mode?.operation) {
+        const total = moves.reduce((sum, x) => sum + x.n, 0);
+        fail(
+          mode.operation === "attack" ? total === 0 : total > 0,
+          mode.operation === "attack"
+            ? "Este modo não move tropas."
+            : "Mova ao menos uma tropa.",
+        );
+        if (mode.operation !== "move")
+          fail(
+            hasEnemy &&
+              (s.units[defender] > 0 || buildingCount(s, defender) > 0),
+            "Escolha defensor com tropas ou construções.",
+          );
+      }
       const beforeMove = clone(state);
       for (const x of moves) if (x.n) move(x.id, target, f, x.n);
       const towerRestored = restoreTowerIfLost();
@@ -3563,13 +3806,21 @@ function showAttackMovement(f, ci, mi) {
         );
         return;
       }
-      if ((coastal || name === "Marcha Imperial") && !hasEnemy) {
+      if (
+        mode?.operation === "move" ||
+        ((coastal || name === "Marcha Imperial") && !hasEnemy)
+      ) {
         finishAction(
           f,
           ci,
           mi,
           false,
-          name + " em " + target + " sem inimigos: movimento realizado sem combate.",
+          name +
+            " em " +
+            target +
+            (hasEnemy
+              ? ": movimento realizado sem combate."
+              : " sem inimigos: movimento realizado sem combate."),
         );
         return;
       }
@@ -3580,6 +3831,8 @@ function showAttackMovement(f, ci, mi) {
         ci,
         mi,
         card: name,
+        physicalCard: card.name,
+        modeLabel: mode?.label,
         stage: "reaction",
         beforeMove,
         towerRestored,

@@ -1,5 +1,7 @@
 # Império da Gran' Vália
 
+Uma variante experimental de 12 cartas está descrita em [Baralhos revisados](../prototipo/baralhos-revisados.md); as tabelas abaixo permanecem vigentes para a mesa principal.
+
 **Estado: proposta para revisão e teste; implementada parcialmente no protótipo.** Valores e efeitos abaixo não são regras finais aprovadas. O Império coleta recursos, constrói tecnologias em regiões distintas, paga impostos para pontuar e pode ganhar pontos ao destruir construções inimigas.
 
 O cenário inicial está em [Mapa](../regras/mapa.md); as regras comuns de domínio e combate estão em [Regras gerais](../regras/regras-gerais.md) e [Combate](../regras/combate.md).
