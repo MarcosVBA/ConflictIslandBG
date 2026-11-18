@@ -19,6 +19,7 @@ Conflict Island é um jogo de tabuleiro assimétrico de fantasia e pirataria, am
 | Facção e baralho dos Elfos | [Elfos](faccoes/elfos.md) |
 | Ideias para facções futuras | [Dragões](faccoes/dragoes.md) |
 | Ideias gerais em exploração ou adiadas | [Pontuação](ideias/pontuacao.md) · [Eventos](ideias/eventos.md) · [Tensão pela madeira](ideias/tensao-madeira.md) · [IA para facções](ideias/ia-para-faccoes.md) |
+| Referência para ilustrações | [Direção artística](arte/direcao-artistica.md) |
 
 [Abrir o protótipo principal](mapa-fluxo-dinamico.html): quatro facções, controle manual e fluxo sem alocação prévia. Cada facção usa um baralho de 12 cartas. O jogo funciona em um único HTML local, sem servidor ou IA. Versões e decisões antigas permanecem arquivadas em `historico/`.
 
@@ -64,7 +65,7 @@ Com Node.js e dependências instaladas, use `npm run check:rapido` para sincroni
 
 ### Limitações e pendências
 
-- **Direção visual:** identidade rústica, fantástica, divertida e aventureira, com clima leve e arte mais abstrata em aquarela, formas geométricas e linhas esporádicas. A tentativa de paleta quente foi rejeitada; o HUD deve mudar de cor com a facção ativa preservando a paleta-base da mesa. O acabamento continua aberto à evolução.
+- **Direção visual:** a [referência artística](arte/direcao-artistica.md) descreve aquarela expressiva e nanquim para as ilustrações. Uma tentativa de paleta quente da interface foi rejeitada; a paleta das ilustrações não define automaticamente a da interface. O HUD deve mudar de cor com a facção ativa preservando a paleta-base da mesa. O acabamento continua aberto à evolução e à avaliação visual.
 - O fluxo principal foi validado pelo usuário, mas equilíbrio, acessibilidade e aparência em desktop e celular aguardam mais partidas e avaliação humana. A posição do extrator inicial e o equilíbrio do mapa, facções, custos e liderança permanecem em teste.
 - As melhorias de 18 de novembro foram verificadas; a avaliação visual de domínio, ícones, campos e modais permanece pendente. Os cliques nos botões de quantidade e todos os modos sem região não têm cobertura específica.
 - A partida não é salva ao fechar ou recarregar; não há semente reproduzível, relatório ou métricas automáticas de equilíbrio. Ajustes manuais de depuração podem criar estados intermediários e não simulam automaticamente a perda da Torre. O estoque de peças físicas não é simulado.
