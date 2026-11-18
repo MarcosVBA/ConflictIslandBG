@@ -456,6 +456,7 @@ function executeCard(f, name, id, ci) {
         resources.elfos,
         $("filhosCost").value,
         $("filhosOrigin").value,
+        r.terrain,
       );
       state = result.mapa;
       Object.assign(resources.elfos, result.saldo);
@@ -1000,15 +1001,13 @@ function showAttackMovement(f, ci, mi) {
         );
         return;
       }
-      if (coastal && !hasEnemy) {
+      if ((coastal || name === "Marcha Imperial") && !hasEnemy) {
         finishAction(
           f,
           ci,
           mi,
           false,
-          "Invasão Costeira em " +
-            target +
-            " sem inimigos: movimento realizado sem saque.",
+          name + " em " + target + " sem inimigos: movimento realizado sem combate.",
         );
         return;
       }

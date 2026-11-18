@@ -9,7 +9,7 @@
 | R3 | Torre Esquecida | Montanha | Não | Ouro | Necromante: 2 zumbis e Torre |
 | R4 | Bosque Morto | Floresta | Não | Madeira | Necromante: 1 zumbi e extrator provisório |
 | R5 | Enseada Safira | Praia | Sim | Nenhum | Piratas: 1 tropa |
-| R6 | Floresta Antiga | Floresta | Não | Madeira | Elfos: 1 unidade |
+| R6 | Floresta Antiga | Floresta | Não | Madeira | Elfos: 2 unidades |
 | R7 | Pico Desolado | Montanha | Não | Nenhum | Livre |
 | R8 | Praia dos Náufragos | Praia | Sim | Nenhum | Livre |
 | R9 | Baixio dos Garimpeiros | Planície | Sim | Ouro | Livre |

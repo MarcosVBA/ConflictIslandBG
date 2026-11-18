@@ -160,6 +160,23 @@ function renderBattle() {
       return;
     }
   }
+  if (b.stage === "reaction" && b.f === "elfos" && !b.attackerReactionDecided) {
+    const available = ConflictIslandBase.reacaoDisponivel(flow.markers, flow.decks.elfos, "elfos", "Conhecimentos da Floresta");
+    if (available) {
+      showBattleHand("elfos");
+      panel.innerHTML = `<h3>Reação do atacante</h3><p>Gaste outra ação para ignorar o primeiro dano neste combate.</p><button id="useAttackDefense">Usar Conhecimentos da Floresta</button><button id="skipAttackDefense">Não usar</button>`;
+      $("useAttackDefense").onclick = () => {
+        commitBattleCard("elfos", available.acao, available.carta, "Conhecimentos da Floresta");
+        b.attackerReactionProtection = 1;
+        b.attackerReactionDecided = true;
+        flowLog("Elfos usaram Conhecimentos da Floresta no ataque.");
+        renderBattle();
+      };
+      $("skipAttackDefense").onclick = () => { b.attackerReactionDecided = true; renderBattle(); };
+      return;
+    }
+    b.attackerReactionDecided = true;
+  }
   if (b.stage === "reaction") {
     showBattleHand(b.defender);
     const defenseName =
@@ -273,6 +290,7 @@ function renderBattle() {
       ].includes(b.card)
         ? 1
         : 0;
+      b.attProtection += b.attackerReactionProtection || 0;
       b.result = battleDamage(
         b.attackerCount,
         b.defenderCount,

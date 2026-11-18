@@ -3,7 +3,7 @@
   'use strict';
   const faccoes = Object.freeze(['imperio', 'necromante', 'piratas', 'elfos']);
   function cenarioInicial(regioes) {
-    return Object.fromEntries(regioes.map(r => [r.id, { owner:r.owner, units:{imperio:r.id==='R1'?2:r.id==='R2'?1:0,necromante:r.id==='R3'?2:r.id==='R4'?1:0,piratas:r.id==='R5'?1:0,elfos:r.id==='R10'?2:r.id==='R6'?1:0}, extractor:r.id==='R4', tower:r.id==='R3', monument:false, tech:null, bar:false, buildings:{imperio:0,necromante:0,piratas:0,elfos:0} }]));
+    return Object.fromEntries(regioes.map(r => [r.id, { owner:r.owner, units:{imperio:r.id==='R1'?2:r.id==='R2'?1:0,necromante:r.id==='R3'?2:r.id==='R4'?1:0,piratas:r.id==='R5'?1:0,elfos:r.id==='R10'||r.id==='R6'?2:0}, extractor:r.id==='R4', tower:r.id==='R3', monument:false, tech:null, bar:false, buildings:{imperio:0,necromante:0,piratas:0,elfos:0} }]));
   }
   function recursosIniciais() {
     return {imperio:{ouro:1,madeira:0},necromante:{ouro:0,madeira:1},piratas:{ouro:0,madeira:0},elfos:{ouro:0,madeira:0}};
@@ -68,7 +68,7 @@
       next.units.piratas++;
     } else if (nome === 'Taverna Pirata') {
       if (dominio(regiao) !== 'piratas' || regiao.bar) throw Error('Exige região controlada sem Bar.');
-      if (Object.values(mapa).filter(item => item.bar).length >= 2) throw Error('Limite de dois bares.');
+      if (Object.values(mapa).filter(item => item.bar).length >= 1) throw Error('Limite de um Bar Pirata no mapa.');
       next.bar = true;
     } else if (nome === 'Projeto de Poder Maligno') {
       if (regiao.units.necromante < 1 || recurso === 'Sem recurso' || regiao.extractor) throw Error('Precisa de zumbi, recurso e região sem extrator.');
@@ -83,7 +83,7 @@
   function coletaDeCartas(nome, regioes, mapa, id, saldo) {
     const local = mapa[id];
     if (!local || !saldo) throw Error('Região inválida.');
-    if (nome === 'Frutos da Mata' && dominio(local) !== 'elfos') throw Error('A região escolhida deve ser dominada pelos Elfos.');
+    if (nome === 'Frutos da Mata' && local.units.elfos < 1) throw Error('A região escolhida precisa ter tropas élficas.');
     if (nome === 'Trabalhadores Zumbificado' && !local.extractor) throw Error('A região escolhida precisa ter extrator.');
     if (!['Frutos da Mata','Trabalhadores Zumbificado'].includes(nome)) throw Error('Carta de coleta inválida.');
     const resultado = {...saldo};
@@ -100,9 +100,9 @@
     if (!Number.isSafeInteger(quantidade) || quantidade < 0 || (nome !== 'Trilhas na Mata' && quantidade > 3) || (nome !== 'Atrás do Tesouro' && quantidade === 0) || (nome === 'Atrás do Tesouro' && mapa[origem].units[faccao] < 1)) throw Error('Escolha tropas disponíveis e uma região adjacente.');
     return calcularMovimento(mapa[origem].units[faccao], mapa[destino].units[faccao], quantidade);
   }
-  function filhosDaFloresta(mapa, id, saldo, custo, origem) {
+  function filhosDaFloresta(mapa, id, saldo, custo, origem, terreno) {
     const regiao = mapa[id];
-    if (!regiao || dominio(regiao) !== 'elfos') throw Error('Exige região dominada pelos Elfos.');
+    if (!regiao || terreno !== 'floresta') throw Error('Exige região de floresta.');
     const recursos = {...saldo}, next = {...mapa};
     next[id] = {...regiao, units:{...regiao.units}};
     if (custo === 'tropas') {
@@ -242,7 +242,7 @@
     const local=mapa[alvo],regiao=regioes.find(r=>r.id===alvo),costeiro=nome==='Invasão Costeira',localOnly=['Ataque a Linha de Suprimentos','Trabalhe enquanto eles dormem'].includes(nome);
     if (!cartas[faccao]?.includes(nome) || !local || !regiao || nome==='Furia da Ilha') throw Error('Carta ou região inválida.');
     const inimigos=faccoes.filter(f=>f!==faccao && (local.units[f]>0 || construcoes(local,f)>0));
-    if ((!costeiro || inimigos.length) && !inimigos.includes(defensor)) throw Error('Escolha defensor com tropas ou construções no local.');
+    if ((!(costeiro || nome==='Marcha Imperial') || inimigos.length) && !inimigos.includes(defensor)) throw Error('Escolha defensor com tropas ou construções no local.');
     if (costeiro && !regiao.coast) throw Error('Invasão Costeira exige destino costeiro.');
     if (nome==='Ataque a Linha de Suprimentos' && (!recursos[defensor] || recursos[defensor].ouro<1)) throw Error('O inimigo precisa ter Ouro.');
     if (!Array.isArray(movimentos) || new Set(movimentos.map(m=>m.id)).size!==movimentos.length || movimentos.some(m=>!mapa[m.id] || m.id===alvo || !Number.isSafeInteger(m.n) || m.n<0 || m.n>mapa[m.id].units[faccao] || localOnly || (costeiro ? !regioes.find(r=>r.id===m.id)?.coast : !vizinhos(ligacoes,alvo).includes(m.id)))) throw Error('Escolha origens e tropas disponíveis.');
@@ -265,7 +265,6 @@
       if (batalha.f==='elfos' && resultado.defenderLoss>0 && regiao.units[batalha.defender]===0) eventos.push({tipo:'pontos',faccao:'elfos',quantidade:1,motivo:'eliminou inimigos em floresta'});
       if (batalha.defender==='elfos' && resultado.attackerLoss>0 && regiao.units[batalha.f]===0) eventos.push({tipo:'pontos',faccao:'elfos',quantidade:1,motivo:'eliminou inimigos em floresta'});
     }
-    if (saques>0) eventos.push({tipo:'pontos',faccao:'piratas',quantidade:saques,motivo:'saque'});
     if (batalha.f==='imperio' && batalha.destroy) eventos.push({tipo:'pontos',faccao:'imperio',quantidade:2*batalha.destroy,motivo:'construções destruídas (proposta)'});
     if (batalha.f==='necromante') {
       if (batalha.card==='Infestação') eventos.push({tipo:'zumbis',quantidade:1});

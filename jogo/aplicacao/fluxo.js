@@ -115,7 +115,7 @@ function factionInfo(f) {
   }
   if (f === "piratas") {
     const bars = Object.values(state).filter((s) => s.bar).length;
-    details = `<p><strong>${bars}/2</strong> Bares Piratas construídos</p><small>Ouro recebido gera pontos na proposta atual.</small>`;
+    details = `<p><strong>${bars}/1</strong> Bar Pirata construído</p><small>O Ouro restante gera pontos na pontuação da rodada.</small>`;
   }
   if (f === "elfos") {
     const forest = elfForestPoints(definitions, state);
@@ -124,7 +124,7 @@ function factionInfo(f) {
   const rules = {
     imperio: `<p><strong>Alistamento obrigatório:</strong> após comprar cartas, adicione 1 soldado em região dominada até o limite de 7; sem domínio, adicione até 2 em região com menos inimigos.</p><p><strong>Impostos:</strong> pague o imposto ativo no máximo uma vez por rodada. Após três rodadas sem pagamento, aplica-se a penalidade de atraso.</p><p><strong>Tecnologias:</strong> seus bônus e pré-requisitos dependem de a construção existir. A construção concede 1 ponto. Valores e efeitos imperiais permanecem em teste.</p>`,
     necromante: `<p><strong>Devastação:</strong> uma região é devastada quando há peças do Necromante e nenhuma peça adversária. No fim da rodada, 2–3 regiões rendem 1 ponto; 4 rendem 2; 5 rendem 3; 6 ou mais rendem 4.</p><p><strong>Magia da Torre:</strong> ao perder seu domínio, remova as peças indicadas pela magia; a Torre permanece e recebe 2 zumbis. Se for sua única região dominada, após comprar cartas adicione 1 zumbi nela, até 5.</p>`,
-    piratas: `<p><strong>Ouro:</strong> cada Ouro recebido rende 1 ponto. Cada Bar controlado gera 1 Ouro por rodada; há limite de 2 Bares.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
+    piratas: `<p><strong>Ouro:</strong> no fim da rodada, após a renda do Bar, devolva todo o Ouro à reserva e pontue 1 por Ouro. Até então, ele pode ser trocado. Um Bar controlado gera 1 Ouro por rodada; há limite de 1 Bar no mapa.</p><p><strong>Saque:</strong> em saque bem-sucedido, receba 1 Ouro do inimigo ou da reserva se ele não tiver Ouro.</p><p><strong>Ilha à Vista:</strong> sem piratas no mapa, coloque 1 em uma costa com a menor quantidade de tropas, escolhendo em caso de empate.</p>`,
     elfos: `<p><strong>Guardiões da Floresta:</strong> ao fim da rodada, 2 florestas dominadas rendem 1 ponto; todas rendem 2 no total. Eliminar as tropas da facção adversária da batalha em floresta rende 1 ponto.</p><p><strong>Coexistência Pacífica:</strong> a primeira troca com cada outro jogador em cada rodada rende 1 ponto.</p><p><strong>Canção de paz:</strong> antes dos dados, gaste a carta e uma ação para cancelar qualquer combate como 0 a 0; movimentos e custos permanecem.</p>`,
   };
   const deck = flow.decks[f];
@@ -335,6 +335,19 @@ function renderFlow() {
     "</details><details><summary>Registro da rodada</summary><ol>" +
     flow.log.map((x) => "<li>" + x + "</li>").join("") +
     "</ol></details>";
+  if (phase !== "fim" && !battle && definitions.every((r) => state[r.id].units.elfos === 0)) {
+    const florestas = definitions.filter((r) => r.terrain === "floresta");
+    const options = florestas.map((r) => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join("");
+    target.innerHTML = `<h3>Vingança da Terra</h3><p>Os Elfos ficaram sem tropas. Escolha uma floresta para cada uma das três tropas.</p>${[1, 2, 3].map((i) => `<label>Tropa ${i} <select id="elfRevive${i}">${options}</select></label>`).join("")}<button id="confirmElfRevive">Adicionar tropas</button>`;
+    $("confirmElfRevive").onclick = () => {
+      const ids = [1, 2, 3].map((i) => $("elfRevive" + i).value);
+      if (definitions.some((r) => state[r.id].units.elfos > 0) || ids.some((id) => !florestas.some((r) => r.id === id))) return;
+      for (const id of ids) state[id].units.elfos++;
+      flowLog("Vingança da Terra: tropas adicionadas em " + ids.join(", ") + ".");
+      refreshOwners(); render(); renderFlow();
+    };
+    return;
+  }
   if (
     phase !== "fim" &&
     definitions.every((r) => state[r.id].units.piratas === 0)

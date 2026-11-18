@@ -39,7 +39,7 @@ Se não houver regiões controladas, adicione duas tropas em uma região com men
 
 | Carta | Cópias | Região ou condição | Efeito proposto |
 | --- | ---: | --- | --- |
-| Marcha Imperial | 3 | Região adjacente a uma que você domina | Mova até 3 soldados de uma região adjacente para a região selecionada; Inicie uma batalha na região. |
+| Marcha Imperial | 3 | Região adjacente a uma que você domina | Mova até 3 soldados de uma região adjacente para a região selecionada; Se houver inimigos, inicie uma batalha na região. |
 | Guarda Imperial | 2 | Ao ser atacado | Ignore até 1 danos às suas unidades nessa batalha. |
 | Tambores de Guerra | 2 | Região qualquer | Mova até 2 soldados adjacentes; Inicie batalha na região; ignore 1 dano às suas unidades na batalha. |
 | Alistamento | 2 | Região controlada | Pague 1 Ouro e adicione 2 soldados. |

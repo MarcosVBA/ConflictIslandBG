@@ -2,7 +2,7 @@
 
 ## Identidade e componentes
 
-Facção voltada a ataques, saques, mobilidade costeira e acordos. Seu crescimento pode ser prejudicado por perdas e por defesa fraca. Ganhar Ouro gera pontos; Bares são sua única fonte passiva de Ouro, com limite de dois.
+Facção voltada a ataques, saques, mobilidade costeira e acordos. Seu crescimento pode ser prejudicado por perdas e por defesa fraca. O Ouro acumulado pode gerar pontos no fim da rodada; Bares são sua única fonte passiva de Ouro, com limite de um Bar no mapa.
 
 O cenário inicial está em [Mapa](../regras/mapa.md). Regras gerais de batalha e sucesso estão em [Combate](../regras/combate.md).
 
@@ -16,7 +16,7 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 
 ## Pontuação
 
-**Definido:** cada Ouro recebido rende 1 ponto; Cada Bar controlado gera 1 Ouro por rodada (No máximo 2 bares). O acordo de Corsário concede uma operação imediata de movimento.
+**Definido:** na fase de pontuação, após receber a renda do Bar, os Piratas devolvem à reserva todo o Ouro que possuem e recebem 1 ponto por Ouro devolvido. Durante a rodada, podem trocar o Ouro recebido antes da pontuação. Um Bar controlado gera 1 Ouro por rodada; os Piratas podem ter no máximo um Bar no mapa. O acordo de Corsário concede uma operação imediata de movimento.
 
 ## Baralho registrado
 
@@ -33,7 +33,7 @@ Habilidade pirata: se não houver mais piratas no mapa, adicione um pirata em um
 | Mercenários Piratas | 2 | Local com Bar Pirata | Adicione 2 piratas. Você pode movê-los para uma região costeira. |
 | Atrás do Tesouro | 3 | Local com piratas | Mova até 3 piratas dessa região para outra adjacente. |
 | Novas Comandante a Bordo | 2 | Qualquer lugar | Descarte toda a mão e compre até ter 5 cartas. |
-| Taverna Pirata | 3 | Região sobre seu controle | Adicione um bar pirata na região |
+| Taverna Pirata | 3 | Região sobre seu controle | Adicione um Bar Pirata na região, respeitando o limite de um no mapa. |
 | **Total** | **23** | | |
 
 ## Liderança por carta

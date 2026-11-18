@@ -36,7 +36,6 @@ function addResource(f, type, n, reason) {
     resources[f],
     ConflictIslandBase.receber(resources[f], type, n),
   );
-  if (f === "piratas" && type === "ouro" && n > 0) addPoints(f, n, reason);
 }
 function hasTech(t) {
   return Object.values(state).some((s) => s.tech === t);
@@ -62,7 +61,7 @@ function taxCard() {
   return `<div class="tax-card" aria-label="Imposto imperial proposto"><strong>Imposto imperial · proposta</strong><span>${game.tax ? taxText(game.tax) : flow.phase === "preparação" && game.taxes.length ? "Revelado ao preparar a rodada" : game.taxPaid ? "Pago nesta rodada" : "Nenhum imposto ativo"}</span><small>Atraso: ${game.delay} de 3 rodadas</small>${flow.phase === "resolução" && activeFaction() === "imperio" && hasTech("Salão Imperial") && game.tax && !game.taxPaid && (game.taxes.length || game.taxDiscard.length) && game.hallUsedRound !== flow.round ? '<label>Recurso a descartar <select id="hallResource"><option value="ouro">Ouro</option><option value="madeira">Madeira</option></select></label><button id="hallChange">Alterar imposto</button><small id="hallMessage" role="status"></small>' : ""}</div>`;
 }
 function gameSummary() {
-  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; Piratas pontuam 1 por Ouro recebido; regras do Império e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste. Eventos de fim de jogo ainda não foram definidos.</p></details>`;
+  return `<div class="game-summary"><small>Vitória ao atingir ${game.victoryTarget} pontos.</small><details><summary>Origem dos pontos</summary><ol>${game.scoreLog.map((x) => "<li>" + x + "</li>").join("") || "<li>Nenhum ponto registrado.</li>"}</ol></details></div><details><summary>Hipóteses de teste</summary><p>Mão reposta na preparação; Taverna Pirata constrói Bar sem custo adicional informado; regras do Império e Guarda Imperial são propostas. A duração de Corsário é uma adaptação de teste. Eventos de fim de jogo ainda não foram definidos.</p></details>`;
 }
 // Cálculo separado da interface para facilitar testes e futuras automações.
 function elfForestPoints(regions, position) {
@@ -74,6 +73,9 @@ function scoreRound(penaltyRegion = null, penaltyResource = null) {
     (s) => s.bar && calcOwner(s) === "piratas",
   ).length;
   if (bars) addResource("piratas", "ouro", bars, "renda dos bares");
+  const pirateGold = resources.piratas.ouro;
+  resources.piratas.ouro = 0;
+  if (pirateGold) addPoints("piratas", pirateGold, "Ouro devolvido à reserva");
   if (game.winner) return;
   const forestScore = elfForestPoints(definitions, state);
   if (forestScore.points)

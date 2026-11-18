@@ -1,8 +1,8 @@
 # Elfos da Floresta
 
-**Conteúdo registrado pelo usuário; implementado no protótipo de quatro facções para teste.** O baralho tem 25 cartas.
+**Conteúdo registrado pelo usuário; implementado no protótipo de quatro facções para teste.** O baralho tem 23 cartas.
 
-**Início definido; implementado no protótipo principal:** os Elfos dominam duas regiões de floresta, com duas unidades em uma e uma unidade na outra, sem recursos iniciais. As regiões do cenário de teste estão em [Mapa](../regras/mapa.md).
+**Início definido; implementado no protótipo principal:** os Elfos dominam duas regiões de floresta, com duas unidades em cada uma, sem recursos iniciais. As regiões do cenário de teste estão em [Mapa](../regras/mapa.md).
 
 ## Guardiões da Floresta
 
@@ -10,6 +10,10 @@ Se dominar 2 regiões de floresta, ganhe 1 ponto no final da rodada. Se dominar 
 Sempre que batalhar em uma região de floresta e eliminar as tropas inimigas da região, ganhe 1 ponto.
 
 **Definido:** basta eliminar as tropas da facção adversária da batalha, mesmo se outra facção inimiga permanecer na região.
+
+## Vingança da Terra
+
+Se não houver mais tropas aliadas em jogo, aloque 3 vezes uma tropa em qualquer região de floresta. **Definido; implementado:** ocorre imediatamente. O jogador escolhe uma floresta para cada tropa; pode escolher a mesma região mais de uma vez.
 
 ## Coexistência Pacifica
 
@@ -20,16 +24,16 @@ Sempre que trocar ao menos um recurso com um jogador, receba 1 ponto. Esse bonus
 | Carta | Cópias | Região ou condição | Efeito proposto |
 | --- | ---: | --- | --- |
 | Furia da Ilha | 3 | Região com tropas aliadas | Mova até 3 tropas para uma região adjacente; Se houver tropas inimigas, batalhe com suas tropas |
-| Conhecimentos da Floresta | 4 | Ao ser atacado | Ignore o primeiro dano na batalha |
+| Conhecimentos da Floresta | 4 | Ao ser atacado ou atacar | Ignore o primeiro dano na batalha |
 | Canção de paz | 1 | Qualquer combate declarado, mesmo sem os Elfos envolvidos; antes da rolagem | Os Elfos gastam uma ação disponível e descartam esta carta para cancelar o combate, como resultado 0 a 0. Movimentos e custos já realizados permanecem; cartas já declaradas e ações gastas não são recuperadas. |
-| Trilhas na Mata | 3 | Qualquer região | Mova tropas de uma região adjacente para essa |
-| Harmônia | 4 | Região com tropas inimigas | Após revelar a carta, troque com o jogador escolhido quantos recursos desejar, incluindo tropas, se ambos concordem |
-| Frutos da Mata | 5 | Qualquer região dominada | Recolha um recurso da região em cada região com tropas élficas, mesmo que não seja floresta; uma região sem recurso não produz. |
-| Filhos da Floresta | 3 | Região controlada | Consuma um recurso, inclusive uma tropa élfica, e adicione 1 unidade na região do marcador; descarte todas suas cartas e compre até 5 novas cartas. |
-| Milagre da Floresta | 2 | Qualquer região | Converta 3 recursos de um mesmo tipo em 2 de outro mesmo tipo; tropas élficas contam como recurso. |
-| **Total** | **25** | | |
+| Trilhas na Mata | 2 | Qualquer região | Mova tropas aliadas de uma região adjacente para essa |
+| Harmônia | 3 | Região com tropas inimigas | Após revelar a carta, troque com o jogador escolhido quantos recursos desejar, incluindo tropas, se ambos concordem |
+| Frutos da Mata | 6 | Qualquer região com tropas aliadas | Recolha um recurso da região em cada região com tropas élficas, mesmo que não seja floresta; uma região sem recurso não produz. |
+| Filhos da Floresta | 3 | Região de Floresta | Consuma um recurso, inclusive uma tropa élfica, e adicione 1 unidade na região do marcador; descarte todas suas cartas e compre até 5 novas cartas. |
+| Milagre da Floresta | 1 | Qualquer região | Converta 3 recursos de um mesmo tipo em 2 de outro mesmo tipo; tropas élficas contam como recurso. |
+| **Total** | **23** | | |
 
-Canção de paz consome uma ação disponível e não requer região.
+Conhecimentos da Floresta consome uma ação disponível também ao ser usada pelo atacante. Canção de paz consome uma ação disponível e não requer região.
 
 ## Liderança por carta
 
