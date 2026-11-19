@@ -62,7 +62,8 @@ const click = id => { const e = element(id); assert(typeof e.onclick === 'functi
 
 // Links dos módulos atuais não dependem dos caminhos históricos antigos.
 assert(element('fullscreen').attributes['aria-label']==='Entrar em tela cheia','Controle de tela cheia ausente.');
-assert((element('lines').innerHTML.match(/<path /g)||[]).length===16,'Todas as conexões devem estar presentes.');
+assert((element('lines').innerHTML.match(/<path /g)||[]).length===15,'Todas as conexões devem estar presentes.');
+check("!neighbors('R6').includes('R7') && !neighbors('R7').includes('R6')",'R6 e R7 não devem ser vizinhas.');
 assert((element('lines').innerHTML.match(/class="selected-connection"/g)||[]).length===2,'Conexões da região inicial devem estar destacadas.');
 run("visualAssets.cartas['Marcha Imperial']='artes/marcha.webp';visualAssets.regioes.R1='artes/praia.webp';render()");
 assert(run("handCard('imperio',{name:'Marcha Imperial',text:'',leadership:1},0,1).includes('src=\"artes/marcha.webp\"')"),'Arte opcional da carta não foi aplicada.');

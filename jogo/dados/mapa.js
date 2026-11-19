@@ -11,4 +11,4 @@ const definitions=Object.freeze([
 {id:'R10',name:'Bosque Élfico',terrain:'floresta',coast:false,resource:'Madeira',owner:'elfos',x:37,y:50},
 {id:'R11',name:'Costa do Ouro Perdido',terrain:'praia',coast:true,resource:'Ouro',owner:'livre',x:62,y:83}
 ].map(Object.freeze));
-const edges=[['R1','R2'],['R1','R8'],['R2','R4'],['R2','R10'],['R3','R4'],['R4','R6'],['R4','R7'],['R5','R6'],['R6','R7'],['R7','R11'],['R8','R5'],['R10','R6'],['R10','R8'],['R10','R11'],['R11','R5'],['R11','R8']];
+const edges=[['R1','R2'],['R1','R8'],['R2','R4'],['R2','R10'],['R3','R4'],['R4','R6'],['R4','R7'],['R5','R6'],['R7','R11'],['R8','R5'],['R10','R6'],['R10','R8'],['R10','R11'],['R11','R5'],['R11','R8']];

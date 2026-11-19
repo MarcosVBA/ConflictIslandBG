@@ -106,6 +106,8 @@ function diagnostics() {
   check(
     !neighbors("R3").includes("R7") &&
       neighbors("R8").includes("R5") &&
+      !neighbors("R6").includes("R7") &&
+      !neighbors("R7").includes("R6") &&
       !neighbors("R6").includes("R8") &&
       neighbors("R7").includes("R11"),
     "Conexões aprovadas e removidas",

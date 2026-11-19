@@ -21,8 +21,8 @@ O Império começa com 1 Ouro; o Necromante com 1 Madeira; Piratas e Elfos come�
 
 Cada ligação é bidirecional e aparece uma vez:
 
-R1-R2, R1-R8, R2-R4, R2-R10, R3-R4, R4-R6, R4-R7, R5-R6, R6-R7, R7-R11, R8-R5, R10-R6, R10-R8, R10-R11, R11-R5, R11-R8.
+R1-R2, R1-R8, R2-R4, R2-R10, R3-R4, R4-R6, R4-R7, R5-R6, R7-R11, R8-R5, R10-R6, R10-R8, R10-R11, R11-R5, R11-R8.
 
-**Definido:** não há ligações diretas R3–R7 nem R6–R8; existe ligação direta R7–R11. O mapa tem 16 ligações bidirecionais.
+**Definido:** não há ligações diretas R3–R7, R6–R7 nem R6–R8; existe ligação direta R7–R11. O mapa tem 15 ligações bidirecionais.
 
 **Pendente de validação:** equilíbrio da distribuição, topologia, posição visual, distâncias efetivas, fontes de recursos e mobilidade costeira. Mapas para cinco ou possivelmente seis jogadores ficam para depois. O cenário anterior de nove regiões está nos [protótipos legados](../historico/prototipos/alocacao-de-marcadores.md).
