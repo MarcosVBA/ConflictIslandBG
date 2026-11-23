@@ -62,3 +62,15 @@ Dessa forma, o foco deixa de ser a facção mais poderosa e se torna criar uma h
 - Menos cartas que os demais jogadores
 - Serve menos como uma facção e mais como um recurso para ser usado pelos outros jogadores de policiamento da mesa
 
+
+# Simplificar mecânicas
+
+- 5 regiões apenas (cinco ilhas, que produzem recursos diversos)
+- menos ataques, foco em adicionar tropas ou marcadores de domínio em cada região
+- Mecânicas criativas para gerar domínio, ataques, recursos e soldados
+- Poucas cartas na mão, porem, você pode escolher manter algumas, incentivando trocar de lado a medida que sua mão melhora para uma facção
+
+## Mudanças nas facções
+- Zumbis não atacam, apenas convertem unidades
+- Facção que consegue dominância a partir de fichas de reputação
+- 
